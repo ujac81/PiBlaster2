@@ -27,7 +27,7 @@ fi
 # tmux windows on the tty terminal after boot.
 # Do not use this setting in productive mode, only for development.
 if [ "$PYBLASTER_RUN_TMUX" = 1 ]; then
-    PYBLASTER_START_DAEMON=0
+  PYBLASTER_START_DAEMON=0
 fi
 
 # Do not start if should not start PiBlaster

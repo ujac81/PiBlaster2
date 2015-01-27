@@ -1,7 +1,9 @@
 #!/bin/sh
 
-# Do not run script if tmux running
-
+# Do not run script if tmux running.
+# TODO do not run if tmux session called pyblaster is running.
+# This is to prevent a log-in loop, when bash is opening inside tmux and
+# This script will be launched again via /etc/profile.d.
 [ `ps aux | grep -c " tmux "` -gt 1 ] && exit 0
 
 setterm -blank 0

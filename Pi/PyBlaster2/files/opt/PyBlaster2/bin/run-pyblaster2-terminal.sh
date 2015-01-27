@@ -3,8 +3,12 @@
 NAME=pyblaster2
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-DAEMON="$PYBLASTER_PATH/pyblaster2.py"
+DAEMON=/usr/bin/pyblaster2
 DAEMON_ARGS="-f -c ${PYBLASTER_CONF}"
+
+# Just to be sure -- should not happen, but who knows...
+sudo service pyblaster2 stop
+sudo killall pyblaster2
 
 echo 1 > /tmp/pyblaster_respawn
 
@@ -26,7 +30,7 @@ setterm -blank 0
     {
       echo
       echo "!!!!! PyBlaster died !!!!!"
-      echo "Restarting in 10 secs, do 'service pyblaster stop' to prevent respawn."
+      echo "Restarting in $PYBLASTER_AUTO_RESPAWN_TIMEOUT secs, do 'service pyblaster stop' to prevent respawn."
     }
     sleep $PYBLASTER_AUTO_RESPAWN_TIMEOUT
   }
@@ -34,4 +38,3 @@ setterm -blank 0
 done
 rm /tmp/pyblaster_respawn
 [ $do_poweroff -eq 1 ] && sudo /sbin/poweroff)&
-
