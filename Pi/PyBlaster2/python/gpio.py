@@ -23,13 +23,13 @@ import log
 # ----- END -----
 LED_GREEN = 15
 LED_YELLOW = 24
-LED_RED = 12
+LED_RED = 1
 LED_BLUE = 17
 LED_WHITE = 11
 
 BUTTON_GREEN = 14
 BUTTON_YELLOW = 23
-BUTTON_RED = 25
+BUTTON_RED = 7
 BUTTON_BLUE = 27
 BUTTON_WHITE = 9
 
@@ -117,6 +117,10 @@ class LED:
             self.set_led(1, 0)
         else:
             self.set_led(1, 1)
+
+    def indicate_error(self):
+        self.set_leds(0)
+        self.set_led_red(1)
 
     def set_led_by_gpio(self, state, stateid, port):
         if not self.init_done:
@@ -255,7 +259,7 @@ class Buttons:
     def join(self):
         """Join all button threads after keep_run in root is False.
         """
-        self.btn_thread.join()
+        self.btn_thread.join(0.1)
 
     def has_button_events(self):
         """True if button events in queue

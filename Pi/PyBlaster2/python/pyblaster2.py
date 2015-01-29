@@ -7,6 +7,7 @@
 import os
 import signal
 import time
+import Queue
 
 import log
 
@@ -33,6 +34,9 @@ class PyBlaster:
         # +++++++++++++++ Objects +++++++++++++++ #
 
         # Each inner object will get reference to PyBlaster as self.main.
+
+        # exceptions in child threads are put here
+        self.ex_queue = Queue.Queue()
 
         self.log = Log(self)
         self.settings = Settings(self)
@@ -112,6 +116,17 @@ class PyBlaster:
             if poll_count % 10 == 0:
                 self.led.play_leds(led_count)
                 led_count += 1
+
+            try:
+                exc = self.ex_queue.get(block=False)
+            except Queue.Empty:
+                pass
+            else:
+                exc_type, exc_obj, exc_trace = exc
+                print exc_type, exc_obj
+                print exc_trace
+                self.keep_run = False
+                self.led.indicate_error()
 
 
             # end daemon loop #

@@ -8,7 +8,7 @@ add_subdirectory(python)
 
 set(PYBLASTER_VERSION_MAJOR 0)
 set(PYBLASTER_VERSION_MINOR 1)
-set(PYBLASTER_VERSION_BUILD 4)
+set(PYBLASTER_VERSION_BUILD 5)
 set(PYBLASTER_VERSION_FULL "${PYBLASTER_VERSION_MAJOR}.${PYBLASTER_VERSION_MINOR}.${PYBLASTER_VERSION_BUILD}")
 
 
@@ -31,7 +31,7 @@ set(CPACK_DEBIAN_PACKAGE_VERSION ${PYBLASTER_VERSION_FULL})
 set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmake/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/cmake/debian/prerm;" )
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "udev, usbmount, python-bluez, python-mutagen, python-sqlite, python-rpi.gpio, python-pymad, sqlite3, bluez, python-lirc, python-smbus, mpd, mpc, tmux")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "udev, usbmount, python-bluez, python-mutagen, python-sqlite, python-rpi.gpio, python-pymad, sqlite3, bluez, python-lirc, python-smbus, tmux")
 set(CPACK_DEBIAN_PACKAGE_CONFLICTS "pyblaster")
 
 include(CPack)

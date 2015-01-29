@@ -150,6 +150,8 @@ These are the settings you have to set in */etc/mpd.conf*
     filesystem_charset      "UTF-8"
     id3v1_encoding          "UTF-8"
 
+    restore_paused "yes"
+
 Create symbolic links to your library in */var/lib/mpd/music* like
 
     # if having a directory local on your SD for local music:

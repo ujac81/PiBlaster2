@@ -5,8 +5,9 @@
 
 from mpd import MPDClient
 import Queue
+import sys
 import threading
-import time
+
 
 import log
 
@@ -44,17 +45,24 @@ class MPDIdler(threading.Thread):
         :return:
         """
 
-        self.connect()
+        try:
 
-        while self.main.keep_run:
-            res = self.client.idle()
-            self.queue_lock.acquire()
-            self.queue.put(res)
-            self.queue_lock.release()
+            self.connect()
 
-        self.client.disconnect()
+            while self.main.keep_run:
+                res = self.client.idle()
+                self.queue_lock.acquire()
+                self.queue.put(res)
+                self.queue_lock.release()
 
-        self.main.log.write(log.MESSAGE, "[THREAD] MPD Idler leaving...")
+            self.client.disconnect()
+
+            self.main.log.write(log.MESSAGE, "[THREAD] MPD Idler leaving...")
+
+        # catch any exceptions here and pass them to the main thread.
+        except Exception:
+            self.main.ex_queue.put(sys.exc_info())
+            pass
 
 
 class MPC:
@@ -117,7 +125,7 @@ class MPC:
         # So we trigger some mpd command to wake up the idler and MPDIdler
         # thread can exit.
         self.update_database()
-        self.idler.join()
+        self.idler.join(10)
 
     def update_database(self):
         """Trigger mpd update command (!= rescan).
