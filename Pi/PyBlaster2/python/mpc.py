@@ -4,7 +4,7 @@
 """
 
 from mpd import MPDClient
-import Queue
+import queue
 import sys
 import threading
 
@@ -79,7 +79,7 @@ class MPC:
 
         self.main = main
         self.client = None
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.queue_lock = threading.Lock()
         self.idler = MPDIdler(self.main, self.queue, self.queue_lock)
 
@@ -109,7 +109,7 @@ class MPC:
         self.queue_lock.acquire()
         try:
             event = self.queue.get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             self.queue_lock.release()
             return
         self.queue_lock.release()

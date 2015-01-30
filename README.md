@@ -38,7 +38,7 @@ the inserted SD card
     $ dmesg | tail
 
 it should print some information about the last connected device or so.
-You need the device name like [sdb] or [sdc]. Don't make a mistake here or you
+You need the device name like [sdb] or [sdc]. **Don't make any mistake here** or you
 might mess up one of your working devices!
 
 Copy image to SD card:
@@ -71,11 +71,12 @@ To upgrade run
 
 ## Configure Raspberry Pi
 
-### Install required python package mpd2
-PyBlaster won't start if mpd2 python package is not installed. To install it, run:
+### Install required python packages
+PyBlaster won't start if some python packages are missing
 
-    $ sudo aptitude install python-pip
-    $ sudo pip install python-mpd2
+    $ sudo aptitude install python3-pip libbluetooth-dev
+    $ sudo pip-3.2 install python-mpd2
+    $ sudo pip-3.2 install pybluez
 
 Documentation of python-mpd2 can be found [here](http://pythonhosted.org/python-mpd2/topics/getting-started.html)
 
@@ -90,19 +91,20 @@ dependencies by hand.
 
 Now clone the git repo and create the package
 
-    $ cd /tmp
-    $ git clone https://github.com/ujac81/PiBlaster2.git
-    $ cd PiBlaster2/Pi/PyBlaster2/
-    $ mkdir build
-    $ cd build
-    $ cmake ..
-    $ cpack
+    # -- $ omitted, so you can copy and paste the whole block
+    cd /tmp
+    git clone https://github.com/ujac81/PiBlaster2.git
+    cd PiBlaster2/Pi/PyBlaster2/
+    mkdir build
+    cd build
+    cmake ..
+    cpack
 
 To install the package with dependencies run
 
     $ sudo gdebi pyblaster2-*-armhf.deb
 
-### Configure MPD
+### Install MPD -- the easy way
 Configure music player daemon which is used as sound back-end for PyBlaster2.
 
 Install it like
@@ -150,7 +152,7 @@ These are the settings you have to set in */etc/mpd.conf*
     filesystem_charset      "UTF-8"
     id3v1_encoding          "UTF-8"
 
-    restore_paused "yes"
+    # restore_paused "yes"
 
 Create symbolic links to your library in */var/lib/mpd/music* like
 
@@ -268,7 +270,7 @@ which pin to use in GPIO mode (not board mode!).
 To load the module on boot, add these lines to */etc/modules* file
 
     lirc_dev
-    lirc_rpi gpio_in_pin=25
+    lirc_rpi gpio_in_pin=26
 
 Tell lirc to use the default drivers.
 Settings in */etc/lirc/hardware.conf* should be
@@ -335,11 +337,10 @@ For my controller it looks like this:
               KEY_LEFT                 0x10EF
               KEY_UP                   0xA05F
               KEY_RIGHT                0x50AF
-              KEY_BACK                 0x708F
               KEY_ENTER                0x906F
               KEY_SETUP                0x20DF
-              KEY_PAUSE                0x609F
-              KEY_PAUSE                0x807F
+              KEY_PLAY                 0x807F
+              KEY_AGAIN                0x708F
               KEY_STOP                 0x609F
               KEY_VOLUMEUP             0x40BF
               KEY_VOLUMEDOWN           0x00FF

@@ -1,13 +1,13 @@
-#!/usr/bin/env python2
-""" pyblaster.py -- Daemon for PiBlaster project
+#!/usr/bin/env python3
+""" pyblaster2.py -- Daemon for PiBlaster project
 
 @Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
 import os
+import queue
 import signal
 import time
-import Queue
 
 import log
 
@@ -36,7 +36,7 @@ class PyBlaster:
         # Each inner object will get reference to PyBlaster as self.main.
 
         # exceptions in child threads are put here
-        self.ex_queue = Queue.Queue()
+        self.ex_queue = queue.Queue()
 
         self.log = Log(self)
         self.settings = Settings(self)
@@ -52,7 +52,7 @@ class PyBlaster:
         # Make sure to run init functions in proper order!
         # Some might depend upon others ;)
 
-        self.led.reset_leds()
+        self.led.init_leds()
         self.settings.parse()
         self.dbhandle.dbconnect()
         self.mpc.connect()
@@ -76,6 +76,7 @@ class PyBlaster:
         # join remaining threads
         self.buttons.join()
         self.mpc.join()
+        self.led.join()
 
         self.log.write(log.MESSAGE, "leaving...")
 
@@ -103,7 +104,7 @@ class PyBlaster:
 
             poll_count += 1
 
-            time.sleep(30. / 1000.)  # 30ms default in config
+            time.sleep(50. / 1000.)  # 50ms default in config
 
             if self.buttons.has_button_events():
                 self.buttons.read_buttons()
@@ -119,12 +120,12 @@ class PyBlaster:
 
             try:
                 exc = self.ex_queue.get(block=False)
-            except Queue.Empty:
+            except queue.Empty:
                 pass
             else:
                 exc_type, exc_obj, exc_trace = exc
-                print exc_type, exc_obj
-                print exc_trace
+                print(exc_type, exc_obj)
+                print(exc_trace)
                 self.keep_run = False
                 self.led.indicate_error()
 
