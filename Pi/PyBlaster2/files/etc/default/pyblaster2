@@ -2,6 +2,8 @@
 
 #
 PYBLASTER_PATH=/opt/PyBlaster2/python
+
+PYBLASTER_LIRC_CONF=/opt/PyBlaster2/etc/pyblaster-lirc.conf
 #
 PYBLASTER_LIB_PATH=/var/lib/pyblaster2
 
@@ -30,3 +32,29 @@ PYBLASTER_AUTO_RESPAWN_TIMEOUT=10
 # Will let /etc/init.d/pyblaster exit before launching daemon
 PYBLASTER_START_DAEMON=1
 
+
+
+# port number on GPIO in BCM mode
+# Do not interfere with DAC+ snd-card:
+# ----- hifiberry dac+ config -----
+# setgpio 2 ALT0 UP # I2C communication DAC chip
+# setgpio 3 ALT0 UP # I2C communication DAC chip
+# setgpio 6 INPUT DEFAULT # do not use, reserved for Master clock
+# setgpio 18 ALT0 DEFAULT # I2S
+# setgpio 19 ALT0 DEFAULT # I2S
+# setgpio 20 ALT0 DEFAULT # I2S
+# setgpio 21 ALT0 DEFAULT # I2S
+# ----- END -----
+
+
+PYBLASTER_LED_GREEN=15
+PYBLASTER_LED_YELLOW=24
+PYBLASTER_LED_RED=1
+PYBLASTER_LED_BLUE=17
+PYBLASTER_LED_WHITE=11
+
+PYBLASTER_BUTTON_GREEN=14
+PYBLASTER_BUTTON_YELLOW=23
+PYBLASTER_BUTTON_RED=7
+PYBLASTER_BUTTON_BLUE=27
+PYBLASTER_BUTTON_WHITE=9

@@ -7,12 +7,14 @@
 import os
 import queue
 import signal
+import sys
 import time
 
 import log
 
 from cmd import Cmd
 from gpio import PB_GPIO, LED, Buttons
+from lircremote import Lirc
 from log import Log
 from mpc import MPC
 from settings import Settings
@@ -40,9 +42,12 @@ class PyBlaster:
 
         self.log = Log(self)
         self.settings = Settings(self)
+        self.settings.parse()
+
         PB_GPIO.init_gpio()
         self.led = LED(self)
         self.buttons = Buttons(self)
+        self.lirc = Lirc(self)
         self.dbhandle = DBHandle(self)
         self.cmd = Cmd(self)
         self.mpc = MPC(self)
@@ -53,7 +58,6 @@ class PyBlaster:
         # Some might depend upon others ;)
 
         self.led.init_leds()
-        self.settings.parse()
         self.dbhandle.dbconnect()
         self.mpc.connect()
 
@@ -67,6 +71,7 @@ class PyBlaster:
 
         self.led.show_init_done()
         self.buttons.start()
+        self.lirc.start()
         self.run()
 
         # +++++++++++++++ Finalize +++++++++++++++ #
@@ -75,6 +80,7 @@ class PyBlaster:
 
         # join remaining threads
         self.buttons.join()
+        self.lirc.join()
         self.mpc.join()
         self.led.join()
 
@@ -106,11 +112,12 @@ class PyBlaster:
 
             time.sleep(50. / 1000.)  # 50ms default in config
 
-            if self.buttons.has_button_events():
-                self.buttons.read_buttons()
+            self.buttons.read_buttons()
 
             if self.mpc.has_idle_event():
                 self.mpc.process_event()
+
+            self.lirc.read_lirc()
 
             # TODO: play LEDs while playing -- if paused, do something else...
 
@@ -126,9 +133,9 @@ class PyBlaster:
                 exc_type, exc_obj, exc_trace = exc
                 print(exc_type, exc_obj)
                 print(exc_trace)
+                self.ret_code = 1
                 self.keep_run = False
                 self.led.indicate_error()
-
 
             # end daemon loop #
 
@@ -236,4 +243,11 @@ class PyBlaster:
 
 
 if __name__ == '__main__':
-    blaster = PyBlaster()
+
+    try:
+        blaster = PyBlaster()
+        sys.exit(blaster.ret_code)
+    except Exception:
+        sys.exc_info()
+        sys.exit(1)
+

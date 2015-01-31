@@ -30,6 +30,7 @@ class Settings:
         self.loglevel = -1
         self.pidifile = "/var/run/pyblaster.pid"
         self.configfile = "/etc/pyblaster2/pyblaster.conf"
+        self.defaultfile = "/etc/default/pyblaster2"
         self.logfile = "/var/log/pyblaster2.log"
         self.polltime = 30  # daemon poll time in ms
         self.pin1_default = "1234"  # bluetooth connect PIN
@@ -41,6 +42,7 @@ class Settings:
         self.use_lirc = False  # Listen on infrared device (requires lirc)
         self.pidfile = "/var/run/pyblaster2.pid"
         self.rebuilddb = False  # If set to true database will be rebuilt.
+        self.defvars = {}  # variables from /etc/default/pyblaster2
 
     def parse(self):
         """ Parse command line args, set defaults and invoke self.read_config()
@@ -82,6 +84,7 @@ class Settings:
             self.loglevel = log.OFF
 
         self.read_config()
+        self.read_default()
 
         if args.kill:
             self.main.kill_other_pyblaster()
@@ -146,3 +149,25 @@ class Settings:
         if self.loglevel == -1:
             self.loglevel = log.DEBUG3
 
+    def read_default(self):
+        """Parse default config file /etc/default/pyblaster2
+        """
+
+        try:
+            f = open(self.defaultfile, "r")
+        except IOError:
+            self.main.log.write(log.EMERGENCY,
+                                "Failed to open default file %s" %
+                                self.defaultfile)
+            raise
+
+        for line in f:
+            if line.startswith('#') \
+                    or len(line) < 3 \
+                    or '=' not in line:
+                continue
+
+            key = line.split('=', 1)[0].strip()
+            val = line.split('=', 1)[1].strip()
+
+            self.defvars[key] = val

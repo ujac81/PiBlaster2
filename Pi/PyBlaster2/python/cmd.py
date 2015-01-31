@@ -315,8 +315,8 @@ class Cmd:
 
         if src != 'button' and ret_stat != STATUSEXIT:
             if ret_stat == STATUSOK:
-                self.main.led.flash_led(gpio.LED_WHITE, 1.0)
+                self.main.led.flash_led(gpio.WHITE, 1.0)
             else:
-                self.main.led.flash_led(gpio.LED_RED, 1.0)
+                self.main.led.flash_led(gpio.RED, 1.0)
 
         return [ret_stat, ret_code, ret_msg, ret_list]

@@ -50,6 +50,7 @@ class MPDIdler(threading.Thread):
             self.connect()
 
             while self.main.keep_run:
+                # throws mpd.ConnectionError
                 res = self.client.idle()
                 self.queue_lock.acquire()
                 self.queue.put(res)

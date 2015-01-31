@@ -1,38 +1,21 @@
-"""gpio.py -- Handle LED and buttons for PyBlaster.
+"""gpio.py -- Handle LEDs and buttons for PyBlaster.
 
 @Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
 import queue
 import RPi.GPIO as GPIO
+import sys
 import threading
 import time
 
 import log
 
-# port number on GPIO in BCM mode
-# Do not interfere with DAC+ snd-card:
-# ----- hifiberry dac+ config -----
-# setgpio 2 ALT0 UP # I2C communication DAC chip
-# setgpio 3 ALT0 UP # I2C communication DAC chip
-# setgpio 6 INPUT DEFAULT # do not use, reserved for Master clock
-# setgpio 18 ALT0 DEFAULT # I2S
-# setgpio 19 ALT0 DEFAULT # I2S
-# setgpio 20 ALT0 DEFAULT # I2S
-# setgpio 21 ALT0 DEFAULT # I2S
-# ----- END -----
-LED_GREEN = 15
-LED_YELLOW = 24
-LED_RED = 1
-LED_BLUE = 17
-LED_WHITE = 11
-
-BUTTON_GREEN = 14
-BUTTON_YELLOW = 23
-BUTTON_RED = 7
-BUTTON_BLUE = 27
-BUTTON_WHITE = 9
-
+GREEN = 0
+YELLOW = 1
+RED = 2
+BLUE = 4
+WHITE = 5
 
 class PB_GPIO:
     """Prepare GPIOs for PyBlaster"""
@@ -40,7 +23,7 @@ class PB_GPIO:
     @staticmethod
     def init_gpio():
         GPIO.setmode(GPIO.BCM)
-        # GPIO.setwarnings(False)
+        GPIO.setwarnings(False)
 
     @staticmethod
     def cleanup():
@@ -48,34 +31,42 @@ class PB_GPIO:
 
 
 class LEDThread(threading.Thread):
-    """Thread receiving commands to flash/unflash LEDs
-
+    """Thread receiving commands to flash/unflash leds from LED via queue
     """
 
     def __init__(self, main, queue, queue_lock):
-        """
-
-        :param main:
-        :param queue:
-        :param queue_lock:
-        :return:
-        """
         threading.Thread.__init__(self)
 
         self.main = main
         self.queue = queue
         self.queue_lock = queue_lock
         self.init_done = False
-
-        self.leds = [LED_GREEN, LED_YELLOW, LED_RED, LED_BLUE, LED_WHITE]
-        self.state = [0]*len(self.leds)
+        self.leds = []
+        self.state = []
 
     def init_gpio(self):
+        """Initialize GPIO ports and set init_done to true, so LEDs may be set.
+        """
+
+        self.leds = [int(self.main.settings.defvars['PYBLASTER_LED_'+x])
+                     for x in ['GREEN', 'YELLOW', 'RED', 'BLUE', 'WHITE']]
+        self.state = [0]*len(self.leds)
+
         for led in self.leds:
             GPIO.setup(led, GPIO.OUT)
         self.init_done = True
 
     def set_led_by_gpio(self, led, state):
+        """Lower/Raise state indicator of LED.
+
+        Each LED has a state counter which will flash the LED if > 0.
+        Multiple actions may raise a LED and lower it, so state might be > 1,
+        if two actions raised it. States below 0 are set to 0.
+        Use -1 to force state to 0
+
+        :param led: [0-4] led index (green, yel, red, blue, white)
+        :param state: 1 = raise, 0 = lower, -1 = off
+        """
         if not self.init_done:
             return
 
@@ -94,30 +85,49 @@ class LEDThread(threading.Thread):
             GPIO.output(self.leds[led], 0)
 
     def run(self):
+        """Start LED commands queue reader loop.
+
+        Wait until LED command pushed into queue and set LED state by queue
+        command. Run until main wants to exit.
+        To not get stuck into queue.get(), you need to push something to
+        the queue after main set keep_run to 0.
+
         """
 
-        :return:
-        """
+        try:
+            self.init_gpio()
+            while self.main.keep_run:
+                led = self.queue.get()
+                self.set_led_by_gpio(led[0], led[1])
 
-        self.init_gpio()
+            self.main.log.write(log.MESSAGE, "[THREAD] LED driver leaving...")
 
-        while self.main.keep_run:
-            led = self.queue.get()
-            self.set_led_by_gpio(led[0], led[1])
-
-        self.main.log.write(log.MESSAGE, "[THREAD] LED driver leaving...")
+        except Exception:
+            # Catch any exception from thread and send it to main thread.
+            self.main.ex_queue.put(sys.exc_info())
+            pass
 
 
 class LED:
-    """LED GPIO handler for PyBlaster"""
+    """LED GPIO handler for PyBlaster.
+
+    Manage queue for LEDThread.
+    """
 
     def __init__(self, main):
-        """Initialize GPIO to BCM mode and disable warnings"""
+        """Initialize LEDThread and LED command queue"""
 
         self.main = main
         self.queue = queue.Queue()  # use one queue for all LEDS
         self.queue_lock = threading.Lock()
         self.led_thread = LEDThread(self.main, self.queue, self.queue_lock)
+
+    def init_leds(self):
+        """Start LEDThread event loop.
+        Do not call before LED ids are known via settings.
+        """
+        self.led_thread.start()
+        self.reset_leds()
 
     def show_init_done(self):
         """Let LEDs flash to indicate that PyBlaster initialization is done"""
@@ -128,11 +138,8 @@ class LED:
                 time.sleep(0.1)
                 self.set_led(led, 0)
 
-    def init_leds(self):
-        self.led_thread.start()
-        self.reset_leds()
-
     def reset_leds(self):
+        """Force all LEDs to 0"""
         self.set_leds(-1)
 
     def set_led(self, num, state):
@@ -141,7 +148,6 @@ class LED:
 
     def set_leds(self, state=1):
         """Set all LEDs to state"""
-
         for led in range(5):
             self.set_led(led, state)
 
@@ -161,6 +167,7 @@ class LED:
         self.set_led(4, state)
 
     def indicate_error(self):
+        """Turn off all LEDs and raise red let"""
         self.set_leds(-1)
         self.set_led_red(1)
 
@@ -168,7 +175,7 @@ class LED:
         """Let a LED flash a certain amount of time and set LED port to LOW
         afterwards.
 
-        Uses threading.Timer with GPIO.output() as callback.
+        Uses threading.Timer with flash_callback() as callback.
         """
 
         self.set_led(led_code, 1)
@@ -178,18 +185,21 @@ class LED:
 
     @staticmethod
     def flash_callback(led, num, state):
+        """Callback for timer routine.
+        Let LED perform command after given time
+        """
         led.set_led(num, state)
 
     def play_leds(self, count):
-        """
-
-        :param count:
-        :return:
+        """Lower current LED, raise next LED.
         """
         self.set_led((count-1) % 5, 0)
         self.set_led(count % 5, 1)
 
     def join(self):
+        """Join LEDThread before exit."""
+        # send some shit to queue, so loop may exit and not stuck in
+        # queue.get()
         self.reset_leds()
         self.led_thread.join()
 
@@ -231,30 +241,32 @@ class ButtonThread(threading.Thread):
         """Read button while keep_run in root object is true
         """
 
-        for i in range(len(self.pins)):
-            GPIO.setup(self.pins[i], GPIO.IN)
-            self.prev_in[i] = GPIO.input(self.pins[i])
+        try:
 
-        while self.main.keep_run:
-            time.sleep(0.05)  # TODO: to config
             for i in range(len(self.pins)):
-                inpt = GPIO.input(self.pins[i])
-                if self.prev_in[i] != inpt:
-                    if inpt:
-                        print("Btn %d (%d) released" % (i, self.pins[i]))
-                    else:
-                        print("Btn %d (%d) pressed" % (i, self.pins[i]))
-                    # self.queue_lock.acquire()
-                    # self.queue.put([self.pins[i], self.names[i]])
-                    # self.queue_lock.release()
-                self.prev_in[i] = inpt
+                GPIO.setup(self.pins[i], GPIO.IN)
+                self.prev_in[i] = GPIO.input(self.pins[i])
 
-                # # Blue and white buttons are vol up and down.
-                # # These should have hold functionality.
-                # if self.pins[i] == BUTTON_BLUE or self.pins[i] == BUTTON_WHITE:
-                #     self.prev_in[i] = 1
+            while self.main.keep_run:
+                time.sleep(0.05)  # TODO: to config
+                for i in range(len(self.pins)):
+                    inpt = GPIO.input(self.pins[i])
+                    if self.prev_in[i] != inpt:
+                        # Note: depending on your wiring, the 'not' must be
+                        # removed!
+                        if not inpt:
+                            self.queue_lock.acquire()
+                            self.queue.put([self.pins[i], self.names[i]])
+                            self.queue_lock.release()
+                    self.prev_in[i] = inpt
 
-        self.main.log.write(log.MESSAGE, "[THREAD] Button reader leaving...")
+            self.main.log.write(log.MESSAGE,
+                                "[THREAD] Button reader leaving...")
+
+        # Forward any exceptions to main thread, so PyBlaster can die.
+        except Exception:
+            self.main.ex_queue.put(sys.exc_info())
+            pass
 
 
 class Buttons:
@@ -267,34 +279,31 @@ class Buttons:
     """
 
     def __init__(self, main):
-        """Create thread for push buttons using names and GPIO ports
-
-        Thread is not started from here -- need to wait until LED class
-        initialized GPIO.
-        """
-
         self.main = main
         self.queue = queue.Queue()  # use one queue for all buttons
         self.queue_lock = threading.Lock()
-
-        self.btn_thread = \
-            ButtonThread(main,
-                         [BUTTON_GREEN, BUTTON_YELLOW, BUTTON_RED,
-                          BUTTON_BLUE, BUTTON_WHITE],
-                         ["green", "yellow", "red", "blue", "white"],
-                         self.queue, self.queue_lock)
+        self.btn_thread = None
 
     def start(self):
         """Let each button thread start.
 
         Not called in __init__() because of later GPIO init in LED class.
         """
+
+        btns = [int(self.main.settings.defvars['PYBLASTER_BUTTON_'+x])
+                for x in ['GREEN', 'YELLOW', 'RED', 'BLUE', 'WHITE']]
+
+        self.btn_thread = \
+            ButtonThread(self.main, btns,
+                         ["green", "yellow", "red", "blue", "white"],
+                         self.queue, self.queue_lock)
+
         self.btn_thread.start()
 
     def join(self):
         """Join all button threads after keep_run in root is False.
         """
-        self.btn_thread.join(0.1)
+        self.btn_thread.join()
 
     def has_button_events(self):
         """True if button events in queue
@@ -314,7 +323,7 @@ class Buttons:
             self.queue_lock.acquire()
             try:
                 result = self.queue.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 self.queue_lock.release()
                 return None
             self.queue_lock.release()
@@ -326,6 +335,9 @@ class Buttons:
 
         Called by main loop if has_button_events() is true.
         """
+        if not self.has_button_events():
+            return
+
         event = self.read_last_button_event()
         if event is None:
             return
