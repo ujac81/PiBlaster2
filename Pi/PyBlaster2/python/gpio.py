@@ -89,18 +89,21 @@ class LEDThread(threading.Thread):
 
         Wait until LED command pushed into queue and set LED state by queue
         command. Run until main wants to exit.
-        To not get stuck into queue.get(), you need to push something to
-        the queue after main set keep_run to 0.
-
         """
 
         try:
             self.init_gpio()
             while self.main.keep_run:
-                led = self.queue.get()
-                self.set_led_by_gpio(led[0], led[1])
+                try:
+                    led = self.queue.get(timeout=0.1)
+                    self.set_led_by_gpio(led[0], led[1])
+                except queue.Empty:
+                    pass
 
             self.main.log.write(log.MESSAGE, "[THREAD] LED driver leaving...")
+            for i in range(len(self.leds)):
+                self.set_led_by_gpio(i, 0)
+            self.set_led_by_gpio(YELLOW, 1)
 
         except Exception:
             # Catch any exception from thread and send it to main thread.
@@ -198,9 +201,6 @@ class LED:
 
     def join(self):
         """Join LEDThread before exit."""
-        # send some shit to queue, so loop may exit and not stuck in
-        # queue.get()
-        self.reset_leds()
         self.led_thread.join()
 
 

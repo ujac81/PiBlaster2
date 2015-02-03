@@ -113,10 +113,7 @@ class PyBlaster:
             time.sleep(50. / 1000.)  # 50ms default in config
 
             self.buttons.read_buttons()
-
-            if self.mpc.has_idle_event():
-                self.mpc.process_event()
-
+            self.mpc.process_idler_events()
             self.lirc.read_lirc()
 
             # TODO: play LEDs while playing -- if paused, do something else...

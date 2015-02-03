@@ -1,5 +1,6 @@
 """lirc.py -- Read remote controller via lirc
 
+@Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
 import lirc
@@ -12,14 +13,13 @@ import log
 
 
 class LircThread(threading.Thread):
-    """
+    """Idle loop to wait for next lirc event.
 
+    Push to queue, whene event received.
+    Managed by Lirc.
     """
 
     def __init__(self, main, queue, queue_lock):
-        """
-
-        """
         threading.Thread.__init__(self)
         self.main = main
         self.queue = queue
@@ -27,9 +27,7 @@ class LircThread(threading.Thread):
         self.lircsock = None
 
     def run(self):
-        """
-
-        """
+        """Loop until main wants to exit."""
 
         try:
 
@@ -37,6 +35,7 @@ class LircThread(threading.Thread):
             self.lircsock = lirc.init("pyblaster2", conf, blocking=False)
 
             while self.main.keep_run:
+                # Nonblocking receive of IR signals
                 read = lirc.nextcode()
                 if len(read):
                     self.queue_lock.acquire()
@@ -56,28 +55,30 @@ class LircThread(threading.Thread):
 
 
 class Lirc:
+    """Manage IR event loop thread and send commands to Cmd.eval(), if such"""
 
     def __init__(self, main):
-
         self.queue = queue.Queue()
         self.queue_lock = threading.Lock()
         self.main = main
         self.lircthread = LircThread(self.main, self.queue, self.queue_lock)
 
     def start(self):
+        """fire up IR read loop"""
         self.lircthread.start()
 
     def join(self):
+        """wait for IR read loop to exit"""
         self.lircthread.join(0.1)
 
     def has_lirc_event(self):
+        """True if IR event received"""
         if not self.queue.empty():
             return True
         return False
 
     def read_last_lirc_event(self):
-        """dry run queue and return last command if such -- None else
-        """
+        """Dry run queue and return last command if such -- None else."""
         result = None
 
         while not self.queue.empty():
@@ -92,6 +93,7 @@ class Lirc:
         return result
 
     def read_lirc(self):
+        """If event in queue, read it and forward to Cmd.eval()"""
 
         if not self.has_lirc_event():
             return

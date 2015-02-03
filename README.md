@@ -142,6 +142,7 @@ These are the settings you have to set in */etc/mpd.conf*
         name            "My ALSA EQ"
         device          "plug:plugequal"
         format          "44100:16:2"
+        auto_resample   "no"
         mixer_device    "default"
         mixer_control   "PCM"
         mixer_index     "0"
@@ -218,6 +219,8 @@ Hifiberry device, mine looks like
      slave.pcm plugequal;
     }
 
+    defaults.pcm.dmix.rate 44100 # Force 44.1 KHz
+    defaults.pcm.dmix.format S16_LE # Force 16 bits
     defaults.pcm.rate_converter "speexrate_medium"
 
 To test your equalizer, use
