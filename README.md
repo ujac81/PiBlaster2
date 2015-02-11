@@ -6,7 +6,29 @@ Docs and source code for the PiBlaster project....
 
 # Development Environment
 
-## Installation of QtCreator 5.3 on unbuntu linux 14.04
+## Software
+
+### Android SDK
+Download latest sdk tools from [android SDK download site](http://developer.android.com/sdk/).
+Untar it and put it to a desired location. Run the update manager
+
+    # from android sdk folder
+    $ tools/android update sdk
+
+and install the updates. Make sure to select all required platforms e.g.
+Android 4.4.2 if required.
+
+### Android NDK
+Download latest native development kit from [android NDK download site](http://developer.android.com/tools/sdk/ndk).
+As of 2015/02/07 there is a bin which is a self extracting archive. Make it
+executable and run it.
+
+    $ chmod a+x android-ndk-r10d-linux-x86_64.bin
+    $ ./android-ndk-r10d-linux-x86_64.bin
+
+You might move the kit wherever you want.
+
+### QtCreator 5.3 on unbuntu linux 14.10
 Download Qt >= 5.31 online installer and run it
 
     $ chmod 755 qt-opensource-linux-x64-1.6.0-4-online.run
@@ -17,7 +39,7 @@ Default selection of packages is ok, just make sure x86_64, armv7 are
 selected for Qt and QtCreator is selected for tools.
 
 ## Compile Application
-See [qt docs](http://qt-project.org/doc/qtcreator-3.0/creator-developing-android.html)
+See [qt docs](http://doc.qt.io/qtcreator/creator-developing-android.html)
 on how connecting android devices.
 If configured correctly, just hit deploy button and wait for the application
  to start on your android device.
@@ -69,14 +91,26 @@ To upgrade run
     $ sudo aptitude upgrade
     $ sudo rpi-update
 
+### Dist-Upgrade to debian jessie
+
+TODO.
+
 ## Configure Raspberry Pi
+
+### Disable display manager in jessie
+Comment out the default display manager in */etc/X11/default-display-manager*
+and add
+
+    /bin/true
+
+to that file.
 
 ### Install required python packages
 PyBlaster won't start if some python packages are missing
 
     $ sudo aptitude install python3-pip libbluetooth-dev
-    $ sudo pip-3.2 install python-mpd2
-    $ sudo pip-3.2 install pybluez
+    $ sudo pip3 install python-mpd2
+    $ sudo pip3 install pybluez
 
 Documentation of python-mpd2 can be found [here](http://pythonhosted.org/python-mpd2/topics/getting-started.html)
 
@@ -278,13 +312,13 @@ To load the module on boot, add these lines to */etc/modules* file
 Tell lirc to use the default drivers.
 Settings in */etc/lirc/hardware.conf* should be
 
-    LIRCD_ARGS=""
-    LOAD_MODULES=true
-    DRIVER="default"
-    DEVICE="/dev/lirc0"
-    MODULES="lirc_rpi"
-    LIRCD_CONF=""
-    LIRCMD_CONF=""
+LIRCD_ARGS=""
+LOAD_MODULES=true
+DRIVER="default"
+DEVICE="/dev/lirc0"
+MODULES="lirc_rpi"
+LIRCD_CONF=""
+LIRCMD_CONF=""
 
 No teach the remote control. Google for irrecord or find a lircd.conf that
 matches your remote. To record use

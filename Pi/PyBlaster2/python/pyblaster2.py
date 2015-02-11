@@ -12,6 +12,7 @@ import time
 
 import log
 
+from bluetoothcomm import RFCommServer
 from cmd import Cmd
 from gpio import PB_GPIO, LED, Buttons
 from lircremote import Lirc
@@ -51,6 +52,7 @@ class PyBlaster:
         self.dbhandle = DBHandle(self)
         self.cmd = Cmd(self)
         self.mpc = MPC(self)
+        self.bt = RFCommServer(self)
 
         # +++++++++++++++ Init Objects +++++++++++++++ #
 
@@ -60,6 +62,7 @@ class PyBlaster:
         self.led.init_leds()
         self.dbhandle.dbconnect()
         self.mpc.connect()
+        self.bt.start_server_thread()
 
         # +++++++++++++++ Daemoninze +++++++++++++++ #
 
@@ -79,6 +82,7 @@ class PyBlaster:
         self.log.write(log.MESSAGE, "Joining threads...")
 
         # join remaining threads
+        self.bt.join()
         self.buttons.join()
         self.lirc.join()
         self.mpc.join()

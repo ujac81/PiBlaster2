@@ -3,7 +3,7 @@
 @Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
-from mpd import MPDClient
+from mpd import MPDClient, ConnectionError
 import queue
 import sys
 import time
@@ -37,7 +37,7 @@ class MPDIdler(threading.Thread):
                 self.client.timeout = 10
                 self.client.connect('localhost', 6600)
                 connected = True
-            except mpd.ConnectionError:
+            except ConnectionError:
                 self.main.log.write(log.ERROR, "[MPDIdler]: Failed to "
                                                "connect! -- retrying...")
                 time.sleep(0.5)
@@ -63,14 +63,14 @@ class MPDIdler(threading.Thread):
                     self.queue_lock.acquire()
                     self.queue.put(res)
                     self.queue_lock.release()
-                except mpd.ConnectionError:
+                except ConnectionError:
                     self.connect()
                     pass
 
             self.client.disconnect()
             self.main.log.write(log.MESSAGE, "[THREAD] MPD Idler leaving...")
 
-        except mpd.ConnectionError:
+        except ConnectionError:
             # Failed on disconnect.
             pass
         # catch any exceptions here and pass them to the main thread.
@@ -102,7 +102,7 @@ class MPC:
                 self.client.timeout = 10
                 self.client.connect('localhost', 6600)
                 connected = True
-            except mpd.ConnectionError:
+            except ConnectionError:
                 time.sleep(0.5)
                 pass
             if connected:

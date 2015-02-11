@@ -42,7 +42,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/opt/PyBlaster2/bin/run-pyblaster2-term
           WORLD_READ WORLD_EXECUTE)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/opt/PyBlaster2/etc/pyblaster-lirc.conf
-        DESTINATION "/opt/PyBlaster2/ec/pyblaster-lirc.conf"
+        DESTINATION "/opt/PyBlaster2/etc"
         PERMISSIONS
           OWNER_READ OWNER_WRITE
           GROUP_READ

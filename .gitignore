@@ -33,12 +33,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-Android/build-PiBlaster-Android_for_armeabi_v7a_GCC_4_8_Qt_5_2_0-Debug/
 
-Android/PiBlaster/PiBlaster.pro.user
-Android/build-PiBlaster-*
-Android/PiBlaster/PiBlaster.pro.user.3.2-pre1
-Android/PiBlaster/android-sources/AndroidManifest.xml.autosave
+Android/build-piblaster2-*
+Android/PiBlaster2/piblaster2.pro.user
 .idea
 .directory
 
