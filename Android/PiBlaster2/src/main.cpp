@@ -1,31 +1,27 @@
 
-
-#include <QBluetoothLocalDevice>
-#include <QString>
-
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
+#include <QQmlContext>
+
+#include "BTCommMessageHandler.h"
+#include "BTMessage.h"
 
 
 int main(int argc, char *argv[])
 {
-    QBluetoothLocalDevice localDevice;
-
-    if (localDevice.isValid())
-    {
-        // Turn Bluetooth on
-        localDevice.powerOn();
-        localDevice.setHostMode(QBluetoothLocalDevice::HostConnectable);
-    }
 
     QGuiApplication app(argc, argv);
-    QQmlApplicationEngine engine(QUrl("qrc:/qml/main.qml"));
+
+    qRegisterMetaType<BTMessage>( "BTMessage" );
+
+    BTCommMessageHandler* btMessages = new BTCommMessageHandler();
+    btMessages->checkBluetoothOn();
+
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("btMessages", btMessages);
+    engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
+
     return app.exec();
-
-
-    if (localDevice.isValid())
-    {
-        // Turn Bluetooth off
-        localDevice.setHostMode(QBluetoothLocalDevice::HostPoweredOff);
-    }
 }
+
+

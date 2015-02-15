@@ -15,6 +15,7 @@ ApplicationWindow {
 
     BluetoothConnect { id: btConn }
     BluetoothComm { id: btComm }
+    BluetoothCommand { id: btCmd }
 
     Rectangle {
         color: "#212126"
@@ -115,6 +116,14 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+
+    Component.onCompleted: {
+        // Incomming commands are bufferd by BTMessageHandler.cpp
+        // and emitted as signal when received completely.
+        // Process them inside extra file BluetoothCommand.
+        btMessages.receivedMessage.connect(btCmd.processMessage);
     }
 
 

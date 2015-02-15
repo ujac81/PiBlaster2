@@ -22,12 +22,12 @@ Item {
         }
         onStringDataChanged: {
             var data = socket.stringData;
-            data = data.substring(0, data.indexOf('\n'))
+            data = data.substring(0, data.indexOf('\n'));
 
             // string data seems to change to empty after each send.
             if ( data.length == 0 ) { return; }
 
-            console.log("RECV: ---"+data+"---");
+            btMessages.bufferLine(data);
 
             // tell PyBlaster to send next line
             socket.stringData = '1';
