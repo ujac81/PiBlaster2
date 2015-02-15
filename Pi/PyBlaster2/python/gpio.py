@@ -14,8 +14,8 @@ import log
 GREEN = 0
 YELLOW = 1
 RED = 2
-BLUE = 4
-WHITE = 5
+BLUE = 3
+WHITE = 4
 
 class PB_GPIO:
     """Prepare GPIOs for PyBlaster"""

@@ -202,7 +202,7 @@ class ServerThread(threading.Thread):
         send_msg = '{0:06d}{1:s}'.format(len(full_msg), full_msg)
 
         try:
-            self.client_sock.send(send_msg)
+            self.client_sock.send((send_msg+'\n').encode('utf-8'))
         except bluetooth.btcommon.BluetoothError:
             self.client_sock.settimeout(self.timeout)
             self.main.led.set_led_white(0)
@@ -235,7 +235,7 @@ class ServerThread(threading.Thread):
                 full_send_msg = '{0:06d}'.format(len(send_msg)) + \
                                 send_msg
                 try:
-                    self.client_sock.send(full_send_msg.encode('utf-8'))
+                    self.client_sock.send((full_send_msg+'\n').encode('utf-8'))
                 except bluetooth.btcommon.BluetoothError:
                     break
                 if not self.recv_ok_byte():
@@ -359,12 +359,13 @@ class ServerThread(threading.Thread):
                 self.client_sock.settimeout(self.comm_timeout)
             if recv_size > 0:
                 try:
-                    data = self.client_sock.recv(recv_size).decode('utf-8')
+                    data = self.client_sock.recv(recv_size).decode(
+                        'utf-8').strip()
                     print("+++%s+++" % data)
                 except bluetooth.btcommon.BluetoothError:
                     receiving = False
                     pass
-            if data:
+            if data and len(data) > 0:
                 if self.next_buffer_size == -1:
                     # Skip if received length is != 4, we received a line feed
                     # or some other crap.

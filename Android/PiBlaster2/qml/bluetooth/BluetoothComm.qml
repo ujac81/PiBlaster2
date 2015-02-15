@@ -22,11 +22,11 @@ Item {
         }
         onStringDataChanged: {
             var data = socket.stringData;
+            data = data.substring(0, data.indexOf('\n'))
 
             // string data seems to change to empty after each send.
             if ( data.length == 0 ) { return; }
 
-            // data = data.substring(0, data.indexOf('\n'))
             console.log("RECV: ---"+data+"---");
 
             // tell PyBlaster to send next line
@@ -37,6 +37,8 @@ Item {
             console.log("BS: error: "+error);
         }
 
+        // Pad number with zeros.
+        // Required for message head (four decimals required).
         function fillZeroes(num, len) {
             var str = String(num);
             while (str.length < len) {
@@ -46,6 +48,9 @@ Item {
         }
 
         function sendSingle(cmd) {
+
+            if ( ! connected ) { return; }
+
             var line = msgid+" 0 "+cmd;
             msgid += 1;
             var head = fillZeroes(line.length, 4);
@@ -53,6 +58,16 @@ Item {
             console.log("SENDING: "+send);
             socket.stringData = send;
         }
+    }
+
+
+    // Send "keepalive" signal every 10s.
+    Timer {
+        interval: 10000
+        running: true
+        repeat: true
+        // sendSingle() will check if connected.
+        onTriggered: socket.sendSingle("keepalive")
     }
 
 

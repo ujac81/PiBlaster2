@@ -119,6 +119,7 @@ class PyBlaster:
             self.buttons.read_buttons()
             self.mpc.process_idler_events()
             self.lirc.read_lirc()
+            self.bt.check_incomming_commands()
 
             # TODO: play LEDs while playing -- if paused, do something else...
 
