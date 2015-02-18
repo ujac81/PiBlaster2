@@ -4,6 +4,7 @@ import QtQuick.Controls 1.2
 
 import "bluetooth"
 import "content"
+import "dialogs"
 
 ApplicationWindow {
     id: main
@@ -12,10 +13,14 @@ ApplicationWindow {
     height: 1280
 
     property string color1: "#94d9ff"
+    property int lastBTDeviceState: 0
 
-    BluetoothConnect { id: btConn }
-    BluetoothComm { id: btComm }
-    BluetoothCommand { id: btCmd }
+    NoBluetoothDialog { id: diagNoBluetooth }
+
+
+//    BluetoothConnect { id: btConn }
+//    BluetoothComm { id: btComm }
+//    BluetoothCommand { id: btCmd }
 
     Rectangle {
         color: "#212126"
@@ -123,12 +128,44 @@ ApplicationWindow {
         // Incomming commands are bufferd by BTMessageHandler.cpp
         // and emitted as signal when received completely.
         // Process them inside extra file BluetoothCommand.
-        btMessages.receivedMessage.connect(btCmd.processMessage);
+//        btMessages.receivedMessage.connect(btCmd.processMessage);
+//        btService.checkBluetoothOn();
+        btService.bluetoothMessage.connect(bt_message);
+        btService.bluetoothError.connect(bt_error);
+        btService.bluetoothModeChanged.connect(bt_devstate);
+
     }
 
 
-    function bt_reconnect() { btConn.reconnect(); }
-    function bt_disconnect() { btConn.disconnect(); }
-    function bt_setService(service) { btComm.setService(service); }
+    function bt_reconnect() {
+        console.log("SCANNING...");
+        btService.serviceSearch("00:1A:7D:DA:71:14");
+    }
+    function bt_disconnect() {
+        console.log("DISCONNECTING...");
+        btService.disconnectService();
+    }
+
+
+    function bt_message(msg) {
+        console.log("BT SERVICE MESSAGE: "+msg)
+    }
+
+    // Raise no bluetooth dialog if bluetooth adapter lost.
+    // App will exit if button on dialog clicked.
+    // Connected to BTService::bluetoothModeChanged().
+    function bt_devstate(state) {
+        console.log("BT DEVICE STATE: "+state);
+        if (state === 0 && lastBTDeviceState === 1) {
+            diagNoBluetooth.open();
+        }
+        lastBTDeviceState = 1;
+    }
+
+    // Set error message for failure dialog and raise dialog.
+    // App will exit after dialog.
+    function bt_error(error) {
+        diagNoBluetooth.service_error(error);
+    }
 
 }

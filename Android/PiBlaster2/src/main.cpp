@@ -5,20 +5,21 @@
 
 #include "BTCommMessageHandler.h"
 #include "BTMessage.h"
+#include "BTService.h"
 
 
 int main(int argc, char *argv[])
 {
+    BTCommMessageHandler* btMessages = new BTCommMessageHandler();
+    BTService* btService = new BTService(btMessages);
+    btService->checkBluetoothOn();
+
 
     QGuiApplication app(argc, argv);
-
     qRegisterMetaType<BTMessage>( "BTMessage" );
-
-    BTCommMessageHandler* btMessages = new BTCommMessageHandler();
-    btMessages->checkBluetoothOn();
-
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("btMessages", btMessages);
+    engine.rootContext()->setContextProperty("btService", btService);
     engine.load(QUrl(QStringLiteral("qrc:///qml/main.qml")));
 
     return app.exec();

@@ -11,7 +11,7 @@ Item {
         connected: true  // property will not return true until connected
 
         onSocketStateChanged: {
-            console.log("New State: "+state)
+            console.log("New BT Socket State: "+state)
 
             // TODO: react on state
 
@@ -63,7 +63,7 @@ Item {
 
     // Send "keepalive" signal every 10s.
     Timer {
-        interval: 10000
+        interval: 5000
         running: true
         repeat: true
         // sendSingle() will check if connected.

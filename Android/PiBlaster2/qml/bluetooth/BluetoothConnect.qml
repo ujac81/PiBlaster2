@@ -17,7 +17,15 @@ Item {
 
         onRunningChanged : {
             if (! btModel.running && ! serviceFound) {
+                // TODO: pop up message
                 console.log("\nNo service found. \n\nPlease start server\nand restart app.\n");
+            }
+            if ( ! btModel.running ) {
+                console.log("BluetoothDiscoveryModel: running = false.");
+                serviceFound = false;
+            }
+            if ( btModel.running ) {
+                console.log("BluetoothDiscoveryModel: running = true.");
             }
         }
 
@@ -43,6 +51,7 @@ Item {
             if (serviceFound)
                 return
             serviceFound = true
+            console.log("=== BT Service Discovered ===");
             console.log("address: " + service.deviceAddress);
             console.log("name: " + service.deviceName);
             console.log("service: " + service.serviceName);
@@ -50,7 +59,6 @@ Item {
             console.log("desc: " + service.serviceDescription);
             console.log("proto: " + service.serviceProtocol);
             console.log("uuid: " + service. serviceUuid);
-//            searchBox.appendText("\nConnecting to server...")
             remoteDeviceName = service.deviceName
             main.bt_setService(service)
         }
@@ -58,11 +66,14 @@ Item {
 
 
     function reconnect() {
+        console.log("Reconnecting BT...");
         disconnect();
         btModel.running = true;
     }
 
     function disconnect() {
+        console.log("Disconnecting...");
+        serviceFound = false;
         btModel.running = false;
     }
 

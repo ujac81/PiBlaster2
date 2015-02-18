@@ -1,7 +1,6 @@
 
 #include <cassert>
 
-#include <QBluetoothLocalDevice>
 #include <QString>
 
 #include "BTCommMessageHandler.h"
@@ -13,20 +12,21 @@ BTCommMessageHandler::BTCommMessageHandler( QObject* parent ) :
 
 
 BTCommMessageHandler::~BTCommMessageHandler()
-{}
-
-
-void BTCommMessageHandler::checkBluetoothOn()
 {
-    QBluetoothLocalDevice localDevice;
-
-    if ( localDevice.isValid() )
-    {
-        // Turn Bluetooth on
-        localDevice.powerOn();
-        localDevice.setHostMode(QBluetoothLocalDevice::HostConnectable);
-    }
+    clearAll();
 }
+
+
+void BTCommMessageHandler::clearAll()
+{
+    for (std::map<int, BTMessage*>::iterator iter = _recvBuffer.begin();
+         iter != _recvBuffer.end(); iter++ )
+    {
+        delete iter->second;
+    }
+    _recvBuffer.clear();
+}
+
 
 BTMessage* BTCommMessageHandler::newMessageObject( int id,
                                                    int status,

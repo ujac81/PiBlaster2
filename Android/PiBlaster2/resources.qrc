@@ -22,5 +22,6 @@
         <file>qml/bluetooth/BluetoothComm.qml</file>
         <file>qml/bluetooth/BluetoothConnect.qml</file>
         <file>qml/bluetooth/BluetoothCommand.qml</file>
+        <file>qml/dialogs/NoBluetoothDialog.qml</file>
     </qresource>
 </RCC>

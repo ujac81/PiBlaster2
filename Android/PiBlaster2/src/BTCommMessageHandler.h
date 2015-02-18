@@ -28,16 +28,11 @@ public:
 
     ~BTCommMessageHandler();
 
-    /**
-     * @brief Check if bluetooth is on, request turn on otherwise.
-     * Emits bluetoothOff() if bluetooth is not on
-     */
-    Q_INVOKABLE void checkBluetoothOn();
-
-
 public slots:
 
     Q_INVOKABLE void bufferLine( const QString& line );
+
+    Q_INVOKABLE void clearAll();
 
 
 signals:
