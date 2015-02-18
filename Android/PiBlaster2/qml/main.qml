@@ -14,6 +14,7 @@ ApplicationWindow {
 
     property string color1: "#94d9ff"
     property int lastBTDeviceState: 0
+    property int btconnected: 0
 
     NoBluetoothDialog { id: diagNoBluetooth }
 
@@ -133,6 +134,8 @@ ApplicationWindow {
         btService.bluetoothMessage.connect(bt_message);
         btService.bluetoothError.connect(bt_error);
         btService.bluetoothModeChanged.connect(bt_devstate);
+        btService.bluetoothConnected.connect(bt_connected);
+        btService.bluetoothDisconnected.connect(bt_disconnected);
 
     }
 
@@ -166,6 +169,29 @@ ApplicationWindow {
     // App will exit after dialog.
     function bt_error(error) {
         diagNoBluetooth.service_error(error);
+    }
+
+    function bt_connected() {
+        btService.writeSocket( "1234" );
+        main.btconnected = 1;
+    }
+
+    function bt_disconnected() {
+        console.log("Disconnected...");
+        main.btconnected = 0
+    }
+
+    // Send "keepalive" signal every 10s.
+    Timer {
+        interval: 5000
+        running: true
+        repeat: true
+        // sendSingle() will check if connected.
+        onTriggered: {
+            if ( main.btconnected === 1 ) {
+                btService.writeSocket("keepalive");
+            }
+        }
     }
 
 }

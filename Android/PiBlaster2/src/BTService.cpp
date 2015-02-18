@@ -1,13 +1,15 @@
 
 #include "BTService.h"
 
+#include <QBluetoothAddress>
 
 BTService::BTService(BTCommMessageHandler* msgHandler):
     QObject(),
     _msgHandler(msgHandler),
     _foundPiBlasterService(false),
-    _control(0),
-    _service(0)
+    _discovery(0),
+    _socket(0),
+    _msgId(0)
 {
     _localDevice = new QBluetoothLocalDevice(this);
 
@@ -46,156 +48,190 @@ void BTService::localDeviceChanged( QBluetoothLocalDevice::HostMode state )
 
 void BTService::serviceSearch(const QString& address)
 {
-    _foundPiBlasterService = false;
+    disconnectService();
 
+    emit bluetoothMessage( "Scanning for PiBlaster service..." );
 
-    if ( _control )
-    {
-        emit bluetoothMessage("Disconnecting from service...");
-        _control->disconnectFromDevice();
-        delete _control;
-        _control = 0;
-    }
+    _discovery = new QBluetoothServiceDiscoveryAgent(this );
+    _discovery->setRemoteAddress( QBluetoothAddress(address) );
+    _discovery->setUuidFilter( _uuid );
 
-    emit bluetoothMessage("Scanning for PiBlaster service...");
+    connect(_discovery, SIGNAL(canceled()), this, SLOT(serviceScanStopped()));
+    connect(_discovery, SIGNAL(finished()), this, SLOT(serviceScanFinished()));
+    connect(_discovery, SIGNAL(error(QBluetoothServiceDiscoveryAgent::Error)),
+            this, SLOT(serviceError(QBluetoothServiceDiscoveryAgent::Error)));
+    connect(_discovery, SIGNAL(serviceDiscovered(QBluetoothServiceInfo)),
+            this, SLOT(serviceDiscovered(QBluetoothServiceInfo)));
 
-    _control = new QLowEnergyController(QBluetoothAddress(address), this );
-    connect(_control, SIGNAL(serviceDiscovered(QBluetoothUuid)),
-            this, SLOT(serviceDiscovered(QBluetoothUuid)));
-    connect(_control, SIGNAL(discoveryFinished()),
-            this, SLOT(serviceScanDone()));
-    connect(_control, SIGNAL(error(QLowEnergyController::Error)),
-            this, SLOT(controllerError(QLowEnergyController::Error)));
-    connect(_control, SIGNAL(connected()), this, SLOT(deviceConnected()));
-    connect(_control, SIGNAL(disconnected()), this, SLOT(deviceDisconnected()));
-
-    _control->connectToDevice();
-}
-
-
-void BTService::deviceConnected()
-{
-    emit bluetoothError("Connected to remote...");
-    _control->discoverServices();
-}
-
-
-void BTService::deviceDisconnected()
-{
-    emit bluetoothError("Connection reset by remote device!");
-}
-
-
-void BTService::serviceDiscovered(const QBluetoothUuid& gatt)
-{
-    if ( gatt == _uuid )
-    {
-        emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
-        _foundPiBlasterService = true;
-    }
-}
-
-void BTService::serviceScanDone()
-{
-    delete _service;
-    _service = 0;
-
-    if ( _foundPiBlasterService )
-    {
-        emit bluetoothMessage("Connecting to service...");
-        _service = _control->createServiceObject( _uuid, this );
-    }
-
-    if ( ! _service )
-    {
-        emit bluetoothError("PiBlaster Service not found.");
-        return;
-    }
-
-    connect(_service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
-            this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
-    connect(_service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
-            this, SLOT(characteristicChanged(QLowEnergyCharacteristic,QByteArray)));
-    connect(_service, SIGNAL(descriptorWritten(QLowEnergyDescriptor,QByteArray)),
-            this, SLOT(confirmedDescriptorWrite(QLowEnergyDescriptor,QByteArray)));
-    connect(_service, SIGNAL(error(QLowEnergyService::ServiceError)),
-            this, SLOT(serviceError(QLowEnergyService::ServiceError)));
-    _service->discoverDetails();
+    _discovery->start();
 }
 
 
 void BTService::disconnectService()
 {
     _foundPiBlasterService = false;
-    _control->disconnectFromDevice();
-    delete _service;
-    _service = 0;
+    _msgId = 0;
+
+    if ( _discovery )
+    {
+        emit bluetoothMessage("Disconnect: Deleting discovery agent...");
+        _discovery->stop();
+        delete _discovery;
+        _discovery = 0;
+    }
+
+    if ( _socket )
+    {
+        emit bluetoothMessage("Disconnect: Wiping out socket...");
+        _socket->disconnectFromService();
+        delete _socket;
+        _socket = 0;
+    }
 
     emit bluetoothMessage("Disconnected service.");
 }
 
 
-void BTService::controllerError(QLowEnergyController::Error error)
+void BTService::stopServiceSearch()
 {
-    qDebug() << "BTService::controllerError(): " << error;
-    switch (error)
+    if ( _discovery )
     {
-    case QLowEnergyController::NoError:
-        break;
-    case QLowEnergyController::UnknownRemoteDeviceError:
-        emit bluetoothError("Controller Error: Unkwown remote device!");
-        break;
-    case QLowEnergyController::NetworkError:
-        emit bluetoothError("Controller Error: Network error!");
-        break;
-    case QLowEnergyController::InvalidBluetoothAdapterError:
-        emit bluetoothError("Controller Error: Bluetooth adapter error!");
-        break;
-    default:
-        emit bluetoothError("Controller Error: unkown controller error!");
+        emit bluetoothMessage("Discovery: Stopping discovery agent...");
+        _discovery->stop();
+        delete _discovery;
+        _discovery = 0;
     }
 }
 
 
-void BTService::serviceStateChanged(QLowEnergyService::ServiceState s)
+void BTService::serviceScanStopped()
 {
-    emit bluetoothMessage(QString("Service state changed: ")+QString::number(s));
+    emit bluetoothMessage("Stop scan: Deleting discovery agent...");
+    disconnectService();
 }
 
-void BTService::serviceError(QLowEnergyService::ServiceError error)
+
+void BTService::serviceError(QBluetoothServiceDiscoveryAgent::Error error)
 {
     qDebug() << "BTService::serviceError(): " << error;
     switch (error) {
-    case QLowEnergyService::NoError:
+    case QBluetoothServiceDiscoveryAgent::NoError:
         break;
-    case QLowEnergyService::OperationError:
-        emit bluetoothError("Service error: operation error!");
+    case QBluetoothServiceDiscoveryAgent::PoweredOffError:
+        emit bluetoothError("Discovery error: adapter has been powered off while scanning!");
         break;
-    case QLowEnergyService::CharacteristicWriteError:
-        emit bluetoothError("Service error: Failed to set characteristic!");
+    case QBluetoothServiceDiscoveryAgent::InputOutputError:
+        emit bluetoothError("Discovery error: I/O error!");
         break;
-    case QLowEnergyService::DescriptorWriteError:
-        emit bluetoothError("Service error: Failed to set descriptor!");
+    case QBluetoothServiceDiscoveryAgent::InvalidBluetoothAdapterError:
+        emit bluetoothError("Discovery error: Invalid adapter!");
         break;
     default:
-        emit bluetoothError("Service error: unknown error!");
+        emit bluetoothError("Discovery error: unknown error!");
     }
 }
 
-void BTService::characteristicChanged(const QLowEnergyCharacteristic &c,
-                                      const QByteArray &value)
+
+void BTService::serviceDiscovered( const QBluetoothServiceInfo& info )
 {
-    // ignore any other characteristic change -> shouldn't really happen though
-    if ( c.uuid() != _uuid )
+    //if ( info.serviceUuid() == _uuid )
+    {
+        emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
+        _foundPiBlasterService = true;
+        _serviceInfo = info;
+    }
+}
+
+
+void BTService::serviceScanFinished()
+{
+    if ( _foundPiBlasterService )
+    {
+        emit bluetoothMessage("Connecting to service...");
+
+        _socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+
+        // TODO: catch I/O errors on socket
+
+        connect(_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+        connect(_socket, SIGNAL(disconnected()), this, SIGNAL(socketDisconnected()));
+        connect(_socket, SIGNAL(error(QBluetoothSocket::SocketError)),
+                this, SIGNAL(socketError(QBluetoothSocket::SocketError)));
+        connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+
+        _socket->connectToService( _serviceInfo );
+    }
+
+    if ( ! _socket )
+    {
+        emit bluetoothError("PiBlaster Service not found.");
+        return;
+    }
+}
+
+
+void BTService::socketConnected()
+{
+    emit bluetoothMessage("Connected to service...");
+    emit bluetoothConnected();
+}
+
+
+void BTService::socketDisconnected()
+{
+    emit bluetoothMessage("Disconnected from service...");
+    emit bluetoothDisconnected();
+}
+
+
+void BTService::socketError(QBluetoothSocket::SocketError error)
+{
+    qDebug() << "BTService::socketError(): " << error;
+    switch (error) {
+    case QBluetoothSocket::NoSocketError:
+        break;
+    case QBluetoothSocket::NetworkError:
+        emit bluetoothError("Socket error: network error!");
+        break;
+    case QBluetoothSocket::OperationError:
+        emit bluetoothError("Socket error: operation error!");
+        break;
+    default:
+        emit bluetoothError("Socket error: unknown error!");
+    }
+}
+
+
+void BTService::readSocket()
+{
+    if ( ! _socket )
         return;
 
-    qDebug() << value.constData();
+    while ( _socket->canReadLine() )
+    {
+        QByteArray line = _socket->readLine();
+        QString sline = QString::fromUtf8( line.constData(), line.length() );
+        _msgHandler->bufferLine( sline );
+
+        // write '1' to buffer to tell PiBlaster to send next line.
+        // TODO: redesign
+        QByteArray text = QString("1").toUtf8() + '\n';
+        _socket->write( text );
+    }
 }
 
-void BTService::confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
-                                         const QByteArray &value)
+
+void BTService::writeSocket( const QString &msg )
 {
-    qDebug() << value.constData();
+    if ( ! _socket )
+        return;
+
+    QString line = QString::number( _msgId ) + " 0 " + msg;
+    QString head = QString("%1").arg( line.length(), 4, 10, QLatin1Char('0') );
+    QString send = head + line;
+    qDebug() << "SEND: " << send;
+    QByteArray text = send.toUtf8() + '\n';
+    _socket->write( text );
+
+    _msgId++;
 }
-
-

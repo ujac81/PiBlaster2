@@ -10,12 +10,12 @@
 #include <QDateTime>
 #include <QVector>
 #include <QTimer>
-#include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothLocalDevice>
-#include <QLowEnergyController>
-#include <QLowEnergyService>
 #include <QBluetoothServiceDiscoveryAgent>
+#include <QBluetoothServiceInfo>
+#include <QBluetoothSocket>
+
 
 QT_USE_NAMESPACE
 class BTService: public QObject
@@ -34,37 +34,26 @@ public slots:
      */
     void checkBluetoothOn();
 
-
-    void serviceSearch( const QString& address );
-
+    void serviceSearch(const QString& address);
+    void stopServiceSearch();
     void disconnectService();
+
+
+    void writeSocket(const QString& msg);
 
 private slots:
 
+    void serviceDiscovered(const QBluetoothServiceInfo& info);
+    void serviceScanFinished();
+    void serviceError(QBluetoothServiceDiscoveryAgent::Error error);
+    void serviceScanStopped();
 
-    //QLowEnergyController
-    /// @brief Called by _control on serviceDiscovered().
-    void serviceDiscovered(const QBluetoothUuid&);
-    /// @brief Called by _control on discoveryFinished().
-    void serviceScanDone();
-    /// @brief Called by _control on error.
-    void controllerError(QLowEnergyController::Error);
-    /// @brief Called by _control on connected().
-    void deviceConnected();
-    /// @brief Called by _control on disconnected().
-    void deviceDisconnected();
 
-    //QLowEnergyService
-    /// @brief Called by _service on stateChanged().
-    void serviceStateChanged(QLowEnergyService::ServiceState s);
-    /// @brief Called by _service on stateChanged().
-    void characteristicChanged(const QLowEnergyCharacteristic &c,
-                               const QByteArray &value);
-    /// @brief Called by _service on descriptorWritten().
-    void confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
-                                  const QByteArray &value);
-    /// @brief Called by _service on error.
-    void serviceError(QLowEnergyService::ServiceError e);
+    void readSocket();
+    void socketConnected();
+    void socketDisconnected();
+    void socketError(QBluetoothSocket::SocketError error);
+
 
 
     /// @brief Triggered if state of local bluetooth device changed.
@@ -76,6 +65,9 @@ Q_SIGNALS:
     void bluetoothMessage(const QString&);
     void bluetoothModeChanged(QBluetoothLocalDevice::HostMode state);
 
+    void bluetoothConnected();
+    void bluetoothDisconnected();
+
 
 private:
     BTCommMessageHandler* _msgHandler;
@@ -83,8 +75,13 @@ private:
     QBluetoothUuid _uuid;
 
     bool _foundPiBlasterService;
-    QLowEnergyController *_control;
-    QLowEnergyService *_service;
+    QBluetoothServiceDiscoveryAgent* _discovery;
+    QBluetoothServiceInfo _serviceInfo;
+
+    QBluetoothSocket* _socket;
+
+    int _msgId;
+
 };
 
 #endif // BTService_H
