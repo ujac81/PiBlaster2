@@ -7,6 +7,7 @@ import Qt.labs.settings 1.0
 import "bluetooth"
 import "content"
 import "dialogs"
+import "play"
 
 ApplicationWindow {
     id: main
@@ -106,6 +107,10 @@ ApplicationWindow {
         ListElement {
             title: "Connect"
             page: "connect/ConnectPage.qml"
+        }
+        ListElement {
+            title: "Play"
+            page: "play/PlayPage.qml"
         }
         ListElement {
             title: "Buttons"

@@ -22,5 +22,9 @@
         <file>qml/bluetooth/BluetoothCommand.qml</file>
         <file>qml/dialogs/NoBluetoothDialog.qml</file>
         <file>images/statusbar.png</file>
+        <file>qml/play/VolumeTab.qml</file>
+        <file>qml/play/PlayTab.qml</file>
+        <file>qml/play/PlayPage.qml</file>
+        <file>qml/play/EqualizerTab.qml</file>
     </qresource>
 </RCC>
