@@ -2,6 +2,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.0
+import Qt.labs.settings 1.0
 
 import "bluetooth"
 import "content"
@@ -18,6 +19,19 @@ ApplicationWindow {
     property bool btconnected: false
     property bool btconnecting: false
     property string statustext: ""
+
+    property string btmac: "00:1A:7D:DA:71:14"
+    property bool btautoconnect: false
+    property string btpin: "1234"
+
+
+    Settings {
+        id: settings
+        property alias btmac: main.btmac
+        property alias btautoconnect: main.btautoconnect
+        property alias btpin: main.btpin
+    }
+
 
     NoBluetoothDialog { id: diagNoBluetooth }
 
@@ -156,12 +170,16 @@ ApplicationWindow {
         btService.bluetoothConnected.connect(bt_connected);
         btService.bluetoothDisconnected.connect(bt_disconnected);
         main.setStatus("PiBlaster 2 remote loaded.");
+
+        if ( main.btautoconnect ) {
+            bt_reconnect();
+        }
     }
 
 
     function bt_reconnect() {
         console.log("SCANNING...");
-        btService.serviceSearch("00:1A:7D:DA:71:14");
+        btService.serviceSearch(main.btmac);
         main.btconnecting = true;
         main.btconnected = false;
     }
@@ -192,11 +210,12 @@ ApplicationWindow {
     // Set error message for failure dialog and raise dialog.
     // App will exit after dialog.
     function bt_error(error) {
+        main.btautoconnect = false;
         diagNoBluetooth.service_error(error);
     }
 
     function bt_connected() {
-        btService.writeSocket( "1234" );
+        btService.writeSocket(main.btpin);
         main.btconnected = true;
         main.btconnecting = false;
         keepalive.running = true;
