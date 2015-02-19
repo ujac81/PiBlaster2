@@ -29,15 +29,25 @@ Item {
         anchors.centerIn: parent
 
         Button {
+            id: connectButton
+            enabled: ! main.btconnected && ! main.btconnecting
+            visible: ! main.btconnected && ! main.btconnecting
             text: "Connect"
             style: touchStyle
-            onClicked: main.bt_reconnect()
+            onClicked: {
+                main.bt_reconnect()
+            }
         }
 
         Button {
+            id: disconnectButton
+            enabled: main.btconnected || main.btconnecting
+            visible: main.btconnected || main.btconnecting
             text: "Disconnect"
             style: touchStyle
-            onClicked: main.bt_disconnect()
+            onClicked: {
+                main.bt_disconnect()
+            }
         }
     }
 

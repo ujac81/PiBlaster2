@@ -19,9 +19,8 @@
         <file>qml/connect/ConnectPage.qml</file>
         <file>qml/connect/SettingsTab.qml</file>
         <file>qml/connect/ConnectTab.qml</file>
-        <file>qml/bluetooth/BluetoothComm.qml</file>
-        <file>qml/bluetooth/BluetoothConnect.qml</file>
         <file>qml/bluetooth/BluetoothCommand.qml</file>
         <file>qml/dialogs/NoBluetoothDialog.qml</file>
+        <file>images/statusbar.png</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 
 import QtQuick 2.2
 import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.0
 
 import "bluetooth"
 import "content"
@@ -14,18 +15,36 @@ ApplicationWindow {
 
     property string color1: "#94d9ff"
     property int lastBTDeviceState: 0
-    property int btconnected: 0
+    property bool btconnected: false
+    property bool btconnecting: false
+    property string statustext: ""
 
     NoBluetoothDialog { id: diagNoBluetooth }
 
-
-//    BluetoothConnect { id: btConn }
-//    BluetoothComm { id: btComm }
 //    BluetoothCommand { id: btCmd }
 
     Rectangle {
         color: "#212126"
         anchors.fill: parent
+    }
+
+    statusBar: BorderImage {
+        border.top: 8
+        source: "/images/statusbar.png"
+        width: parent.width
+        height: main.statustext != "" ? 50 : 0
+        Behavior on height {
+            NumberAnimation {
+                easing.type: Easing.OutCubic;
+                duration: 500
+            }
+        }
+        Text {
+            font.pixelSize: 20
+            anchors.verticalCenter: parent.verticalCenter
+            color: "white"
+            text: main.statustext
+        }
     }
 
     toolBar: BorderImage {
@@ -59,7 +78,7 @@ ApplicationWindow {
         }
 
         Text {
-            font.pixelSize: 42
+            font.pixelSize: 38
             Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
             x: backButton.x + backButton.width + 20
             anchors.verticalCenter: parent.verticalCenter
@@ -136,22 +155,27 @@ ApplicationWindow {
         btService.bluetoothModeChanged.connect(bt_devstate);
         btService.bluetoothConnected.connect(bt_connected);
         btService.bluetoothDisconnected.connect(bt_disconnected);
-
+        main.setStatus("PiBlaster 2 remote loaded.");
     }
 
 
     function bt_reconnect() {
         console.log("SCANNING...");
         btService.serviceSearch("00:1A:7D:DA:71:14");
+        main.btconnecting = true;
+        main.btconnected = false;
     }
     function bt_disconnect() {
         console.log("DISCONNECTING...");
         btService.disconnectService();
+        main.btconnecting = false;
+        main.btconnected = false;
     }
 
 
     function bt_message(msg) {
-        console.log("BT SERVICE MESSAGE: "+msg)
+        console.log("BT SERVICE MESSAGE: "+msg);
+        main.setStatus("Bluetooth: "+msg);
     }
 
     // Raise no bluetooth dialog if bluetooth adapter lost.
@@ -173,25 +197,40 @@ ApplicationWindow {
 
     function bt_connected() {
         btService.writeSocket( "1234" );
-        main.btconnected = 1;
+        main.btconnected = true;
+        main.btconnecting = false;
+        keepalive.running = true;
     }
 
     function bt_disconnected() {
         console.log("Disconnected...");
-        main.btconnected = 0
+        main.btconnected = false;
+        main.btconnecting = false;
+        keepalive.running = false;
     }
 
     // Send "keepalive" signal every 10s.
     Timer {
+        id: keepalive
         interval: 5000
-        running: true
+        running: false
         repeat: true
         // sendSingle() will check if connected.
-        onTriggered: {
-            if ( main.btconnected === 1 ) {
-                btService.writeSocket("keepalive");
-            }
-        }
+        onTriggered: btService.writeSocket("keepalive");
+    }
+
+
+    function setStatus(msg) {
+        main.statustext = msg;
+        deletestatus.restart();
+    }
+
+    Timer {
+        id: deletestatus
+        interval: 3000
+        running: false
+        repeat: false
+        onTriggered: main.statustext = "";
     }
 
 }
