@@ -12,6 +12,7 @@ BTService::BTService(BTCommMessageHandler* msgHandler):
     _msgId(0)
 {
     _localDevice = new QBluetoothLocalDevice(this);
+    _hostMode = QBluetoothLocalDevice::HostPoweredOff;
 
     connect(_localDevice,
             SIGNAL(hostModeStateChanged(QBluetoothLocalDevice::HostMode)),
@@ -29,9 +30,15 @@ void BTService::checkBluetoothOn()
 {
     if ( _localDevice->isValid() )
     {
-        // Turn Bluetooth on
-        _localDevice->powerOn();
-        _localDevice->setHostMode( QBluetoothLocalDevice::HostConnectable );
+        if ( _localDevice->hostMode() != QBluetoothLocalDevice::HostConnectable )
+        {
+            // Turn Bluetooth on
+            _localDevice->powerOn();
+            _localDevice->setHostMode( QBluetoothLocalDevice::HostConnectable );
+        } else {
+            _hostMode = QBluetoothLocalDevice::HostConnectable;
+            emit bluetoothModeChanged( QBluetoothLocalDevice::HostConnectable );
+        }
     }
     else
     {
@@ -42,6 +49,7 @@ void BTService::checkBluetoothOn()
 
 void BTService::localDeviceChanged( QBluetoothLocalDevice::HostMode state )
 {
+    _hostMode = state;
     emit bluetoothModeChanged(state);
 }
 
@@ -154,16 +162,15 @@ void BTService::serviceScanFinished()
         // TODO: catch I/O errors on socket
 
         connect(_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
-        connect(_socket, SIGNAL(disconnected()), this, SIGNAL(socketDisconnected()));
+        connect(_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
         connect(_socket, SIGNAL(error(QBluetoothSocket::SocketError)),
-                this, SIGNAL(socketError(QBluetoothSocket::SocketError)));
+                this, SLOT(socketError(QBluetoothSocket::SocketError)));
         connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+        connect(_socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)),
+                this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)));
 
         _socket->connectToService( _serviceInfo );
-    }
-
-    if ( ! _socket )
-    {
+    } else {
         emit bluetoothError("PiBlaster Service not found.");
         return;
     }
@@ -202,6 +209,12 @@ void BTService::socketError(QBluetoothSocket::SocketError error)
 }
 
 
+void BTService::socketStateChanged(QBluetoothSocket::SocketState state)
+{
+    qDebug() << "BTService::socketStateChanged(): " << state;
+}
+
+
 void BTService::readSocket()
 {
     if ( ! _socket )
@@ -216,7 +229,12 @@ void BTService::readSocket()
         // write '1' to buffer to tell PiBlaster to send next line.
         // TODO: redesign
         QByteArray text = QString("1").toUtf8() + '\n';
-        _socket->write( text );
+        qint64 bytes = _socket->write( text );
+        if ( bytes == -1 )
+        {
+            emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
+            disconnectService();
+        }
     }
 }
 
@@ -231,7 +249,12 @@ void BTService::writeSocket( const QString &msg )
     QString send = head + line;
     qDebug() << "SEND: " << send;
     QByteArray text = send.toUtf8() + '\n';
-    _socket->write( text );
+    qint64 bytes = _socket->write( text );
+    if ( bytes == -1 )
+    {
+        emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
+        disconnectService();
+    }
 
     _msgId++;
 }

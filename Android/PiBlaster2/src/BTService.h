@@ -26,6 +26,9 @@ public:
     BTService(BTCommMessageHandler* msgHandler);
     ~BTService();
 
+
+    Q_INVOKABLE QBluetoothLocalDevice::HostMode hostMode() const { return _hostMode; }
+
 public slots:
 
     /**
@@ -53,7 +56,7 @@ private slots:
     void socketConnected();
     void socketDisconnected();
     void socketError(QBluetoothSocket::SocketError error);
-
+    void socketStateChanged(QBluetoothSocket::SocketState state);
 
 
     /// @brief Triggered if state of local bluetooth device changed.
@@ -62,6 +65,7 @@ private slots:
 Q_SIGNALS:
 
     void bluetoothError(const QString&);
+    void bluetoothWarning(const QString&);
     void bluetoothMessage(const QString&);
     void bluetoothModeChanged(QBluetoothLocalDevice::HostMode state);
 
@@ -82,6 +86,7 @@ private:
 
     int _msgId;
 
+    QBluetoothLocalDevice::HostMode _hostMode;
 };
 
 #endif // BTService_H

@@ -25,6 +25,19 @@ ApplicationWindow {
     property bool btautoconnect: false
     property string btpin: "1234"
 
+    property bool playPlaying: false
+    property bool playRepeat: false
+    property bool playShuffle: false
+
+    property string playSong: "SuperSongName EXTREM LONG SuperSongName LONGER SuperSongName ..."
+    property string playArtist: "No Artist"
+    property string playAlbum: "No Album"
+    property int playLength: 0
+    property int playPosition: 0
+    property int playVolume: 50
+    property int playMixerVolume: 50
+    property int playAmpVolume: 50
+
 
     Settings {
         id: settings
@@ -35,8 +48,8 @@ ApplicationWindow {
 
 
     NoBluetoothDialog { id: diagNoBluetooth }
+    BluetoothCommand { id: btCmd }
 
-//    BluetoothCommand { id: btCmd }
 
     Rectangle {
         color: "#212126"
@@ -99,6 +112,10 @@ ApplicationWindow {
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
             text: "PiBlaster Remote 2.0"
+            MouseArea {
+                anchors.fill: parent
+                onClicked: stackView.pop()
+            }
         }
     }
 
@@ -167,16 +184,18 @@ ApplicationWindow {
         // Incomming commands are bufferd by BTMessageHandler.cpp
         // and emitted as signal when received completely.
         // Process them inside extra file BluetoothCommand.
-//        btMessages.receivedMessage.connect(btCmd.processMessage);
-//        btService.checkBluetoothOn();
+
+        btMessages.receivedMessage.connect(btCmd.processMessage);
         btService.bluetoothMessage.connect(bt_message);
         btService.bluetoothError.connect(bt_error);
+        btService.bluetoothWarning.connect(bt_warning);
         btService.bluetoothModeChanged.connect(bt_devstate);
         btService.bluetoothConnected.connect(bt_connected);
         btService.bluetoothDisconnected.connect(bt_disconnected);
         main.setStatus("PiBlaster 2 remote loaded.");
 
-        if ( main.btautoconnect ) {
+        if (btService.hostMode() === 1 && main.btautoconnect) {
+            console.log("Found active bluetooth on startup -- autoconnecting...");
             bt_reconnect();
         }
     }
@@ -209,7 +228,11 @@ ApplicationWindow {
         if (state === 0 && lastBTDeviceState === 1) {
             diagNoBluetooth.open();
         }
-        lastBTDeviceState = 1;
+        if (lastBTDeviceState === 0 && state === 1 && main.btautoconnect) {
+            console.log("Bluetooth activated -- autoconnecting...");
+            bt_reconnect();
+        }
+        lastBTDeviceState = state;
     }
 
     // Set error message for failure dialog and raise dialog.
@@ -217,6 +240,11 @@ ApplicationWindow {
     function bt_error(error) {
         main.btautoconnect = false;
         diagNoBluetooth.service_error(error);
+    }
+
+    // Set warning message for failure dialog and raise dialog.
+    function bt_warning(warning) {
+        diagNoBluetooth.service_warning(warning);
     }
 
     function bt_connected() {
@@ -255,6 +283,15 @@ ApplicationWindow {
         running: false
         repeat: false
         onTriggered: main.statustext = "";
+    }
+
+
+    function btSendSingle(cmd) {
+        if (main.btconnected) {
+            btService.writeSocket(cmd);
+        } else {
+            main.setStatus("Not connected to PiBlaster!");
+        }
     }
 
 }

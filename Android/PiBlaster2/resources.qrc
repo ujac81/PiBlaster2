@@ -26,5 +26,13 @@
         <file>qml/play/PlayTab.qml</file>
         <file>qml/play/PlayPage.qml</file>
         <file>qml/play/EqualizerTab.qml</file>
+        <file>images/play/stop.png</file>
+        <file>images/play/shuffle.png</file>
+        <file>images/play/repeat.png</file>
+        <file>images/play/play.png</file>
+        <file>images/play/pause.png</file>
+        <file>images/play/forward.png</file>
+        <file>images/play/backward.png</file>
+        <file>qml/items/FlickText.qml</file>
     </qresource>
 </RCC>

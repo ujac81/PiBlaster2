@@ -4,6 +4,8 @@ import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
+import "../items"
+
 Item {
     width: parent.width
     height: parent.height
@@ -28,38 +30,88 @@ Item {
         spacing: 40
         anchors.centerIn: parent
 
-        Text {
-            id: currentSong
-            horizontalAlignment: Text.AlignCenter
-            verticalAlignment: Text.AlignBottom
-            font.pixelSize: 28
-            font.weight: Font.DemiBold
-            text: "SuperSongName"
-            color: "white"
+        FlickText {
+            textheight: 28
+            flicktext: main.playSong
+            textweight: Font.DemiBold
         }
-        Text {
-            id: currentArtist
-            horizontalAlignment: Text.AlignCenter
-            verticalAlignment: Text.AlignBottom
-            font.pixelSize: 24
-            text: "SuperArtist"
-            color: "white"
+        FlickText {
+            textheight: 24
+            flicktext: main.playArtist
         }
-        Text {
-            id: currentAlbum
-            horizontalAlignment: Text.AlignCenter
-            verticalAlignment: Text.AlignBottom
-            font.pixelSize: 20
-            text: "SuperAlbum"
-            color: "white"
+        FlickText {
+            textheight: 20
+            flicktext: main.playAlbum
         }
 
         Row {
             spacing: 20
-            Label { text: "prev" }
-            Label { text: "pause" }
-            Label { text: "stop" }
-            Label { text: "next" }
+            height: 48
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Image {
+                source: "qrc:///images/play/backward.png"
+                width: parent.height
+                height: parent.height
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("playprev");
+                }
+            }
+            Image {
+                source: "qrc:///images/play/stop.png"
+                width: parent.height
+                height: parent.height
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("playstop");
+                }
+            }
+            Image {
+                source: main.playPlaying ? "qrc:///images/play/pause.png" : "qrc:///images/play/play.png"
+                width: parent.height
+                height: parent.height
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("playtoggle");
+                }
+            }
+            Image {
+                source: "qrc:///images/play/forward.png"
+                width: parent.height
+                height: parent.height
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("playnext");
+                }
+            }
+        }
+
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 60
+            height: 48
+
+            Image {
+                source: "qrc:///images/play/shuffle.png"
+                width: parent.height
+                height: parent.height
+                opacity: main.playShuffle ? 1 : 0.5
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("toggleshuffle");
+                }
+            }
+            Image {
+                source: "qrc:///images/play/repeat.png"
+                width: parent.height
+                height: parent.height
+                opacity: main.playRepeat ? 1 : 0.5
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: main.btSendSingle("togglerepeat");
+                }
+            }
         }
 
         Column {
@@ -83,13 +135,21 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
                 font.pixelSize: 20
-                text: "Volume"
+                text: "Volume " + main.playVolume
                 color: "white"
             }
             Slider {
+                id: playPlayVolumeSider
                 anchors.margins: 20
                 style: touchStyle
-                value: 0.5
+                value: main.playVolume
+                updateValueWhileDragging: false
+                minimumValue: 0
+                maximumValue: 100
+                stepSize: 1
+                onValueChanged: {
+                    main.btSendSingle("setvolume "+playPlayVolumeSider.value);
+                }
             }
         }
     }

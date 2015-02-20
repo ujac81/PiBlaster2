@@ -19,3 +19,6 @@ OTHER_FILES += \
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    qml/items/FlickText.qml
