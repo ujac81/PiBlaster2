@@ -7,6 +7,9 @@ import QtQuick.Controls.Styles 1.1
 import "../items"
 
 Item {
+    id: playTab
+
+
     width: parent.width
     height: parent.height
 
@@ -148,7 +151,9 @@ Item {
                 maximumValue: 100
                 stepSize: 1
                 onValueChanged: {
-                    main.btSendSingle("setvolume "+playPlayVolumeSider.value);
+                    if (playPlayVolumeSider.value !== main.playVolume) {
+                        main.btSendSingle("setvolume "+playPlayVolumeSider.value);
+                    }
                 }
             }
         }
@@ -185,4 +190,12 @@ Item {
             }
         }
     }
+
+
+    function update_status(msg) {
+        for ( var i = 0; i < 13; ++i ) {
+            console.log(i+": "+msg.payloadElements(0)[i]);
+        }
+    }
+
 }

@@ -33,7 +33,7 @@ ApplicationWindow {
     property string playArtist: "No Artist"
     property string playAlbum: "No Album"
     property int playLength: 0
-    property int playPosition: 0
+    property double playPosition: 0
     property int playVolume: 50
     property int playMixerVolume: 50
     property int playAmpVolume: 50
@@ -166,15 +166,32 @@ ApplicationWindow {
                          }
 
         initialItem: Item {
+            objectName: "InitialItem"
             width: parent.width
             height: parent.height
             ListView {
+                id: mainListView
                 model: pageModel
                 anchors.fill: parent
                 delegate: AndroidDelegate {
                     text: title
                     onClicked: stackView.push(Qt.resolvedUrl(page))
                 }
+            }
+
+            function activated() {}
+        }
+
+        // let current stack page update on load if required.
+        onCurrentItemChanged: {
+            if ( currentItem ) {
+                currentItem.activated();
+            }
+        }
+
+        function update_status(msg) {
+            if (currentItem.objectName === "PlayPage" ) {
+                currentItem.update_status(msg);
             }
         }
     }

@@ -136,15 +136,15 @@ class Cmd:
 
         # # # # playstatus # # # #
 
-        # elif cmd == "playstatus":
-        #     # show current playlist item
-        #
-        #     info = self.parent.play.get_play_status()
-        #     if info is None:
-        #         ret_stat = -1
-        #     else:
-        #         ret_list = [info]
-        #     ret_code = PLAY_INFO
+        elif cmd == "playstatus":
+            # show current playlist item
+
+            info = self.main.mpc.get_play_status()
+            if len(info) == 0:
+                ret_stat = -1
+            else:
+                ret_list = [info]
+            ret_code = PLAY_INFO
 
         # # # # plclear # # # #
 

@@ -5,10 +5,13 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
 Item {
+    objectName: "PlayPage"
+
     width: parent.width
     height: parent.height
 
     TabView {
+        id: playTabView
         anchors.fill: parent
         style: touchStyle
         Tab {
@@ -22,6 +25,20 @@ Item {
         Tab {
             title: "Equalizer"
             EqualizerTab{ visible: true }
+        }
+
+        onCurrentIndexChanged: tabChanged(currentIndex);
+
+        function tabChanged(index) {
+            if ( index ===  0 ) {
+                main.btSendSingle("playstatus");
+            }
+            if ( index ===  1 ) {
+                main.btSendSingle("volumestatus");
+            }
+            if ( index ===  2 ) {
+                main.btSendSingle("equalizerstatus");
+            }
         }
     }
 
@@ -56,5 +73,17 @@ Item {
                 }
             }
         }
+    }
+
+    function activated() {
+        playTabView.tabChanged(0);
+    }
+
+
+    function update_status(msg) {
+        if (msg.code() === 304) {
+            playTabView.getTab(0).item.update_status(msg);
+        }
+
     }
 }

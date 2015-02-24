@@ -4,6 +4,7 @@
 """
 
 from mpd import MPDClient, ConnectionError
+import os
 import queue
 import sys
 import time
@@ -152,6 +153,38 @@ class MPC:
         if vol > 100:
             vol = 100
         self.client.setvol(vol)
+
+    def get_play_status(self):
+        """
+
+        :return:
+        """
+
+        result = []
+        status = self.client.status()
+        cur = self.client.currentsong()
+        result.append(status['random'])
+        result.append(status['repeat'])
+        result.append(status['state'])
+        result.append(status['volume'])
+        result.append(status['time'].replace(':', '.'))
+        result.append(cur['time'])
+        result.append(cur['album'] if 'album' in cur else '')
+        result.append(cur['albumartist'] if 'albumartist' in cur else '')
+        if 'title' in cur:
+            result.append(cur['title'])
+        else:
+            filename = cur['file']
+            ext = os.path.splitext(filename)[1]
+            title = os.path.split(filename)[1].replace(ext, '').\
+                replace('_', ' ')
+            result.append(title)
+        result.append(cur['file'])
+        result.append(cur['date'] if 'date' in cur else '')
+        result.append(cur['genre'] if 'genre' in cur else '')
+        result.append(cur['track'] if 'track' in cur else '')
+
+        return result
 
     def exit_client(self):
         """Disconnect from mpc

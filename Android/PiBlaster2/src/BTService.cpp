@@ -247,7 +247,8 @@ void BTService::writeSocket( const QString &msg )
     QString line = QString::number( _msgId ) + " 0 " + msg;
     QString head = QString("%1").arg( line.length(), 4, 10, QLatin1Char('0') );
     QString send = head + line;
-    qDebug() << "SEND: " << send;
+    if ( msg != "keepalive" )
+        qDebug() << "SEND: " << send;
     QByteArray text = send.toUtf8() + '\n';
     qint64 bytes = _socket->write( text );
     if ( bytes == -1 )

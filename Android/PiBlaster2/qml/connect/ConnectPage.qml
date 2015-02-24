@@ -5,6 +5,8 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
 Item {
+    objectName: "ConnectPage"
+
     width: parent.width
     height: parent.height
 
@@ -53,4 +55,7 @@ Item {
             }
         }
     }
+
+
+    function activated() {}
 }
