@@ -123,13 +123,21 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
                 font.pixelSize: 20
-                text: "Position"
+                text: "Position " + main.playPositionText + " / " + main.playLengthText
                 color: "white"
             }
             Slider {
+                id: playPlayPosSider
                 anchors.margins: 20
                 style: touchStyle
-                value: 0.5
+                value: 0
+                updateValueWhileDragging: false
+                minimumValue: 0
+                onValueChanged: {
+                    if (playPlayPosSider.value !== main.playPosition) {
+                        main.btSendSingle("setpos "+playPlayPosSider.value);
+                    }
+                }
             }
         }
         Column {
@@ -193,9 +201,39 @@ Item {
 
 
     function update_status(msg) {
-        for ( var i = 0; i < 13; ++i ) {
-            console.log(i+": "+msg.payloadElements(0)[i]);
+        if (msg.payloadElementsSize(0) !== 13) {
+            main.setStatus("Ill-formed payload received for play-status!")
+        } else {
+            var arr = msg.payloadElements(0);
+            main.playShuffle = arr[0] === "1";
+            main.playRepeat = arr[1] === "1";
+            main.playPlaying = arr[2] === "play";
+            main.playVolume = parseInt(arr[3]);
+            main.playPosition = parseFloat(arr[4]);
+            main.playLength = parseInt(arr[5]);
+            main.playAlbum = arr[6];
+            main.playArtist = arr[7];
+            main.playSong = arr[8];
+            main.playPositionText = seconds_to_string(main.playPosition);
+            main.playLengthText = seconds_to_string(main.playLength);
+
+            console.log(main.playPosition);
+            console.log(main.playLength);
+            console.log(main.playPositionText);
+            console.log(main.playLengthText);
+
+            playPlayVolumeSider.value = main.playVolume;
+            playPlayPosSider.maximumValue = main.playLength;
+            playPlayPosSider.value = main.playPosition;
         }
+    }
+
+    function seconds_to_string(time) {
+        var res = "" + Math.floor(time/60) + ":";
+        var sec = Math.floor(time % 60);
+        if (sec < 10) { res += "0"; }
+        res += sec;
+        return res;
     }
 
 }

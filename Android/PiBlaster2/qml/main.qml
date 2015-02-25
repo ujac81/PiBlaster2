@@ -25,15 +25,17 @@ ApplicationWindow {
     property bool btautoconnect: false
     property string btpin: "1234"
 
-    property bool playPlaying: false
-    property bool playRepeat: false
     property bool playShuffle: false
+    property bool playRepeat: false
+    property bool playPlaying: false
 
     property string playSong: "SuperSongName EXTREM LONG SuperSongName LONGER SuperSongName ..."
     property string playArtist: "No Artist"
     property string playAlbum: "No Album"
     property int playLength: 0
     property double playPosition: 0
+    property string playPositionText: "0:00"
+    property string playLengthText: "0:00"
     property int playVolume: 50
     property int playMixerVolume: 50
     property int playAmpVolume: 50
@@ -185,6 +187,7 @@ ApplicationWindow {
         // let current stack page update on load if required.
         onCurrentItemChanged: {
             if ( currentItem ) {
+                console.log("=== Stack item changed ===");
                 currentItem.activated();
             }
         }

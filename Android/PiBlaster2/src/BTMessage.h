@@ -53,6 +53,12 @@ public:
     Q_INVOKABLE QString payload( int i ) const { return _payload[i]; }
 
     Q_INVOKABLE QList<QString> payloadElements( int i ) const { return _payloadElements[i]; }
+    Q_INVOKABLE int payloadElementsSize( int i ) const
+    {
+        if ( i >= _payloadElements.size() )
+            return 0;
+        return _payloadElements[i].size();
+    }
 
     bool addPayload( const QString& line )
     {

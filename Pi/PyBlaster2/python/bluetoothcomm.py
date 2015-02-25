@@ -9,6 +9,7 @@ import sys
 import threading
 
 from codes import *
+from codes import *
 import cmd
 import log
 
@@ -361,7 +362,6 @@ class ServerThread(threading.Thread):
                 try:
                     data = self.client_sock.recv(recv_size).decode(
                         'utf-8').strip()
-                    print("+++%s+++" % data)
                 except bluetooth.btcommon.BluetoothError:
                     receiving = False
                     pass
@@ -394,7 +394,6 @@ class ServerThread(threading.Thread):
         self.client_sock.settimeout(self.comm_timeout)
         try:
             self.client_sock.recv(1)
-            print("===1===")
         except bluetooth.btcommon.BluetoothError:
             return False
             pass
