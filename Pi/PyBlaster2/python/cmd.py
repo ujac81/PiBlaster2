@@ -136,6 +136,14 @@ class Cmd:
 
         # # # # playstatus # # # #
 
+        elif cmd == "playnext":
+            ret_code = PLAY_NEXT
+            self.main.mpc.next()
+
+        elif cmd == "playprev":
+            ret_code = PLAY_PREV
+            self.main.mpc.previous()
+
         elif cmd == "playstatus":
             # show current playlist item
 
@@ -145,6 +153,13 @@ class Cmd:
             else:
                 ret_list = [info]
             ret_code = PLAY_INFO
+
+        elif cmd == "playstop":
+            ret_code = PLAY_STOPPED
+            self.main.mpc.stop()
+
+        elif cmd == "playtoggle":
+            ret_code = self.main.mpc.toggle()
 
         # # # # plclear # # # #
 
@@ -292,20 +307,17 @@ class Cmd:
         #     # let APP set correct volume slider position
         #     self.parent.play.send_track_info()
 
-        # # # # vol_set # # # #
-
-        # elif cmd == "volset":
-        #     if len(line) != 2:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "volset needs 1 arg"
-        #     else:
-        #         if int_args[1] is None:
-        #             ret_stat = ERRORARGS
-        #             ret_msg = "volsset needs int arg"
-        #         else:
-        #             self.parent.play.vol_set(int_args[1])
-        #             # let APP set correct volume slider position
-        #             self.parent.play.send_track_info()
+        elif cmd == "setvolume":
+            if len(line) != 2:
+                ret_stat = ERRORARGS
+                ret_msg = "setvolume needs 1 arg"
+            else:
+                if int_args[1] is None:
+                    ret_stat = ERRORARGS
+                    ret_msg = "setvolume needs int arg"
+                else:
+                    ret_code = VOL_MIXER_CHANGED
+                    self.main.mpc.set_volume(int_args[1])
 
         else:
             ret_stat = ERRORUNKNOWN

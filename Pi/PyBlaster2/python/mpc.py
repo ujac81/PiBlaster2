@@ -10,7 +10,7 @@ import sys
 import time
 import threading
 
-
+import codes
 import log
 
 
@@ -37,6 +37,7 @@ class MPDIdler(threading.Thread):
                 self.client = MPDClient()
                 self.client.timeout = 10
                 self.client.connect('localhost', 6600)
+                # self.client.subscribe('pyblaster')
                 connected = True
             except ConnectionError:
                 self.main.log.write(log.ERROR, "[MPDIdler]: Failed to "
@@ -102,6 +103,7 @@ class MPC:
                 self.client = MPDClient()
                 self.client.timeout = 10
                 self.client.connect('localhost', 6600)
+                # self.client.subscribe('pyblaster')
                 connected = True
             except ConnectionError:
                 time.sleep(0.5)
@@ -118,13 +120,18 @@ class MPC:
 
         self.queue_lock.acquire()
         try:
-            event = self.queue.get_nowait()
+            events = self.queue.get_nowait()
         except queue.Empty:
             self.queue_lock.release()
             return
         self.queue_lock.release()
 
-        self.main.log.write(log.MESSAGE, "[MPD event]: %s" % event)
+        self.main.log.write(log.MESSAGE, "[MPD event]: %s" % events)
+
+        for event in events:
+            if event == 'player':
+                res = self.main.cmd.eval('playstatus', 'idler')
+                self.main.bt.send_client([-1] + res)
 
     def join(self):
         """Join all button threads after keep_run in root is False.
@@ -134,7 +141,11 @@ class MPC:
         # The loop in MPDIdler should exit now, but would hang in idle().
         # So we trigger some mpd command to wake up the idler and MPDIdler
         # thread can exit.
+        # self.client.sendmessage('pyblaster', 'quit')
         self.update_database()
+        time.sleep(1)
+        self.update_database()
+        time.sleep(1)
         self.idler.join(10)
 
     def update_database(self):
@@ -147,12 +158,16 @@ class MPC:
         int(self.client.status()['volume'])
 
     def change_volume(self, amount):
-        vol = self.volume() + amount
+        self.set_volume(self.volume() + amount)
+
+    def set_volume(self, setvol):
+        vol = setvol
         if vol < 0:
             vol = 0
         if vol > 100:
             vol = 100
         self.client.setvol(vol)
+        return self.volume()
 
     def get_play_status(self):
         """
@@ -185,6 +200,43 @@ class MPC:
         result.append(cur['track'] if 'track' in cur else '')
 
         return result
+
+    def play_status(self):
+        """0 if stopped, 1 if paused, 2 if playing
+        """
+        status = self.client.status()['state']
+        if status == 'stop':
+            return codes.PLAY_STOPPED
+        if status == 'pause':
+            return codes.PLAY_PAUSED
+        return codes.PLAY_PLAYING
+
+    def toggle(self):
+        """Toggle play/pause
+        :return: new play status from self.play_status()
+        """
+        status = self.play_status()
+        self.pause() if status == codes.PLAY_PLAYING else self.play()
+        return self.play_status()
+
+    def pause(self):
+        self.client.pause()
+
+    def play(self):
+        self.client.play()
+
+    def stop(self):
+        self.client.stop()
+
+    def next(self):
+        self.client.next()
+
+    def previous(self):
+        self.client.previous()
+
+    def seekcurrent(self, time):
+        song_pos = int(self.client.status()['song'])
+        self.client.seek(song_pos, time)
 
     def exit_client(self):
         """Disconnect from mpc

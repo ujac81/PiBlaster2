@@ -9,6 +9,17 @@ import "../items"
 Item {
     id: playTab
 
+    property string playSong: "No Song Name"
+    property string playArtist: "No Artist"
+    property string playAlbum: "No Album"
+    property int playLength: 0
+    property double playPosition: 0
+    property string playPositionText: "0:00"
+    property string playLengthText: "0:00"
+    property int playVolume: 50
+    property int playMixerVolume: 50
+    property int playAmpVolume: 50
+
 
     width: parent.width
     height: parent.height
@@ -35,16 +46,16 @@ Item {
 
         FlickText {
             textheight: 28
-            flicktext: main.playSong
+            flicktext: playTab.playSong
             textweight: Font.DemiBold
         }
         FlickText {
             textheight: 24
-            flicktext: main.playArtist
+            flicktext: playTab.playArtist
         }
         FlickText {
             textheight: 20
-            flicktext: main.playAlbum
+            flicktext: playTab.playAlbum
         }
 
         Row {
@@ -123,7 +134,7 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
                 font.pixelSize: 20
-                text: "Position " + main.playPositionText + " / " + main.playLengthText
+                text: "Position " + playTab.playPositionText + " / " + playTab.playLengthText
                 color: "white"
             }
             Slider {
@@ -134,7 +145,7 @@ Item {
                 updateValueWhileDragging: false
                 minimumValue: 0
                 onValueChanged: {
-                    if (playPlayPosSider.value !== main.playPosition) {
+                    if (playPlayPosSider.value !== playTab.playPosition) {
                         main.btSendSingle("setpos "+playPlayPosSider.value);
                     }
                 }
@@ -146,21 +157,22 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
                 font.pixelSize: 20
-                text: "Volume " + main.playVolume
+                text: "Volume " + playTab.playVolume
                 color: "white"
             }
             Slider {
                 id: playPlayVolumeSider
                 anchors.margins: 20
                 style: touchStyle
-                value: main.playVolume
+                value: playTab.playVolume
                 updateValueWhileDragging: false
                 minimumValue: 0
                 maximumValue: 100
                 stepSize: 1
                 onValueChanged: {
-                    if (playPlayVolumeSider.value !== main.playVolume) {
+                    if (playPlayVolumeSider.value !== playTab.playVolume) {
                         main.btSendSingle("setvolume "+playPlayVolumeSider.value);
+                        playTab.playVolume = playPlayVolumeSider.value;
                     }
                 }
             }
@@ -208,23 +220,18 @@ Item {
             main.playShuffle = arr[0] === "1";
             main.playRepeat = arr[1] === "1";
             main.playPlaying = arr[2] === "play";
-            main.playVolume = parseInt(arr[3]);
-            main.playPosition = parseFloat(arr[4]);
-            main.playLength = parseInt(arr[5]);
-            main.playAlbum = arr[6];
-            main.playArtist = arr[7];
-            main.playSong = arr[8];
-            main.playPositionText = seconds_to_string(main.playPosition);
-            main.playLengthText = seconds_to_string(main.playLength);
+            playVolume = parseInt(arr[3]);
+            playPosition = parseFloat(arr[4]);
+            playLength = parseInt(arr[5]);
+            playAlbum = arr[6];
+            playArtist = arr[7];
+            playSong = arr[8];
+            playPositionText = seconds_to_string(playPosition);
+            playLengthText = seconds_to_string(playLength);
 
-            console.log(main.playPosition);
-            console.log(main.playLength);
-            console.log(main.playPositionText);
-            console.log(main.playLengthText);
-
-            playPlayVolumeSider.value = main.playVolume;
-            playPlayPosSider.maximumValue = main.playLength;
-            playPlayPosSider.value = main.playPosition;
+            playPlayVolumeSider.value = playVolume;
+            playPlayPosSider.value = playPosition;
+            playPlayPosSider.maximumValue = playLength;
         }
     }
 
@@ -234,6 +241,22 @@ Item {
         if (sec < 10) { res += "0"; }
         res += sec;
         return res;
+    }
+
+
+    Timer {
+        id: positionTimer
+        interval: 1000
+        running: main.playPlaying
+        repeat: true
+        onTriggered: {
+            playPosition += 1;
+            if (playPosition > playLength) {
+                playPosition = playLength;
+            }
+            playPlayPosSider.value = playPosition;
+            playPositionText = seconds_to_string(playPosition);
+        }
     }
 
 }

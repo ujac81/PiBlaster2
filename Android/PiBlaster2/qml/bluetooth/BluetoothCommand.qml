@@ -24,6 +24,13 @@ Item
             stackView.update_status(msg)
         }
 
+        if (msg.code() === 305 || msg.code() === 306) {
+            main.playPlaying = false;
+        }
+
+        if (msg.code() === 307) {
+            main.playPlaying = true;
+        }
     }
 
 

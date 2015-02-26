@@ -29,18 +29,6 @@ ApplicationWindow {
     property bool playRepeat: false
     property bool playPlaying: false
 
-    property string playSong: "SuperSongName EXTREM LONG SuperSongName LONGER SuperSongName ..."
-    property string playArtist: "No Artist"
-    property string playAlbum: "No Album"
-    property int playLength: 0
-    property double playPosition: 0
-    property string playPositionText: "0:00"
-    property string playLengthText: "0:00"
-    property int playVolume: 50
-    property int playMixerVolume: 50
-    property int playAmpVolume: 50
-
-
     Settings {
         id: settings
         property alias btmac: main.btmac
@@ -272,6 +260,7 @@ ApplicationWindow {
         main.btconnected = true;
         main.btconnecting = false;
         keepalive.running = true;
+        main.btautoconnect = true;
     }
 
     function bt_disconnected() {
@@ -281,20 +270,30 @@ ApplicationWindow {
         keepalive.running = false;
     }
 
-    // Send "keepalive" signal every 10s.
-    Timer {
-        id: keepalive
-        interval: 5000
-        running: false
-        repeat: true
-        // sendSingle() will check if connected.
-        onTriggered: btService.writeSocket("keepalive");
+    function btSendSingle(cmd) {
+        if (main.btconnected) {
+            // reset keep alive to prevent interference with command sending.
+            keepalive.running = false;
+            keepalive.running = true;
+            btService.writeSocket(cmd);
+        } else {
+            main.setStatus("Not connected to PiBlaster!");
+        }
     }
-
 
     function setStatus(msg) {
         main.statustext = msg;
         deletestatus.restart();
+    }
+
+    // Send "keepalive" signal every 10s.
+    Timer {
+        id: keepalive
+        interval: 10000
+        running: false
+        repeat: true
+        // sendSingle() will check if connected.
+        onTriggered: btService.writeSocket("keepalive");
     }
 
     Timer {
@@ -305,13 +304,5 @@ ApplicationWindow {
         onTriggered: main.statustext = "";
     }
 
-
-    function btSendSingle(cmd) {
-        if (main.btconnected) {
-            btService.writeSocket(cmd);
-        } else {
-            main.setStatus("Not connected to PiBlaster!");
-        }
-    }
 
 }

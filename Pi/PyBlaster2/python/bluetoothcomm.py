@@ -49,6 +49,7 @@ class ServerThread(threading.Thread):
         self.port = 0
         self.uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
         self.next_buffer_size = -1  # set in read_socket to receive lines
+        self.msgid = -1  # id counter for messages sent by server (negative)
 
     def run(self):
         """
@@ -69,7 +70,7 @@ class ServerThread(threading.Thread):
                         out = self.out_queue.get_nowait()
                         self.out_queue_lock.release()
 
-                        self.send_client(msg_id=out[0],
+                        self.send_client(msg_id_in=out[0],
                                          status=out[1],
                                          code=out[2],
                                          msg=out[3],
@@ -107,6 +108,7 @@ class ServerThread(threading.Thread):
         self.main.log.write(log.MESSAGE, '[BTTHREAD] RFCOMM service opened as '
                                          'PyBlaster')
         self.mode = NOTCONNECTED
+        self.msgid = -1
 
     def read_socket(self):
         """Check if command found in socket
@@ -176,7 +178,7 @@ class ServerThread(threading.Thread):
         self.main.log.write(log.MESSAGE, '[BTTHREAD] Closed connection.')
         self.start_server()
 
-    def send_client(self, msg_id, status, code, msg, message_list):
+    def send_client(self, msg_id_in, status, code, msg, message_list):
         """Send data package to PiBlaster APP via bluetooth
 
         :param msg_id: message id as received by read_command
@@ -188,6 +190,13 @@ class ServerThread(threading.Thread):
 
         if self.mode == NOTCONNECTED:
             return
+
+        # -1 indicates, that message is sent by server without request.
+        # Use inner message counter and decrease it (negative ids)
+        msg_id = msg_id_in
+        if msg_id_in == -1:
+            msg_id = self.msgid
+            self.msgid -= 1
 
         self.client_sock.settimeout(self.comm_timeout)
         self.main.led.set_led_white(1)
@@ -431,16 +440,17 @@ class RFCommServer:
                 self.in_queue_lock.acquire()
                 cmd = self.in_queue.get_nowait()
                 self.in_queue_lock.release()
-                status, code, msg, res_list = \
-                    self.main.cmd.eval(cmd[1], 'rfcomm', cmd[2])
-                self.send_client(cmd[0], status, code, msg, res_list)
+                self.send_client([cmd[0]] +
+                                 self.main.cmd.eval(cmd[1], 'rfcomm', cmd[2]))
             except queue.Empty:
                 pass
 
-    def send_client(self, msg_id, status, code, msg, res_list):
-        """
-        """
+    def send_client(self, arr):
+        """Put array of [id, status, code, message, payload] to send queue.
 
-        self.out_queue_lock.acquire()
-        self.out_queue.put([msg_id, status, code, msg, res_list])
-        self.out_queue_lock.release()
+        :param arr: [msg_id, status, code, msg, res_list]
+        """
+        if self.server_thread.mode == AUTHORIZED:
+            self.out_queue_lock.acquire()
+            self.out_queue.put(arr)
+            self.out_queue_lock.release()
