@@ -34,5 +34,6 @@
         <file>images/play/forward.png</file>
         <file>images/play/backward.png</file>
         <file>qml/items/FlickText.qml</file>
+        <file>qml/items/ScrollBar.qml</file>
     </qresource>
 </RCC>

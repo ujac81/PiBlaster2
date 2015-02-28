@@ -56,36 +56,36 @@ class ServerThread(threading.Thread):
 
         """
 
-        try:
+        # try:
 
-            self.start_server()
+        self.start_server()
 
-            while self.main.keep_run:
-                self.read_socket()
+        while self.main.keep_run:
+            self.read_socket()
 
-                # dry run outgoing queue on new connection
-                while not self.out_queue.empty():
-                    try:
-                        self.out_queue_lock.acquire()
-                        out = self.out_queue.get_nowait()
-                        self.out_queue_lock.release()
+            # dry run outgoing queue on new connection
+            while not self.out_queue.empty():
+                try:
+                    self.out_queue_lock.acquire()
+                    out = self.out_queue.get_nowait()
+                    self.out_queue_lock.release()
 
-                        self.send_client(msg_id_in=out[0],
-                                         status=out[1],
-                                         code=out[2],
-                                         msg=out[3],
-                                         message_list=out[4]
-                                         )
-                    except queue.Empty:
-                        pass
+                    self.send_client(msg_id_in=out[0],
+                                     status=out[1],
+                                     code=out[2],
+                                     msg=out[3],
+                                     message_list=out[4]
+                                     )
+                except queue.Empty:
+                    pass
 
-            self.main.log.write(log.MESSAGE,
-                                '[THREAD] RFCOMM server leaving...')
+        self.main.log.write(log.MESSAGE,
+                            '[THREAD] RFCOMM server leaving...')
 
-        except bluetooth.btcommon.BluetoothError:
-            # except Exception:
-            self.main.ex_queue.put(sys.exc_info())
-            pass
+        # except bluetooth.btcommon.BluetoothError:
+        #     # except Exception:
+        #     self.main.ex_queue.put(sys.exc_info())
+        #     pass
 
     def start_server(self):
         """Open bluetooth server socket and advertise service
@@ -440,8 +440,8 @@ class RFCommServer:
                 self.in_queue_lock.acquire()
                 cmd = self.in_queue.get_nowait()
                 self.in_queue_lock.release()
-                self.send_client([cmd[0]] +
-                                 self.main.cmd.eval(cmd[1], 'rfcomm', cmd[2]))
+                res = self.main.cmd.eval(cmd[1], 'rfcomm', cmd[2])
+                self.send_client([cmd[0]] + res)
             except queue.Empty:
                 pass
 

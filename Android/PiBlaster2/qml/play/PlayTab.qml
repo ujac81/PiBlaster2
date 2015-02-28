@@ -1,6 +1,6 @@
 
 
-import QtQuick 2.2
+import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
@@ -13,34 +13,17 @@ Item {
     property string playArtist: "No Artist"
     property string playAlbum: "No Album"
     property int playLength: 0
-    property double playPosition: 0
+    property int playPosition: 0
     property string playPositionText: "0:00"
     property string playLengthText: "0:00"
     property int playVolume: 50
     property int playMixerVolume: 50
     property int playAmpVolume: 50
 
-
-    width: parent.width
-    height: parent.height
-
-    property real progress: 0
-    SequentialAnimation on progress {
-        loops: Animation.Infinite
-        running: true
-        NumberAnimation {
-            from: 0
-            to: 1
-            duration: 3000
-        }
-        NumberAnimation {
-            from: 1
-            to: 0
-            duration: 3000
-        }
-    }
+    anchors.fill: parent
 
     Column {
+
         spacing: 40
         anchors.centerIn: parent
 
@@ -113,7 +96,7 @@ Item {
                 opacity: main.playShuffle ? 1 : 0.5
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: main.btSendSingle("toggleshuffle");
+                    onClicked: main.btSendSingle("togglerandom");
                 }
             }
             Image {
@@ -139,13 +122,19 @@ Item {
             }
             Slider {
                 id: playPlayPosSider
+                property int preventSend: 1
+
                 anchors.margins: 20
                 style: touchStyle
-                value: 0
+                value: -1 // prevent "setpos 0" on load
                 updateValueWhileDragging: false
-                minimumValue: 0
+                minimumValue: -1
+                stepSize: 1
                 onValueChanged: {
-                    if (playPlayPosSider.value !== playTab.playPosition) {
+                    if (playPlayPosSider.value !== -1 &&
+                        playPlayPosSider.value !== playTab.playPosition &&
+                        playPlayPosSider.preventSend !== 1) {
+                        console.log("POS SLIDER: val = "+playPlayPosSider.value+", pos = "+playTab.playPosition);
                         main.btSendSingle("setpos "+playPlayPosSider.value);
                     }
                 }
@@ -211,6 +200,22 @@ Item {
         }
     }
 
+    Timer {
+        id: positionTimer
+        interval: 1000
+        running: main.playPlaying
+        repeat: true
+        onTriggered: {
+            var pos = playTab.playPosition;
+            pos += 1;
+            if (pos > playLength) {
+                pos = playLength;
+            }
+            playTab.playPosition = pos;
+            playPlayPosSider.value = pos;
+            playPositionText = seconds_to_string(pos);
+        }
+    }
 
     function update_status(msg) {
         if (msg.payloadElementsSize(0) !== 13) {
@@ -220,18 +225,23 @@ Item {
             main.playShuffle = arr[0] === "1";
             main.playRepeat = arr[1] === "1";
             main.playPlaying = arr[2] === "play";
-            playVolume = parseInt(arr[3]);
-            playPosition = parseFloat(arr[4]);
-            playLength = parseInt(arr[5]);
-            playAlbum = arr[6];
-            playArtist = arr[7];
-            playSong = arr[8];
-            playPositionText = seconds_to_string(playPosition);
-            playLengthText = seconds_to_string(playLength);
+            playTab.playVolume = parseInt(arr[3]);
+            var pos = parseFloat(arr[4]);
+            playTab.playLength = parseInt(arr[5]);
+            playTab.playAlbum = arr[6];
+            playTab.playArtist = arr[7];
+            playTab.playSong = arr[8];
+            playTab.playPositionText = seconds_to_string(pos);
+            playTab.playLengthText = seconds_to_string(playTab.playLength);
 
-            playPlayVolumeSider.value = playVolume;
-            playPlayPosSider.value = playPosition;
-            playPlayPosSider.maximumValue = playLength;
+            playPlayVolumeSider.value = playTab.playVolume;
+
+            playPlayPosSider.preventSend = 1;
+            playPlayPosSider.maximumValue = playTab.playLength;
+            playPlayPosSider.value = pos;
+            playTab.playPosition = pos;
+            playPlayPosSider.minimumValue = 0;
+            playPlayPosSider.preventSend = 0;
         }
     }
 
@@ -243,20 +253,5 @@ Item {
         return res;
     }
 
-
-    Timer {
-        id: positionTimer
-        interval: 1000
-        running: main.playPlaying
-        repeat: true
-        onTriggered: {
-            playPosition += 1;
-            if (playPosition > playLength) {
-                playPosition = playLength;
-            }
-            playPlayPosSider.value = playPosition;
-            playPositionText = seconds_to_string(playPosition);
-        }
-    }
-
 }
+

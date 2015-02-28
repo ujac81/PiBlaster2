@@ -91,24 +91,24 @@ class LEDThread(threading.Thread):
         command. Run until main wants to exit.
         """
 
-        try:
-            self.init_gpio()
-            while self.main.keep_run:
-                try:
-                    led = self.queue.get(timeout=0.1)
-                    self.set_led_by_gpio(led[0], led[1])
-                except queue.Empty:
-                    pass
+        # try:
+        self.init_gpio()
+        while self.main.keep_run:
+            try:
+                led = self.queue.get(timeout=0.1)
+                self.set_led_by_gpio(led[0], led[1])
+            except queue.Empty:
+                pass
 
-            self.main.log.write(log.MESSAGE, "[THREAD] LED driver leaving...")
-            for i in range(len(self.leds)):
-                self.set_led_by_gpio(i, 0)
-            self.set_led_by_gpio(YELLOW, 1)
+        self.main.log.write(log.MESSAGE, "[THREAD] LED driver leaving...")
+        for i in range(len(self.leds)):
+            self.set_led_by_gpio(i, 0)
+        self.set_led_by_gpio(YELLOW, 1)
 
-        except Exception:
-            # Catch any exception from thread and send it to main thread.
-            self.main.ex_queue.put(sys.exc_info())
-            pass
+        # except Exception:
+        #     # Catch any exception from thread and send it to main thread.
+        #     self.main.ex_queue.put(sys.exc_info())
+        #     pass
 
 
 class LED:
@@ -241,32 +241,32 @@ class ButtonThread(threading.Thread):
         """Read button while keep_run in root object is true
         """
 
-        try:
+        # try:
 
+        for i in range(len(self.pins)):
+            GPIO.setup(self.pins[i], GPIO.IN)
+            self.prev_in[i] = GPIO.input(self.pins[i])
+
+        while self.main.keep_run:
+            time.sleep(0.05)  # TODO: to config
             for i in range(len(self.pins)):
-                GPIO.setup(self.pins[i], GPIO.IN)
-                self.prev_in[i] = GPIO.input(self.pins[i])
+                inpt = GPIO.input(self.pins[i])
+                if self.prev_in[i] != inpt:
+                    # Note: depending on your wiring, the 'not' must be
+                    # removed!
+                    if not inpt:
+                        self.queue_lock.acquire()
+                        self.queue.put([self.pins[i], self.names[i]])
+                        self.queue_lock.release()
+                self.prev_in[i] = inpt
 
-            while self.main.keep_run:
-                time.sleep(0.05)  # TODO: to config
-                for i in range(len(self.pins)):
-                    inpt = GPIO.input(self.pins[i])
-                    if self.prev_in[i] != inpt:
-                        # Note: depending on your wiring, the 'not' must be
-                        # removed!
-                        if not inpt:
-                            self.queue_lock.acquire()
-                            self.queue.put([self.pins[i], self.names[i]])
-                            self.queue_lock.release()
-                    self.prev_in[i] = inpt
+        self.main.log.write(log.MESSAGE,
+                            "[THREAD] Button reader leaving...")
 
-            self.main.log.write(log.MESSAGE,
-                                "[THREAD] Button reader leaving...")
-
-        # Forward any exceptions to main thread, so PyBlaster can die.
-        except Exception:
-            self.main.ex_queue.put(sys.exc_info())
-            pass
+        # # Forward any exceptions to main thread, so PyBlaster can die.
+        # except Exception:
+        #     self.main.ex_queue.put(sys.exc_info())
+        #     pass
 
 
 class Buttons:
@@ -347,12 +347,12 @@ class Buttons:
                                          button_color)
 
         if button_color == "green":
-            self.main.cmd.eval("playpause", "button")
+            self.main.cmd.eval("playtoggle", "button")
         if button_color == "yellow":
             self.main.cmd.eval("playnext", "button")
         if button_color == "red":
             self.main.cmd.eval("poweroff", "button")
         if button_color == "blue":
-            self.main.cmd.eval("volinc", "button")
-        if button_color == "white":
             self.main.cmd.eval("voldec", "button")
+        if button_color == "white":
+            self.main.cmd.eval("volinc", "button")

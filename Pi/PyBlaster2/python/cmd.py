@@ -70,83 +70,21 @@ class Cmd:
 
         if cmd == "disconnect":
             ret_stat = STATUSDISCONNECT
+            ret_code = CON_DISCONNECT
 
-        # # # # lsfulldir <storid> <dirid> # # # #
-
-        # elif cmd == "lsfulldir":
-        #     if len(line) != 3:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "lsfulldir needs 2 args"
-        #     else:
-        #         stor = self.parent.usb.get_dev_by_storid(int_args[1])
-        #         if stor is None:
-        #             ret_stat = ERRORARGS
-        #             ret_msg = "illegal storage id"
-        #         else:
-        #             ret_list = stor.list_full_dir(int_args[2])
-        #             ret_code = LS_FULL_DIR
-
-        # # # # keepalive # # # #
-
-        elif cmd == "keepalive":
-            # nothing to do, timeout poll count will be reset
-            # in RFCommServer.read_command()
-            ret_msg = "OK"
+        if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
-        # # # # plappendmultiple # # # #
-
-        # elif cmd == "plappendmultiple":
-        #     if len(line) != 2 or int_args[1] is None:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plappendmultiple needs 2 args"
-        #     elif src != 'rfcomm':
-        #         ret_stat = ERROREVAL
-        #         ret_msg = "plappendmultiple need to be called via BT"
-        #     else:
-        #         added = self.parent.listmngr.append_multiple(payload,
-        #                                                      int_args[1])
-        #         ret_msg = "%d items appended to playlist" % added
-        #         ret_code = PL_ADD_OK
-
-        # # # # playnext # # # #
-
-        # elif cmd == "playnext":
-        #
-        #     self.parent.play.play_next()
-        #     self.parent.play.send_track_info()
-        #     ret_code = PLAY_NEXT
-
-        # # # # playpause # # # #
-
-        # elif cmd == "playpause":
-        #     # pause / unpause or start playing at current playlist pos
-        #
-        #     self.parent.play.play_pause()
-        #     self.parent.play.send_track_info()
-        #     ret_code = PLAY_PAUSE
-
-        # # # # playprev # # # #
-
-        # elif cmd == "playprev":
-        #
-        #     self.parent.play.play_prev()
-        #     self.parent.play.send_track_info()
-        #     ret_code = PLAY_PREV
-
-        # # # # playstatus # # # #
-
-        elif cmd == "playnext":
+        if cmd == "playnext":
             ret_code = PLAY_NEXT
             self.main.mpc.next()
 
-        elif cmd == "playprev":
+        if cmd == "playprev":
             ret_code = PLAY_PREV
             self.main.mpc.previous()
 
-        elif cmd == "playstatus":
+        if cmd == "playstatus":
             # show current playlist item
-
             info = self.main.mpc.get_play_status()
             if len(info) == 0:
                 ret_stat = -1
@@ -154,172 +92,57 @@ class Cmd:
                 ret_list = [info]
             ret_code = PLAY_INFO
 
-        elif cmd == "playstop":
+        if cmd == "playstop":
             ret_code = PLAY_STOPPED
             self.main.mpc.stop()
 
-        elif cmd == "playtoggle":
+        if cmd == "playtoggle" or cmd == "playpause":
             ret_code = self.main.mpc.toggle()
 
-        # # # # plclear # # # #
-
-        # elif cmd == "plclear":
-        #     if len(line) == 2 and int_args[1] is not None:
-        #         self.parent.listmngr.clear(int_args[1])
-        #     else:
-        #         self.parent.listmngr.clear()
-        #     ret_msg = "Playlist cleared."
-
-        # # # # plgoto # # # #
-
-        # elif cmd == "plgoto":
-        #     if len(line) == 3 and int_args[1] is not None and \
-        #             int_args[2] is not None:
-        #         self.parent.play.load(int_args[1], int_args[2])
-        #         ret_code = PL_JUMP_OK
-        #         self.parent.play.send_track_info()
-        #     elif len(line) == 2 and int_args[1] is not None:
-        #         self.parent.play.load(-1, int_args[1])
-        #         ret_code = PL_JUMP_OK
-        #         self.parent.play.send_track_info()
-
-        # # # #  plmodify # # # #
-
-        # elif cmd == "plmodify":
-        #     if len(line) == 2 and int_args[1] is not None:
-        #         self.parent.listmngr.modify_playlist(payload, int_args[1])
-        #         ret_msg = "OK"
-        #         ret_code = PL_MODIFIED
-        #     else:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plmodify needs 1 int arg!"
-
-        # # # # plsave # # # #
-
-        # elif cmd == "plsave":
-        #     if not self.parent.listmngr.save():
-        #         ret_stat = ERROREVAL
-        #         ret_msg = "Save failed -- name exists or playlist empty!"
-        #     else:
-        #         ret_msg = "Playlist saved."
-
-        # # # # plsaveas # # # #
-
-        # elif cmd == "plsaveas":
-        #     if len(line) != 3:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plsaveas needs 2 args!"
-        #     else:
-        #         if not self.parent.listmngr.save_as(line[1], line[2]):
-        #             ret_stat = ERROREVAL
-        #             ret_msg = "Save failed -- name exists or playlist empty!"
-        #         else:
-        #             ret_msg = "Playlist saved as %s." % line[1]
-
-        # # # # plsaveasexisting # # # #
-
-        # elif cmd == "plsaveasexisting":
-        #     if len(line) != 2 or int_args[1] is None:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plsaveasexisting needs 1 arg!"
-        #     else:
-        #         if not self.parent.listmngr.save_overwrite(int_args[1]):
-        #             ret_stat = ERROREVAL
-        #             ret_msg = \
-        #                 "Save failed -- no such playlist or playlist empty!"
-        #         else:
-        #             ret_msg = "Playlist %d overwitten." % int_args[1]
-
-        # # # # plshow # # # #
-
-        # elif cmd == "plshow":
-        #     if len(line) != 5 or int_args[1] is None or \
-        #             int_args[2] is None or int_args[3] is None or \
-        #             int_args[4] is None:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plshow needs 4 args"
-        #     else:
-        #         ret_list = self.parent.listmngr.list_playlist(
-        #             list_id=int_args[1],
-        #             start_at=int_args[2],
-        #             max_items=int_args[3],
-        #             printformat=line[4])
-        #         ret_msg = "OK"
-        #         ret_code = PL_SHOW
-
-        # # # # plshowlists # # # #
-
-        # elif cmd == "plshowlists":
-        #     ret_list = self.parent.listmngr.list_playlists()
-
-        # # # # plrandomize # # # #
-
-        # elif cmd == "plrandomize":
-        #     if len(line) != 2 or int_args[1] is None:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "plrandomize 1|2"
-        #     else:
-        #         self.parent.listmngr.randomize_playlist(int_args[1])
-        #         ret_msg = "OK"
-        #         ret_code = PL_MODIFIED
-
-        # # # # poweroff # # # #
-
-        elif cmd == "poweroff":
+        if cmd == "poweroff":
+            ret_code = CON_POWEROFF
             ret_stat = STATUSEXIT
             self.main.keep_run = 0
             self.main.ret_code = 10  # tell init script to invoke poweroff
 
-        # # # # quit # # # #
-
-        elif cmd == "quit":
+        if cmd == "quit":
+            ret_code = CON_QUIT
             ret_stat = STATUSEXIT
             self.main.keep_run = 0
 
-        # # # # search # # # #
-
-        # elif cmd == "search":
-        #     if len(line) < 4:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "search needs 3+ args"
-        #     elif int_args[1] is None or int_args[2] is None:
-        #         ret_stat = ERRORARGS
-        #         ret_msg = "Usage: search MODE LIMIT PATTERN"
-        #     else:
-        #         pattern = ' '.join(line[3:])
-        #         ret_list = self.parent.usb.search_files(pattern, int_args[1],
-        #                                                 int_args[2])
-        #         ret_code = SEARCH_RES
-
-        # # # # vol_dec / vol_inc # # # #
-
-        # elif cmd == "voldec" or cmd == "volinc":
-        #     vol_change = self.parent.settings.default_vol_change
-        #
-        #     if len(line) == 2 and int_args[1] is not None:
-        #         vol_change = int_args[1]
-        #
-        #     if cmd == "voldec":
-        #         self.parent.play.vol_dec(vol_change)
-        #     else:
-        #         self.parent.play.vol_inc(vol_change)
-        #
-        #     # let APP set correct volume slider position
-        #     self.parent.play.send_track_info()
-
-        elif cmd == "setvolume":
-            if len(line) != 2:
+        if cmd == "setpos":
+            ret_code = PLAY_POS
+            if len(line) != 2 or int_args[1] is None:
                 ret_stat = ERRORARGS
-                ret_msg = "setvolume needs 1 arg"
+                ret_msg = "setpos needs 1 int arg"
             else:
-                if int_args[1] is None:
-                    ret_stat = ERRORARGS
-                    ret_msg = "setvolume needs int arg"
-                else:
-                    ret_code = VOL_MIXER_CHANGED
-                    self.main.mpc.set_volume(int_args[1])
+                self.main.mpc.seek_current(int_args[1])
 
-        else:
+        if cmd == "setvolume":
+            ret_code = VOL_MIXER_CHANGED
+            if len(line) != 2 or int_args[1] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "setvolume needs 1 int arg"
+            else:
+                self.main.mpc.set_volume(int_args[1])
+
+        if cmd == "togglerandom":
+            ret_code = TOGGLE_RANDOM
+            self.main.mpc.toggle_random()
+
+        if cmd == "togglerepeat":
+            ret_code = TOGGLE_REPEAT
+            self.main.mpc.toggle_repeat()
+
+        if cmd == "voldec":
+            ret_code = VOL_MIXER_CHANGED
+            self.main.mpc.change_volume(-2)
+
+        if cmd == "volinc":
+            ret_code = VOL_MIXER_CHANGED
+            self.main.mpc.change_volume(2)
+
+        if ret_code == -1:
             ret_stat = ERRORUNKNOWN
             ret_msg = "unknown command"
 

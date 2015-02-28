@@ -29,29 +29,29 @@ class LircThread(threading.Thread):
     def run(self):
         """Loop until main wants to exit."""
 
-        try:
+        # try:
 
-            conf = self.main.settings.defvars['PYBLASTER_LIRC_CONF']
-            self.lircsock = lirc.init("pyblaster2", conf, blocking=False)
+        conf = self.main.settings.defvars['PYBLASTER_LIRC_CONF']
+        self.lircsock = lirc.init("pyblaster2", conf, blocking=False)
 
-            while self.main.keep_run:
-                # Nonblocking receive of IR signals
-                read = lirc.nextcode()
-                if len(read):
-                    self.queue_lock.acquire()
-                    self.queue.put(read[0])
-                    self.queue_lock.release()
-                time.sleep(0.05)  # read each 50 ms
+        while self.main.keep_run:
+            # Nonblocking receive of IR signals
+            read = lirc.nextcode()
+            if len(read):
+                self.queue_lock.acquire()
+                self.queue.put(read[0])
+                self.queue_lock.release()
+            time.sleep(0.05)  # read each 50 ms
 
-            lirc.deinit()
+        lirc.deinit()
 
-            self.main.log.write(log.MESSAGE,
-                                "[THREAD] Lirc socket leaving...")
+        self.main.log.write(log.MESSAGE,
+                            "[THREAD] Lirc socket leaving...")
 
-        # Forward any exceptions to main thread, so PyBlaster can die.
-        except Exception:
-            self.main.ex_queue.put(sys.exc_info())
-            pass
+        # # Forward any exceptions to main thread, so PyBlaster can die.
+        # except Exception:
+        #     self.main.ex_queue.put(sys.exc_info())
+        #     pass
 
 
 class Lirc:

@@ -127,17 +127,17 @@ class PyBlaster:
                 self.led.play_leds(led_count)
                 led_count += 1
 
-            try:
-                exc = self.ex_queue.get(block=False)
-            except queue.Empty:
-                pass
-            else:
-                exc_type, exc_obj, exc_trace = exc
-                print(exc_type, exc_obj)
-                print(exc_trace)
-                self.ret_code = 1
-                self.keep_run = False
-                self.led.indicate_error()
+            # try:
+            #     exc = self.ex_queue.get(block=False)
+            # except queue.Empty:
+            #     pass
+            # else:
+            #     exc_type, exc_obj, exc_trace = exc
+            #     print(exc_type, exc_obj)
+            #     print(exc_trace)
+            #     self.ret_code = 1
+            #     self.keep_run = False
+            #     self.led.indicate_error()
 
             # end daemon loop #
 
