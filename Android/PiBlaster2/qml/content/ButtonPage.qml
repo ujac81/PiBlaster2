@@ -38,66 +38,115 @@
 **
 ****************************************************************************/
 
-
-
-
-
-import QtQuick 2.2
+import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
-Item {
+import "../items"
+
+Rectangle {
     width: parent.width
     height: parent.height
+    color: "transparent"
+    id: rect
 
-    property real progress: 0
-    SequentialAnimation on progress {
-        loops: Animation.Infinite
-        running: true
-        NumberAnimation {
-            from: 0
-            to: 1
-            duration: 3000
-        }
-        NumberAnimation {
-            from: 1
-            to: 0
-            duration: 3000
-        }
-    }
+    Flickable {
 
-    Column {
-        spacing: 40
-        anchors.centerIn: parent
+        id: view
+        anchors.fill: parent
 
-        Button {
-            text: "Press me"
-            style: touchStyle
-        }
+        contentWidth: grid.width
+        contentHeight: grid.height
 
-        Button {
-            style: touchStyle
-            text: "Press me too"
-        }
+        boundsBehavior: Flickable.StopAtBounds
+        flickableDirection: Flickable.VerticalFlick
 
-        Button {
-            anchors.margins: 20
-            style: touchStyle
-            text: "Don't press me"
-            onClicked: if (stackView) stackView.pop()
-        }
+        Grid {
+            id: grid
+            spacing: 40
+            columns: 1
+            horizontalItemAlignment: Grid.AlignHCenter
 
-        Row {
-            spacing: 20
-            Switch {
-                style: switchStyle
+            // anchors.horizontalCenter: rect.horizontalCenter
+            // anchors.centerIn: parent
+
+            Rectangle {
+                width: rect.width
+                height: 1
+                color: "transparent"
             }
-            Switch {
-                style: switchStyle
+
+
+            Button {
+                text: "Press me"
+                style: touchStyle
             }
+
+            Button {
+                style: touchStyle
+                text: "Press me too"
+            }
+
+            Button {
+                text: "Press me"
+                style: touchStyle
+            }
+
+            Button {
+                style: touchStyle
+                text: "Press me too"
+            }
+
+            Button {
+                text: "Press me"
+                style: touchStyle
+            }
+
+            Button {
+                style: touchStyle
+                text: "Press me too"
+            }
+
+            Button {
+                text: "Press me"
+                style: touchStyle
+            }
+
+            Button {
+                style: touchStyle
+                text: "Press me too"
+            }
+
+            Button {
+                anchors.margins: 20
+                style: touchStyle
+                text: "Don't press me"
+                onClicked: if (stackView) stackView.pop()
+            }
+
+            Row {
+                spacing: 20
+                Switch {
+                    style: switchStyle
+                }
+                Switch {
+                    style: switchStyle
+                }
+            }
+
+        } // column
+
+        // Only show the scrollbars when the view is moving.
+        states: State {
+            name: "ShowBars"
+            when: view.movingVertically
+            PropertyChanges { target: verticalScrollBar; opacity: 1 }
         }
 
-    }
+        transitions: Transition {
+            NumberAnimation { properties: "opacity"; duration: 400 }
+        }
+    } // flick
 
     Component {
         id: touchStyle
@@ -173,4 +222,17 @@ Item {
             }
         }
     }
+
+
+    // Attach scrollbars to the right and bottom edges of the view.
+    ScrollBar {
+        id: verticalScrollBar
+        width: 12; height: view.height-12
+        anchors.right: view.right
+        opacity: 0
+        orientation: Qt.Vertical
+        position: view.visibleArea.yPosition
+        pageSize: view.visibleArea.heightRatio
+    }
+
 }

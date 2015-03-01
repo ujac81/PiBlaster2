@@ -64,9 +64,10 @@ class Cmd:
                             "Eval cmd [%s]: %s; payload size: %d" %
                             (src, " || ".join(line), len(payload)))
 
-        # Command evaluation, in alphabetical order.
+        # # # EVAL CMD # # #
 
-        # # # # disconnect # # # #
+        # Command evaluation, in alphabetical order.
+        # If ret_code is unchanged, unknown command is assumed.
 
         if cmd == "disconnect":
             ret_stat = STATUSDISCONNECT
@@ -92,7 +93,7 @@ class Cmd:
                 ret_list = [info]
             ret_code = PLAY_INFO
 
-        if cmd == "playstop":
+        if cmd == "playstop" or cmd == "stop":
             ret_code = PLAY_STOPPED
             self.main.mpc.stop()
 
@@ -141,6 +142,8 @@ class Cmd:
         if cmd == "volinc":
             ret_code = VOL_MIXER_CHANGED
             self.main.mpc.change_volume(2)
+
+        # # # END EVAL CMD # # #
 
         if ret_code == -1:
             ret_stat = ERRORUNKNOWN
