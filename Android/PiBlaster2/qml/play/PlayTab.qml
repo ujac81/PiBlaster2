@@ -33,25 +33,13 @@ Rectangle {
         contentHeight: playGrid.height
         boundsBehavior: Flickable.StopAtBounds
         flickableDirection: Flickable.VerticalFlick
-
         leftMargin: 0.1 * playTab.width
         topMargin: 0.1 * playTab.width
-
 
         Column {
             id: playGrid
             spacing: 40
             width: 0.8 * playTab.width
-//            anchors.leftMargin: 0.1 * playTab.width
-//            anchors.topMargin: 0.1 * playTab.height
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-
-//            Rectangle {
-//                width: 0.9 * playTab.width
-//                height: 1
-//                color: "transparent"
-//            }
 
             FlickText {
                 textheight: 28
@@ -139,6 +127,7 @@ Rectangle {
 
             Column {
                 spacing: 10
+                width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
@@ -149,16 +138,15 @@ Rectangle {
                 Slider {
                     id: playPlayPosSider
                     property int preventSend: 1
-
+                    width: parent.width
                     anchors.margins: 20
                     style: touchStyle
-                    value: -1 // prevent "setpos 0" on load
+                    value: 0
                     updateValueWhileDragging: false
-                    minimumValue: -1
+                    minimumValue: 0
                     stepSize: 1
                     onValueChanged: {
-                        if (playPlayPosSider.value !== -1 &&
-                            playPlayPosSider.value !== playTab.playPosition &&
+                        if (playPlayPosSider.value !== playTab.playPosition &&
                             playPlayPosSider.preventSend !== 1) {
                             console.log("POS SLIDER: val = "+playPlayPosSider.value+", pos = "+playTab.playPosition);
                             main.btSendSingle("setpos "+playPlayPosSider.value);
@@ -168,6 +156,7 @@ Rectangle {
             }
             Column {
                 spacing: 10
+                width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
@@ -177,6 +166,7 @@ Rectangle {
                 }
                 Slider {
                     id: playPlayVolumeSider
+                    width: parent.width
                     anchors.margins: 20
                     style: touchStyle
                     value: playTab.playVolume
@@ -192,7 +182,7 @@ Rectangle {
                     }
                 }
             }
-        } // grid
+        } // column
 
         // Only show the scrollbars when the view is moving.
         states: State {
@@ -290,7 +280,6 @@ Rectangle {
             playPlayPosSider.maximumValue = playTab.playLength;
             playPlayPosSider.value = pos;
             playTab.playPosition = pos;
-            playPlayPosSider.minimumValue = 0;
             playPlayPosSider.preventSend = 0;
         }
     }
