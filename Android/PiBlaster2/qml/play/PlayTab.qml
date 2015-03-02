@@ -16,6 +16,7 @@ Rectangle {
     property string playSong: "No Song Name"
     property string playArtist: "No Artist"
     property string playAlbum: "No Album"
+    property int receivedStatus: 0
     property int playLength: 0
     property int playPosition: 0
     property string playPositionText: "0:00"
@@ -246,6 +247,18 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: fetchStatusTimer
+        interval: 250
+        running: true
+        repeat: true
+        onTriggered:  {
+            if (playTab.receivedStatus === 0) {
+                main.btSendSingle("playstatus");
+            }
+        }
+    }
+
     // Attach scrollbars to the right and bottom edges of the view.
     ScrollBar {
         id: playScrollBar
@@ -281,6 +294,8 @@ Rectangle {
             playPlayPosSider.value = pos;
             playTab.playPosition = pos;
             playPlayPosSider.preventSend = 0;
+
+            playTab.receivedStatus = 1;
         }
     }
 

@@ -145,6 +145,9 @@ class MPC:
             if event == 'player' or event == 'options' or event == 'mixer':
                 res = self.main.cmd.eval('playstatus', 'idler')
                 self.main.bt.send_client([-1] + res)
+            if event == 'mixer':
+                res = self.main.cmd.eval('volstatus', 'idler')
+                self.main.bt.send_client([-1] + res)
 
     def join(self):
         """Join all button threads after keep_run in root is False.

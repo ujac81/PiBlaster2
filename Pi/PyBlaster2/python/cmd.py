@@ -120,12 +120,29 @@ class Cmd:
                 self.main.mpc.seek_current(int_args[1])
 
         if cmd == "setvolume":
-            ret_code = VOL_MIXER_CHANGED
+            ret_code = VOL_MASTER_CHANGED
             if len(line) != 2 or int_args[1] is None:
                 ret_stat = ERRORARGS
                 ret_msg = "setvolume needs 1 int arg"
             else:
                 self.main.mpc.set_volume(int_args[1])
+
+        if cmd == "setvolumeamp":
+            ret_code = VOL_AMP_CHANGED
+            if len(line) != 2 or int_args[1] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "setvolumeamp needs 1 int arg"
+            else:
+                # self.main.alsa.set_master_volume(int_args[1])
+                print("AMP: %d" % int_args[1])
+
+        if cmd == "setvolumemixer":
+            ret_code = VOL_MIXER_CHANGED
+            if len(line) != 2 or int_args[1] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "setvolumemixer needs 1 int arg"
+            else:
+                self.main.alsa.set_master_volume(int_args[1])
 
         if cmd == "togglerandom":
             ret_code = TOGGLE_RANDOM
@@ -142,6 +159,13 @@ class Cmd:
         if cmd == "volinc":
             ret_code = VOL_MIXER_CHANGED
             self.main.mpc.change_volume(2)
+
+        if cmd == "volstatus":
+            master = self.main.mpc.volume()
+            mixer = self.main.alsa.get_master_volume()
+            amp = 0
+            ret_code = VOL_STATUS
+            ret_list = [["%d" % i for i in [master, mixer, amp]]]
 
         # # # END EVAL CMD # # #
 

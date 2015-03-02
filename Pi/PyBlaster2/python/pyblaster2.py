@@ -12,6 +12,7 @@ import time
 
 import log
 
+from alsamixer import AlsaMixer
 from bluetoothcomm import RFCommServer
 from cmd import Cmd
 from gpio import PB_GPIO, LED, Buttons
@@ -53,6 +54,7 @@ class PyBlaster:
         self.cmd = Cmd(self)
         self.mpc = MPC(self)
         self.bt = RFCommServer(self)
+        self.alsa = AlsaMixer(self)
 
         # +++++++++++++++ Init Objects +++++++++++++++ #
 
@@ -63,6 +65,7 @@ class PyBlaster:
         self.dbhandle.dbconnect()
         self.mpc.connect()
         self.bt.start_server_thread()
+        self.alsa.init_alsa()
 
         # +++++++++++++++ Daemoninze +++++++++++++++ #
 
@@ -246,10 +249,10 @@ class PyBlaster:
 
 if __name__ == '__main__':
 
-    try:
-        blaster = PyBlaster()
-        sys.exit(blaster.ret_code)
-    except Exception:
-        sys.exc_info()
-        sys.exit(1)
+    # try:
+    blaster = PyBlaster()
+    sys.exit(blaster.ret_code)
+    # except Exception:
+    #     sys.exc_info()
+    #     sys.exit(1)
 

@@ -43,6 +43,7 @@ class Settings:
         self.pidfile = "/var/run/pyblaster2.pid"
         self.rebuilddb = False  # If set to true database will be rebuilt.
         self.defvars = {}  # variables from /etc/default/pyblaster2
+        self.mixer_channel = 'Master'  # name for alsa mixer master channel
 
     def parse(self):
         """ Parse command line args, set defaults and invoke self.read_config()
@@ -136,6 +137,8 @@ class Settings:
                     self.puk = val
                 if key == "use_lirc" and val == "1":
                     self.use_lirc = True
+                if key == "mixer_channel":
+                    self.mixer_channel = val
 
             except ValueError:
                 self.main.log.write(log.EMERGENCY, "Failed to convert %s "

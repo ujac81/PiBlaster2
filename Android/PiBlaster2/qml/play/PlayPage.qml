@@ -34,7 +34,7 @@ Item {
                 main.btSendSingle("playstatus");
             }
             if ( index ===  1 ) {
-                main.btSendSingle("volumestatus");
+                main.btSendSingle("volstatus");
             }
             if ( index ===  2 ) {
                 main.btSendSingle("equalizerstatus");
@@ -84,6 +84,8 @@ Item {
         if (msg.code() === 304) {
             playTabView.getTab(0).item.update_status(msg);
         }
-
+        if (msg.code() === 404) {
+            playTabView.getTab(1).item.update_status(msg);
+        }
     }
 }

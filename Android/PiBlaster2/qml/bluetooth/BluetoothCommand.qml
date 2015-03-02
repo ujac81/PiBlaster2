@@ -21,6 +21,7 @@ Item
         }
 
         if (msg.code() === 304) {
+            // answer on playstatus
             stackView.update_status(msg)
         }
 
@@ -30,6 +31,11 @@ Item
 
         if (msg.code() === 307) {
             main.playPlaying = true;
+        }
+
+        if (msg.code() === 404) {
+            // answer on volstatus
+            stackView.update_status(msg)
         }
     }
 

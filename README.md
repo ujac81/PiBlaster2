@@ -108,9 +108,10 @@ to that file.
 ### Install required python packages
 PyBlaster won't start if some python packages are missing
 
-    $ sudo aptitude install python3-pip libbluetooth-dev
-    $ sudo pip3 install python-mpd2
-    $ sudo pip3 install pybluez
+    $ sudo aptitude install python3-pip libbluetooth-dev libasound2-dev
+    $ sudo pip-3.2 install python-mpd2
+    $ sudo pip-3.2 install pybluez
+    $ sudo pip-3.2 install pyalsaaudio
 
 Documentation of python-mpd2 can be found [here](http://pythonhosted.org/python-mpd2/topics/getting-started.html)
 
