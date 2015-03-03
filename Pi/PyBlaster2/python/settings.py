@@ -44,6 +44,8 @@ class Settings:
         self.rebuilddb = False  # If set to true database will be rebuilt.
         self.defvars = {}  # variables from /etc/default/pyblaster2
         self.mixer_channel = 'Master'  # name for alsa mixer master channel
+        self.amp_i2cbus = 1  # id of i2c bus (use i2cdetect -l)
+        self.amp_i2caddress = 0x0  # i2c address for amp
 
     def parse(self):
         """ Parse command line args, set defaults and invoke self.read_config()
@@ -139,6 +141,10 @@ class Settings:
                     self.use_lirc = True
                 if key == "mixer_channel":
                     self.mixer_channel = val
+                if key == "amp_i2cbus":
+                    self.amp_i2cbus = int(val)
+                if key == "amp_i2caddress":
+                    self.amp_i2caddress = int(val, 16)
 
             except ValueError:
                 self.main.log.write(log.EMERGENCY, "Failed to convert %s "
