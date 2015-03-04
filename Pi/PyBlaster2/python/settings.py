@@ -44,7 +44,7 @@ class Settings:
         self.rebuilddb = False  # If set to true database will be rebuilt.
         self.defvars = {}  # variables from /etc/default/pyblaster2
         self.mixer_channel = 'Master'  # name for alsa mixer master channel
-        self.amp_i2cbus = 1  # id of i2c bus (use i2cdetect -l)
+        self.amp_i2cbus = -1  # id of i2c bus (use i2cdetect -l)
         self.amp_i2caddress = 0x0  # i2c address for amp
 
     def parse(self):

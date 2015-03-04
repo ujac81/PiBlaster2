@@ -16,6 +16,7 @@ from alsamixer import AlsaMixer
 from bluetoothcomm import RFCommServer
 from cmd import Cmd
 from gpio import PB_GPIO, LED, Buttons
+from i2c import I2C
 from lircremote import Lirc
 from log import Log
 from mpc import MPC
@@ -55,6 +56,7 @@ class PyBlaster:
         self.mpc = MPC(self)
         self.bt = RFCommServer(self)
         self.alsa = AlsaMixer(self)
+        self.i2c = I2C(self)
 
         # +++++++++++++++ Init Objects +++++++++++++++ #
 
@@ -66,6 +68,7 @@ class PyBlaster:
         self.mpc.connect()
         self.bt.start_server_thread()
         self.alsa.init_alsa()
+        self.i2c.open_bus()
 
         # +++++++++++++++ Daemoninze +++++++++++++++ #
 

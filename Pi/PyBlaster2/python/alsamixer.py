@@ -123,7 +123,7 @@ class AlsaMixer:
             if m is not None:
                 self.equal_channels.append(m.group(0))
 
-        self.main.log.write(log.MESSAGE, "[ALSA]: found mixer channels: %s" %
+        self.main.log.write(log.MESSAGE, "[ALSA]: found equal channels: %s" %
                             ' '.join(self.equal_channels))
 
     def get_equal_vals(self):

@@ -133,8 +133,7 @@ class Cmd:
                 ret_stat = ERRORARGS
                 ret_msg = "setvolumeamp needs 1 int arg"
             else:
-                # self.main.alsa.set_master_volume(int_args[1])
-                print("AMP: %d" % int_args[1])
+                self.main.i2c.write_volume(int_args[1])
 
         if cmd == "setvolumemixer":
             ret_code = VOL_MIXER_CHANGED
@@ -163,7 +162,7 @@ class Cmd:
         if cmd == "volstatus":
             master = self.main.mpc.volume()
             mixer = self.main.alsa.get_master_volume()
-            amp = 0
+            amp = self.main.i2c.read_volume()
             ret_code = VOL_STATUS
             ret_list = [["%d" % i for i in [master, mixer, amp]]]
 
