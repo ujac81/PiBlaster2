@@ -50,26 +50,26 @@ Item {
     width: parent.width
     height: parent.height
 
-    Column {
-        spacing: 12
+    Row {
+        spacing: 30
         anchors.centerIn: parent
 
-        Slider {
-            anchors.margins: 20
-            style: touchStyle
-            value: 0
-        }
-        Slider {
-            anchors.margins: 20
-            style: touchStyle
-            value: 0.5
-        }
-        Slider {
-            anchors.margins: 20
-            style: touchStyle
-            value: 1.0
-        }
+        Repeater {
 
+            model: 5
+
+            Slider {
+                orientation: Qt.Vertical
+                style: touchStyle
+                value: 50
+                minimumValue: 0
+                maximumValue: 100
+                stepSize: 1
+                onValueChanged: {
+                    console.log(index+": "+value);
+                }
+            }
+        }
     }
 
     Component {

@@ -73,6 +73,13 @@ class Cmd:
             ret_stat = STATUSDISCONNECT
             ret_code = CON_DISCONNECT
 
+        if cmd == "equalstatus":
+            ret_code = EQUAL_STATUS
+            if self.main.alsa.has_equalizer():
+                chans = self.main.alsa.equal_channels
+                vals = ["%d" % i for i in self.main.alsa.get_equal_vals()]
+                ret_list = [vals, chans]
+
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 

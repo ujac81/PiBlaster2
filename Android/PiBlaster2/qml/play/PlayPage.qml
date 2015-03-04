@@ -37,7 +37,7 @@ Item {
                 main.btSendSingle("volstatus");
             }
             if ( index ===  2 ) {
-                main.btSendSingle("equalizerstatus");
+                main.btSendSingle("equalstatus");
             }
         }
     }
@@ -86,6 +86,9 @@ Item {
         }
         if (msg.code() === 404) {
             playTabView.getTab(1).item.update_status(msg);
+        }
+        if (msg.code() === 504) {
+            playTabView.getTab(2).item.update_status(msg);
         }
     }
 }

@@ -29,4 +29,6 @@ VOL_MIXER_CHANGED = 402
 VOL_AMP_CHANGED = 403
 VOL_STATUS = 404    # answer on volstatus
 
+EQUAL_STATUS = 504  # answer on equalstatus
+
 KEEP_ALIVE = 1000   # answer on keepalive

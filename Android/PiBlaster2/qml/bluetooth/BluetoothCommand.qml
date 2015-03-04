@@ -37,6 +37,11 @@ Item
             // answer on volstatus
             stackView.update_status(msg)
         }
+
+        if (msg.code() === 504) {
+            // answer on equalstatus
+            stackView.update_status(msg)
+        }
     }
 
 
