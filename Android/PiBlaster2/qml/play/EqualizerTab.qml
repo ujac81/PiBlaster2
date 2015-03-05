@@ -54,11 +54,10 @@ Rectangle {
                         orientation: Qt.Vertical
                         stepSize: 1
                         onValueChanged: {
-//                            if (volPlayVolumeSider.value !== volTab.playVolume) {
-//                                main.btSendSingle("setvolume "+volPlayVolumeSider.value);
-//                                volTab.playVolume = volPlayVolumeSider.value;
-//                            }
-                            console.log("EQUAL "+index+"="+value);
+                            if (value !== equalTab.equalVal[index]) {
+                                main.btSendSingle("setequal "+index+" "+value);
+                                equalTab.equalVal[index] = value
+                            }
                         }
                     }
 

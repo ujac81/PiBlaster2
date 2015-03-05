@@ -158,13 +158,10 @@ class MPC:
         # So we trigger some mpd command to wake up the idler and MPDIdler
         # thread can exit.
         # self.client.sendmessage('pyblaster', 'quit')
-        print("join 1")
         self.toggle_repeat()
         time.sleep(0.5)
-        print("join 2")
         self.toggle_repeat()
         time.sleep(0.5)
-        print("join done")
 
     def get_status(self):
         for i in range(5):

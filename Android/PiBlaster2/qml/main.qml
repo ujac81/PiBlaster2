@@ -46,6 +46,16 @@ ApplicationWindow {
         anchors.fill: parent
     }
 
+    menuBar: MenuBar {
+        Menu {
+            title: "Menu1"
+            MenuItem { text: "item1" }
+            MenuItem { text: "item2" }
+            MenuItem { text: "item3" }
+            MenuItem { text: "item4" }
+        }
+    }
+
     statusBar: BorderImage {
         border.top: 8
         source: "/images/statusbar.png"
@@ -108,6 +118,7 @@ ApplicationWindow {
             }
         }
     }
+
 
     ListModel {
         id: pageModel

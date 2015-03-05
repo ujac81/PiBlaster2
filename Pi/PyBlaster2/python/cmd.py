@@ -118,6 +118,14 @@ class Cmd:
             ret_stat = STATUSEXIT
             self.main.keep_run = 0
 
+        if cmd == "setequal":
+            ret_code = EQUAL_CHANNEL_CHANGED
+            if len(line) != 3 or int_args[1] is None or int_args[2] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "setequal requires 2 int args"
+            else:
+                self.main.alsa.set_equal_channel(int_args[1], int_args[2])
+
         if cmd == "setpos":
             ret_code = PLAY_POS
             if len(line) != 2 or int_args[1] is None:

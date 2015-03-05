@@ -65,3 +65,5 @@ class I2C:
             vol2 = 0
 
         self.bus.write_byte(self.main.settings.amp_i2caddress, vol2)
+        self.main.log.write(log.MESSAGE,
+                            "[I2C] set volume to %d (%d%%)" % (vol, vol2))

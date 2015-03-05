@@ -150,13 +150,21 @@ class AlsaMixer:
         Invokes `amixer -D equal cset numid=(chan+1) (val)`.
 
         :param chan: channel as integer value [0..N_channels-1].
-        :param val: value between 0 and 100 -- int or string allowed.
+        :param val: value between 0 and 100
         """
         if chan >= len(self.equal_channels):
             return
 
+        if val < 0:
+            val = 0
+        if val > 100:
+            val = 100
+
         Popen(["amixer", "-D", "equal", "cset", "numid=%d" % (chan+1),
                "%s" % val], stdout=PIPE, stderr=PIPE).communicate()
+
+        self.main.log.write(log.MESSAGE,
+                            "[ALSA] set equal channel %d to %d." % (chan, val))
 
     def set_equal_channels(self, valstring):
         """Set all equalizer channels by space separated string.
