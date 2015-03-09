@@ -1,7 +1,10 @@
 
+
+
 import QtQuick 2.2
+import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.1
 import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.0
 import Qt.labs.settings 1.0
 
 import "bluetooth"
@@ -10,6 +13,7 @@ import "dialogs"
 import "play"
 
 ApplicationWindow {
+
     id: main
     visible: true
     width: 800
@@ -56,6 +60,71 @@ ApplicationWindow {
         }
     }
 
+    toolBar: ToolBar {
+        height: 80
+
+//        style: ToolBarStyle {
+////            padding {
+////                left: 8
+////                right: 8
+////                top: 3
+////                bottom: 3
+////            }
+//            background: Rectangle {
+//                implicitWidth: 100
+//                implicitHeight: 80
+//                border.color: "#33B5E5"
+//                color: "#020203"
+//                opacity: 0.5
+////                gradient: Gradient {
+////                    GradientStop { position: 0 ; color: "#fff" }
+////                    GradientStop { position: 1 ; color: "#eee" }
+////                }
+//            }
+//        }
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 10
+            Rectangle {
+                id: backButton
+                width: opacity ? 60 : 0
+                anchors.left: parent.left
+                anchors.leftMargin: 20
+                opacity: stackView.depth > 1 ? 1 : 0
+                anchors.verticalCenter: parent.verticalCenter
+                antialiasing: true
+                height: 60
+                radius: 4
+                color: backmouse.pressed ? "#222" : "transparent"
+                Behavior on opacity { NumberAnimation{} }
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "/images/navigation_previous_item.png"
+                }
+                MouseArea {
+                    id: backmouse
+                    anchors.fill: parent
+                    anchors.margins: -10
+                    onClicked: stackView.pop()
+                }
+            }
+            Text {
+                font.pixelSize: 30
+                Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
+                x: backButton.x + backButton.width + 20
+                anchors.verticalCenter: parent.verticalCenter
+                color: "white"
+                text: "PiBlaster Remote 2.0"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: stackView.pop()
+                }
+            }
+            Item { Layout.fillWidth: true }
+        }
+    }
+
     statusBar: BorderImage {
         border.top: 8
         source: "/images/statusbar.png"
@@ -75,49 +144,49 @@ ApplicationWindow {
         }
     }
 
-    toolBar: BorderImage {
-        border.bottom: 8
-        source: "/images/toolbar.png"
-        width: parent.width
-        height: 100
+//    toolBar: BorderImage {
+//        border.bottom: 8
+//        source: "/images/toolbar.png"
+//        width: parent.width
+//        height: 100
 
-        Rectangle {
-            id: backButton
-            width: opacity ? 60 : 0
-            anchors.left: parent.left
-            anchors.leftMargin: 20
-            opacity: stackView.depth > 1 ? 1 : 0
-            anchors.verticalCenter: parent.verticalCenter
-            antialiasing: true
-            height: 60
-            radius: 4
-            color: backmouse.pressed ? "#222" : "transparent"
-            Behavior on opacity { NumberAnimation{} }
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                source: "/images/navigation_previous_item.png"
-            }
-            MouseArea {
-                id: backmouse
-                anchors.fill: parent
-                anchors.margins: -10
-                onClicked: stackView.pop()
-            }
-        }
+//        Rectangle {
+//            id: backButton
+//            width: opacity ? 60 : 0
+//            anchors.left: parent.left
+//            anchors.leftMargin: 20
+//            opacity: stackView.depth > 1 ? 1 : 0
+//            anchors.verticalCenter: parent.verticalCenter
+//            antialiasing: true
+//            height: 60
+//            radius: 4
+//            color: backmouse.pressed ? "#222" : "transparent"
+//            Behavior on opacity { NumberAnimation{} }
+//            Image {
+//                anchors.verticalCenter: parent.verticalCenter
+//                source: "/images/navigation_previous_item.png"
+//            }
+//            MouseArea {
+//                id: backmouse
+//                anchors.fill: parent
+//                anchors.margins: -10
+//                onClicked: stackView.pop()
+//            }
+//        }
 
-        Text {
-            font.pixelSize: 38
-            Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
-            x: backButton.x + backButton.width + 20
-            anchors.verticalCenter: parent.verticalCenter
-            color: "white"
-            text: "PiBlaster Remote 2.0"
-            MouseArea {
-                anchors.fill: parent
-                onClicked: stackView.pop()
-            }
-        }
-    }
+//        Text {
+//            font.pixelSize: 38
+//            Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
+//            x: backButton.x + backButton.width + 20
+//            anchors.verticalCenter: parent.verticalCenter
+//            color: "white"
+//            text: "PiBlaster Remote 2.0"
+//            MouseArea {
+//                anchors.fill: parent
+//                onClicked: stackView.pop()
+//            }
+//        }
+//    }
 
 
     ListModel {
