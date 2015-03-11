@@ -7,10 +7,13 @@ import QtQuick.Dialogs 1.1
 import QtQuick.Controls 1.2
 import Qt.labs.settings 1.0
 
-import "bluetooth"
 import "content"
 import "dialogs"
 import "play"
+
+import "UI.js" as UI
+import "BT.js" as BT
+
 
 ApplicationWindow {
 
@@ -33,6 +36,8 @@ ApplicationWindow {
     property bool playRepeat: false
     property bool playPlaying: false
 
+    ////////////////////// SETTING //////////////////////
+
     Settings {
         id: settings
         property alias btmac: main.btmac
@@ -40,9 +45,12 @@ ApplicationWindow {
         property alias btpin: main.btpin
     }
 
+    ////////////////////// DIALOGS //////////////////////
+
 
     NoBluetoothDialog { id: diagNoBluetooth }
-    BluetoothCommand { id: btCmd }
+
+    ////////////////////// BACKGROUND //////////////////////
 
 
     Rectangle {
@@ -50,9 +58,11 @@ ApplicationWindow {
         anchors.fill: parent
     }
 
+    ////////////////////// MENU //////////////////////
+
     menuBar: MenuBar {
         Menu {
-            title: "Menu1"
+            title: "Main"
             MenuItem { text: "item1" }
             MenuItem { text: "item2" }
             MenuItem { text: "item3" }
@@ -60,28 +70,10 @@ ApplicationWindow {
         }
     }
 
+    ////////////////////// TOP TOOL BAR //////////////////////
+
     toolBar: ToolBar {
         height: 80
-
-//        style: ToolBarStyle {
-////            padding {
-////                left: 8
-////                right: 8
-////                top: 3
-////                bottom: 3
-////            }
-//            background: Rectangle {
-//                implicitWidth: 100
-//                implicitHeight: 80
-//                border.color: "#33B5E5"
-//                color: "#020203"
-//                opacity: 0.5
-////                gradient: Gradient {
-////                    GradientStop { position: 0 ; color: "#fff" }
-////                    GradientStop { position: 1 ; color: "#eee" }
-////                }
-//            }
-//        }
 
         RowLayout {
             anchors.fill: parent
@@ -125,6 +117,8 @@ ApplicationWindow {
         }
     }
 
+    ////////////////////// BOTTOM STATUS BAR //////////////////////
+
     statusBar: BorderImage {
         border.top: 8
         source: "/images/statusbar.png"
@@ -144,49 +138,7 @@ ApplicationWindow {
         }
     }
 
-//    toolBar: BorderImage {
-//        border.bottom: 8
-//        source: "/images/toolbar.png"
-//        width: parent.width
-//        height: 100
-
-//        Rectangle {
-//            id: backButton
-//            width: opacity ? 60 : 0
-//            anchors.left: parent.left
-//            anchors.leftMargin: 20
-//            opacity: stackView.depth > 1 ? 1 : 0
-//            anchors.verticalCenter: parent.verticalCenter
-//            antialiasing: true
-//            height: 60
-//            radius: 4
-//            color: backmouse.pressed ? "#222" : "transparent"
-//            Behavior on opacity { NumberAnimation{} }
-//            Image {
-//                anchors.verticalCenter: parent.verticalCenter
-//                source: "/images/navigation_previous_item.png"
-//            }
-//            MouseArea {
-//                id: backmouse
-//                anchors.fill: parent
-//                anchors.margins: -10
-//                onClicked: stackView.pop()
-//            }
-//        }
-
-//        Text {
-//            font.pixelSize: 38
-//            Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
-//            x: backButton.x + backButton.width + 20
-//            anchors.verticalCenter: parent.verticalCenter
-//            color: "white"
-//            text: "PiBlaster Remote 2.0"
-//            MouseArea {
-//                anchors.fill: parent
-//                onClicked: stackView.pop()
-//            }
-//        }
-//    }
+    ////////////////////// STACK LIST MODEL //////////////////////
 
 
     ListModel {
@@ -224,6 +176,8 @@ ApplicationWindow {
             page: "content/ListPage.qml"
         }
     }
+
+    ////////////////////// STACK VIEW ELEMENT //////////////////////
 
     StackView {
         id: stackView
@@ -267,104 +221,33 @@ ApplicationWindow {
         }
     }
 
+    ////////////////////// ONLOAD //////////////////////
+
 
     Component.onCompleted: {
         // Incomming commands are bufferd by BTMessageHandler.cpp
         // and emitted as signal when received completely.
         // Process them inside extra file BluetoothCommand.
 
-        btMessages.receivedMessage.connect(btCmd.processMessage);
-        btService.bluetoothMessage.connect(bt_message);
-        btService.bluetoothError.connect(bt_error);
-        btService.bluetoothWarning.connect(bt_warning);
-        btService.bluetoothModeChanged.connect(bt_devstate);
-        btService.bluetoothConnected.connect(bt_connected);
-        btService.bluetoothDisconnected.connect(bt_disconnected);
-        main.setStatus("PiBlaster 2 remote loaded.");
+        btMessages.receivedMessage.connect(BT.processMessage);
+        btService.bluetoothMessage.connect(UI.bt_message);
+        btService.bluetoothError.connect(UI.bt_error);
+        btService.bluetoothWarning.connect(UI.bt_warning);
+        btService.bluetoothModeChanged.connect(UI.bt_devstate);
+        btService.bluetoothConnected.connect(UI.bt_connected);
+        btService.bluetoothDisconnected.connect(UI.bt_disconnected);
+        UI.setStatus("PiBlaster 2 remote loaded.");
 
         if (btService.hostMode() === 1 && main.btautoconnect) {
             console.log("Found active bluetooth on startup -- autoconnecting...");
-            bt_reconnect();
+            UI.bt_reconnect();
         }
     }
 
 
-    function bt_reconnect() {
-        console.log("SCANNING...");
-        btService.serviceSearch(main.btmac);
-        main.btconnecting = true;
-        main.btconnected = false;
-    }
-    function bt_disconnect() {
-        console.log("DISCONNECTING...");
-        btService.disconnectService();
-        main.btconnecting = false;
-        main.btconnected = false;
-    }
 
 
-    function bt_message(msg) {
-        console.log("BT SERVICE MESSAGE: "+msg);
-        main.setStatus("Bluetooth: "+msg);
-    }
-
-    // Raise no bluetooth dialog if bluetooth adapter lost.
-    // App will exit if button on dialog clicked.
-    // Connected to BTService::bluetoothModeChanged().
-    function bt_devstate(state) {
-        console.log("BT DEVICE STATE: "+state);
-        if (state === 0 && lastBTDeviceState === 1) {
-            diagNoBluetooth.open();
-        }
-        if (lastBTDeviceState === 0 && state === 1 && main.btautoconnect) {
-            console.log("Bluetooth activated -- autoconnecting...");
-            bt_reconnect();
-        }
-        lastBTDeviceState = state;
-    }
-
-    // Set error message for failure dialog and raise dialog.
-    // App will exit after dialog.
-    function bt_error(error) {
-        main.btautoconnect = false;
-        diagNoBluetooth.service_error(error);
-    }
-
-    // Set warning message for failure dialog and raise dialog.
-    function bt_warning(warning) {
-        diagNoBluetooth.service_warning(warning);
-    }
-
-    function bt_connected() {
-        btService.writeSocket(main.btpin);
-        main.btconnected = true;
-        main.btconnecting = false;
-        keepalive.running = true;
-        main.btautoconnect = true;
-    }
-
-    function bt_disconnected() {
-        console.log("Disconnected...");
-        main.btconnected = false;
-        main.btconnecting = false;
-        keepalive.running = false;
-    }
-
-    function btSendSingle(cmd) {
-        if (main.btconnected) {
-            // reset keep alive to prevent interference with command sending.
-            keepalive.running = false;
-            keepalive.running = true;
-            btService.writeSocket(cmd);
-        } else {
-            main.setStatus("Not connected to PiBlaster!");
-        }
-    }
-
-    function setStatus(msg) {
-        main.statustext = msg;
-        deletestatus.restart();
-    }
+    ////////////////////// TIMERS //////////////////////
 
     // Send "keepalive" signal every 10s.
     Timer {

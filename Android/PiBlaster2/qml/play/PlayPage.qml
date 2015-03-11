@@ -4,6 +4,8 @@ import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
+import "../UI.js" as UI
+
 Item {
     objectName: "PlayPage"
 
@@ -31,13 +33,13 @@ Item {
 
         function tabChanged(index) {
             if ( index ===  0 ) {
-                main.btSendSingle("playstatus");
+                UI.btSendSingle("playstatus");
             }
             if ( index ===  1 ) {
-                main.btSendSingle("volstatus");
+                UI.btSendSingle("volstatus");
             }
             if ( index ===  2 ) {
-                main.btSendSingle("equalstatus");
+                UI.btSendSingle("equalstatus");
             }
         }
     }

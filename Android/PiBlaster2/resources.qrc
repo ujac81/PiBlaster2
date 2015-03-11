@@ -19,7 +19,6 @@
         <file>qml/connect/ConnectPage.qml</file>
         <file>qml/connect/SettingsTab.qml</file>
         <file>qml/connect/ConnectTab.qml</file>
-        <file>qml/bluetooth/BluetoothCommand.qml</file>
         <file>qml/dialogs/NoBluetoothDialog.qml</file>
         <file>images/statusbar.png</file>
         <file>qml/play/VolumeTab.qml</file>
@@ -35,5 +34,7 @@
         <file>images/play/backward.png</file>
         <file>qml/items/FlickText.qml</file>
         <file>qml/items/ScrollBar.qml</file>
+        <file>qml/UI.js</file>
+        <file>qml/BT.js</file>
     </qresource>
 </RCC>

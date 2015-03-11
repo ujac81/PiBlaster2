@@ -5,6 +5,7 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
 import "../items"
+import "../UI.js" as UI
 
 Rectangle {
     id: playTab
@@ -67,7 +68,7 @@ Rectangle {
                     height: parent.height
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("playprev");
+                        onClicked: UI.btSendSingle("playprev");
                     }
                 }
                 Image {
@@ -76,7 +77,7 @@ Rectangle {
                     height: parent.height
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("playstop");
+                        onClicked: UI.btSendSingle("playstop");
                     }
                 }
                 Image {
@@ -85,7 +86,7 @@ Rectangle {
                     height: parent.height
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("playtoggle");
+                        onClicked: UI.btSendSingle("playtoggle");
                     }
                 }
                 Image {
@@ -94,7 +95,7 @@ Rectangle {
                     height: parent.height
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("playnext");
+                        onClicked: UI.btSendSingle("playnext");
                     }
                 }
             }
@@ -111,7 +112,7 @@ Rectangle {
                     opacity: main.playShuffle ? 1 : 0.5
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("togglerandom");
+                        onClicked: UI.btSendSingle("togglerandom");
                     }
                 }
                 Image {
@@ -121,7 +122,7 @@ Rectangle {
                     opacity: main.playRepeat ? 1 : 0.5
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: main.btSendSingle("togglerepeat");
+                        onClicked: UI.btSendSingle("togglerepeat");
                     }
                 }
             }
@@ -150,7 +151,7 @@ Rectangle {
                         if (playPlayPosSider.value !== playTab.playPosition &&
                             playPlayPosSider.preventSend !== 1) {
                             console.log("POS SLIDER: val = "+playPlayPosSider.value+", pos = "+playTab.playPosition);
-                            main.btSendSingle("setpos "+playPlayPosSider.value);
+                            UI.btSendSingle("setpos "+playPlayPosSider.value);
                         }
                     }
                 }
@@ -177,7 +178,7 @@ Rectangle {
                     stepSize: 1
                     onValueChanged: {
                         if (playPlayVolumeSider.value !== playTab.playVolume) {
-                            main.btSendSingle("setvolume "+playPlayVolumeSider.value);
+                            UI.btSendSingle("setvolume "+playPlayVolumeSider.value);
                             playTab.playVolume = playPlayVolumeSider.value;
                         }
                     }
@@ -254,7 +255,7 @@ Rectangle {
         repeat: true
         onTriggered:  {
             if (playTab.receivedStatus === 0) {
-                main.btSendSingle("playstatus");
+                UI.btSendSingle("playstatus");
             }
         }
     }
@@ -272,7 +273,7 @@ Rectangle {
 
     function update_status(msg) {
         if (msg.payloadElementsSize(0) !== 13) {
-            main.setStatus("Ill-formed payload received for play-status!")
+            UI.setStatus("Ill-formed payload received for play-status!")
         } else {
             var arr = msg.payloadElements(0);
             main.playShuffle = arr[0] === "1";

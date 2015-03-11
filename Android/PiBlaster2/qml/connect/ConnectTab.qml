@@ -4,6 +4,8 @@ import QtQuick 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
+import "../UI.js" as UI
+
 Item {
     width: parent.width
     height: parent.height
@@ -35,7 +37,7 @@ Item {
             text: "Connect"
             style: touchStyle
             onClicked: {
-                main.bt_reconnect()
+                UI.bt_reconnect()
             }
         }
 
@@ -46,7 +48,7 @@ Item {
             text: "Disconnect"
             style: touchStyle
             onClicked: {
-                main.bt_disconnect()
+                UI.bt_disconnect()
             }
         }
     }

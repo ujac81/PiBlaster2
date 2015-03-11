@@ -5,6 +5,7 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
 import "../items"
+import "../UI.js" as UI
 
 Rectangle {
     id: volTab
@@ -57,7 +58,7 @@ Rectangle {
                     stepSize: 1
                     onValueChanged: {
                         if (volPlayVolumeSider.value !== volTab.playVolume) {
-                            main.btSendSingle("setvolume "+volPlayVolumeSider.value);
+                            UI.btSendSingle("setvolume "+volPlayVolumeSider.value);
                             volTab.playVolume = volPlayVolumeSider.value;
                         }
                     }
@@ -88,7 +89,7 @@ Rectangle {
                     stepSize: 1
                     onValueChanged: {
                         if (volMixerVolumeSider.value !== volTab.playMixerVolume) {
-                            main.btSendSingle("setvolumemixer "+volMixerVolumeSider.value);
+                            UI.btSendSingle("setvolumemixer "+volMixerVolumeSider.value);
                             volTab.playMixerVolume = volMixerVolumeSider.value;
                         }
                     }
@@ -119,7 +120,7 @@ Rectangle {
                     stepSize: 1
                     onValueChanged: {
                         if (volAmpVolumeSider.value !== volTab.playAmpVolume) {
-                            main.btSendSingle("setvolumeamp "+volAmpVolumeSider.value);
+                            UI.btSendSingle("setvolumeamp "+volAmpVolumeSider.value);
                             volTab.playAmpVolume = volAmpVolumeSider.value;
                         }
                     }
@@ -186,7 +187,7 @@ Rectangle {
 
     function update_status(msg) {
         if (msg.payloadElementsSize(0) !== 3) {
-            main.setStatus("Ill-formed payload received for vol-status!")
+            UI.setStatus("Ill-formed payload received for vol-status!")
         } else {
             var arr = msg.payloadElements(0);
             playVolume = parseInt(arr[0]);

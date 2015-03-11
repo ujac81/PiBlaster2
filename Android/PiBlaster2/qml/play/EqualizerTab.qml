@@ -5,6 +5,8 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.1
 
 import "../items"
+import "../UI.js" as UI
+
 
 Rectangle {
     id: equalTab
@@ -55,7 +57,7 @@ Rectangle {
                         stepSize: 1
                         onValueChanged: {
                             if (value !== equalTab.equalVal[index]) {
-                                main.btSendSingle("setequal "+index+" "+value);
+                                UI.btSendSingle("setequal "+index+" "+value);
                                 equalTab.equalVal[index] = value
                             }
                         }
@@ -144,7 +146,7 @@ Rectangle {
 
     function update_status(msg) {
         if (msg.payloadSize() !== 2) {
-            main.setStatus("Ill-formed payload received for equal-status!")
+            UI.setStatus("Ill-formed payload received for equal-status!")
         } else {
 
             var arr = msg.payloadElements(0);
