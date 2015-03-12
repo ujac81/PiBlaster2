@@ -1,10 +1,10 @@
 
 
 
-import QtQuick 2.2
+import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
-import QtQuick.Controls 1.2
+import QtQuick.Controls 1.3
 import Qt.labs.settings 1.0
 
 import "content"
@@ -61,13 +61,24 @@ ApplicationWindow {
     ////////////////////// MENU //////////////////////
 
     menuBar: MenuBar {
+
         Menu {
             title: "Main"
-            MenuItem { text: "item1" }
-            MenuItem { text: "item2" }
-            MenuItem { text: "item3" }
-            MenuItem { text: "item4" }
+            enabled: stackView.depth == 1
+            visible: stackView.depth == 1
+
+            MenuItem { text: "Connect" }
+            MenuItem { text: "Disconnect" }
+            MenuItem { text: "Exit" }
+
         }
+
+
+
+//        function clear() {
+//            console.log("--- menu clear ---");
+//            menus.clear();
+//        }
     }
 
     ////////////////////// TOP TOOL BAR //////////////////////
@@ -152,10 +163,6 @@ ApplicationWindow {
             page: "play/PlayPage.qml"
         }
         ListElement {
-            title: "Buttons"
-            page: "content/ButtonPage.qml"
-        }
-        ListElement {
             title: "Sliders"
             page: "content/SliderPage.qml"
         }
@@ -209,7 +216,6 @@ ApplicationWindow {
         // let current stack page update on load if required.
         onCurrentItemChanged: {
             if ( currentItem ) {
-                console.log("=== Stack item changed ===");
                 currentItem.activated();
             }
         }

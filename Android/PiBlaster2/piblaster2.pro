@@ -4,13 +4,22 @@ TARGET = PiBlaster2
 
 include(src/src.pri)
 
-#OTHER_FILES += \
-#    qml/main.qml \
-#    qml/connect/ConnectPage.qml \
-#    qml/connect/ConnectTab.qml \
-#    qml/connect/SettingsTab.qml \
-#    qml/content/AndroidDelegate.qml \
-#    qml/content/ButtonPage.qml \
+OTHER_FILES += \
+    android/AndroidManifest.xml \
+    qml/main.qml \
+    qml/BT.js \
+    qml/UI.js \
+    qml/connect/ConnectPage.qml \
+    qml/connect/ConnectTab.qml \
+    qml/connect/SettingsTab.qml \
+    qml/content/AndroidDelegate.qml \
+    qml/play/PlayPage.qml \
+    qml/play/PlayTab.qml \
+    qml/play/VolumeTab.qml \
+    qml/play/EqualizerTab.qml \
+    qml/dialogs/NoBluetoothDialog.qml \
+    qml/items/FlickText.qml \
+    qml/items/ScrollBar.qml
 #    qml/content/ListPage.qml \
 #    qml/content/ProgressBarPage.qml \
 #    qml/content/SliderPage.qml \
@@ -19,9 +28,5 @@ include(src/src.pri)
 
 RESOURCES += \
     resources.qrc
-
-#DISTFILES += \
-#    qml/items/FlickText.qml
-
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

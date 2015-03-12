@@ -18,7 +18,7 @@ function bt_disconnect() {
 
 function bt_message(msg) {
     console.log("BT SERVICE MESSAGE: "+msg);
-    main.setStatus("Bluetooth: "+msg);
+    setStatus("Bluetooth: "+msg);
 }
 
 // Raise no bluetooth dialog if bluetooth adapter lost.
