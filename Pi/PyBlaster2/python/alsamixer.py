@@ -175,16 +175,60 @@ class AlsaMixer:
         if len(vals) != len(self.equal_channels):
             return
 
-        for i in range(len(vals)):
-            self.set_equal_channel(i, vals[i])
+        int_vals = []
+        for val in vals:
+            try:
+                int_arg = int(val)
+                if int_arg < 0:
+                    int_arg = 0
+                if int_arg > 100:
+                    int_arg = 100
+                int_vals.append(int_arg)
+            except TypeError:
+                int_vals.append(66)
+            except ValueError:
+                int_vals.append(66)
+
+        cmd = ""
+        for i in range(len(int_vals)):
+            cmd += "amixer -D equal cset numid=%d %s;" % (i+1, int_vals[i])
+
+        if not len(cmd):
+            return
+
+        Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True).communicate()
+
+        self.main.log.write(log.MESSAGE,
+                            "[ALSA] set equal channels to %s" %
+                            ' '.join('%d' % x for x in int_vals))
 
     def set_equal_status(self, status):
         """
 
         :param status:
-        :return:
         """
 
         self.main.log.write(log.MESSAGE, "[ALSA] Setting equalizer to '%s'"
                             % status)
+
+        vals = ' '.join(['66']*len(self.equal_channels))
+
+        if status == "bass":
+            vals = "77 76 75 72 66 66 66 66 66 66"
+        if status == "morebass":
+            vals = "85 85 81 74 66 66 66 66 66 66"
+        if status == "maxbass":
+            vals = "100 100 93 79 66 66 66 66 66 66"
+        if status == "lessbass":
+            vals = "40 45 50 60 66 66 66 66 66 66"
+        if status == "lesserbass":
+            vals = "30 35 40 60 66 66 66 66 66 66"
+        if status == "moremid":
+            vals = "60 65 74 78 82 82 78 74 64 60"
+        if status == "lessmid":
+            vals = "82 78 74 65 60 60 65 74 78 82"
+        if status == "moretrebble":
+            vals = "66 66 66 66 66 66 72 75 76 77"
+
+        self.set_equal_channels(vals)
 

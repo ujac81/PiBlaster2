@@ -38,6 +38,7 @@ Rectangle {
 
 
             Repeater {
+                id: equalRepeater
 
                 model: equalTab.equalText.length
 
@@ -46,6 +47,7 @@ Rectangle {
                     width: 50
 
                     Slider {
+                        id: equalSlide
                         height: 0.8 * equalTab.height - 20 - 20 - 10
                         width: 50
                         style: touchStyle
@@ -65,12 +67,16 @@ Rectangle {
 
 
                     Text {
+                        id: equalText
                         width: 50
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
                         font.pixelSize: 20
                         text: equalTab.equalText[index]
                         color: "white"
+                    }
+                    function set_equal_val() {
+                        equalSlide.value = equalTab.equalVal[index];
                     }
                 }
             }
@@ -89,6 +95,13 @@ Rectangle {
             }
 
         } // row
+
+        function update_vals() {
+            for(var i = 0; i < equalRepeater.count; i++) {
+                equalRepeater.itemAt(i).set_equal_val()
+            }
+        }
+
     } // flick
 
     Component {
@@ -149,12 +162,18 @@ Rectangle {
             UI.setStatus("Ill-formed payload received for equal-status!")
         } else {
 
+            console.log("SET EQUAL STATUS");
+            console.log(msg.payloadElements(0));
+            console.log(msg.payloadElements(1));
+
             var arr = msg.payloadElements(0);
             equalVal.length = 0;
             for (var i = 0; i < arr.length; i++ ) {
                 equalVal.push(parseInt(arr[i]));
             }
             equalText = msg.payloadElements(1);
+
+            equalFlick.update_vals();
         }
     }
 }

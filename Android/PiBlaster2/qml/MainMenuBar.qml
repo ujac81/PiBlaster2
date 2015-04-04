@@ -53,8 +53,20 @@ MenuBar {
             onTriggered: UI.btSendSingle("setequalstatus maxbass");
         }
         MenuItem {
+            text: "Less bass"
+            onTriggered: UI.btSendSingle("setequalstatus lessbass");
+        }
+        MenuItem {
+            text: "Lesser bass"
+            onTriggered: UI.btSendSingle("setequalstatus lesserbass");
+        }
+        MenuItem {
             text: "More mid"
             onTriggered: UI.btSendSingle("setequalstatus moremid");
+        }
+        MenuItem {
+            text: "Less mid"
+            onTriggered: UI.btSendSingle("setequalstatus lessmid");
         }
         MenuItem {
             text: "More trebble"
