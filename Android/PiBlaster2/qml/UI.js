@@ -70,7 +70,7 @@ function btSendSingle(cmd) {
         keepalive.running = true;
         btService.writeSocket(cmd);
     } else {
-        main.setStatus("Not connected to PiBlaster!");
+        setStatus("Not connected to PiBlaster!");
     }
 }
 

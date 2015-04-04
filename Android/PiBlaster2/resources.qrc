@@ -35,5 +35,6 @@
         <file>qml/items/ScrollBar.qml</file>
         <file>qml/UI.js</file>
         <file>qml/BT.js</file>
+        <file>qml/MainMenuBar.qml</file>
     </qresource>
 </RCC>

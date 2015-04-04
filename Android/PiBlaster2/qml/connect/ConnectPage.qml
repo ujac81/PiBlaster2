@@ -11,6 +11,7 @@ Item {
     height: parent.height
 
     TabView {
+        id: connectTabView
         anchors.fill: parent
         style: touchStyle
         Tab {
@@ -20,6 +21,17 @@ Item {
         Tab {
             title: "Settings"
             SettingsTab{ visible: true }
+        }
+
+        onCurrentIndexChanged: tabChanged(index)
+
+        function tabChanged(index) {
+            if ( index ===  0 ) {
+                mainMenuBar.set_menu("connectMenu");
+            }
+            if ( index ===  1 ) {
+                mainMenuBar.set_menu("connectSettingsMenu");
+            }
         }
     }
 
@@ -57,5 +69,7 @@ Item {
     }
 
 
-    function activated() {}
+    function activated() {
+        connectTabView.tabChanged(0);
+    }
 }

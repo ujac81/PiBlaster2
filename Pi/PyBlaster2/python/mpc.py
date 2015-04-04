@@ -279,12 +279,15 @@ class MPC:
 
     def pause(self):
         self.client.pause()
+        return self.play_status()
 
     def play(self):
         self.client.play()
+        return self.play_status()
 
     def stop(self):
         self.client.stop()
+        return self.play_status()
 
     def next(self):
         self.client.next()

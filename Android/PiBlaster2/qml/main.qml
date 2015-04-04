@@ -60,26 +60,7 @@ ApplicationWindow {
 
     ////////////////////// MENU //////////////////////
 
-    menuBar: MenuBar {
-
-        Menu {
-            title: "Main"
-            enabled: stackView.depth == 1
-            visible: stackView.depth == 1
-
-            MenuItem { text: "Connect" }
-            MenuItem { text: "Disconnect" }
-            MenuItem { text: "Exit" }
-
-        }
-
-
-
-//        function clear() {
-//            console.log("--- menu clear ---");
-//            menus.clear();
-//        }
-    }
+    menuBar: MainMenuBar { id: mainMenuBar }
 
     ////////////////////// TOP TOOL BAR //////////////////////
 
@@ -210,7 +191,9 @@ ApplicationWindow {
                 }
             }
 
-            function activated() {}
+            function activated() {
+                mainMenuBar.set_menu("main");
+            }
         }
 
         // let current stack page update on load if required.

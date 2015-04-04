@@ -177,3 +177,14 @@ class AlsaMixer:
 
         for i in range(len(vals)):
             self.set_equal_channel(i, vals[i])
+
+    def set_equal_status(self, status):
+        """
+
+        :param status:
+        :return:
+        """
+
+        self.main.log.write(log.MESSAGE, "[ALSA] Setting equalizer to '%s'"
+                            % status)
+

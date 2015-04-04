@@ -7,6 +7,7 @@ include(src/src.pri)
 OTHER_FILES += \
     android/AndroidManifest.xml \
     qml/main.qml \
+    qml/MainMenuBar.qml \
     qml/BT.js \
     qml/UI.js \
     qml/connect/ConnectPage.qml \
@@ -30,3 +31,4 @@ RESOURCES += \
     resources.qrc
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+

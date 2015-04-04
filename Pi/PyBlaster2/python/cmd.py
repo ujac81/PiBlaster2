@@ -87,6 +87,12 @@ class Cmd:
             ret_code = PLAY_NEXT
             self.main.mpc.next()
 
+        if cmd == "playpause":
+            ret_code = self.main.mpc.pause()
+
+        if cmd == "playplay":
+            ret_code = self.main.mpc.play()
+
         if cmd == "playprev":
             ret_code = PLAY_PREV
             self.main.mpc.previous()
@@ -125,6 +131,18 @@ class Cmd:
                 ret_msg = "setequal requires 2 int args"
             else:
                 self.main.alsa.set_equal_channel(int_args[1], int_args[2])
+
+        if cmd == "setequalstatus":
+            ret_code = EQUAL_STATUS
+            if len(line) != 2:
+                ret_stat = ERRORARGS
+                ret_msg = "setequalstatus requires 1 arg"
+            else:
+                self.main.alsa.set_equal_status(line[1])
+                if self.main.alsa.has_equalizer():
+                    chans = self.main.alsa.equal_channels
+                    vals = ["%d" % i for i in self.main.alsa.get_equal_vals()]
+                    ret_list = [vals, chans]
 
         if cmd == "setpos":
             ret_code = PLAY_POS
