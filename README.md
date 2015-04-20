@@ -38,6 +38,10 @@ and install it to any location (/opt/Qt) is okay.
 Default selection of packages is ok, just make sure x86_64, armv7 are
 selected for Qt and QtCreator is selected for tools.
 
+To configure android kit successfully, install a java sdk and the ant tool.
+
+    $ sudo aptitude install openjdk-7-jdk ant
+
 ## Compile Application
 See [qt docs](http://doc.qt.io/qtcreator/creator-developing-android.html)
 on how connecting android devices.

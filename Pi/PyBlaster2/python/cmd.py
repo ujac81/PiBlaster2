@@ -87,9 +87,6 @@ class Cmd:
             ret_code = PLAY_NEXT
             self.main.mpc.next()
 
-        if cmd == "playpause":
-            ret_code = self.main.mpc.pause()
-
         if cmd == "playplay":
             ret_code = self.main.mpc.play()
 
