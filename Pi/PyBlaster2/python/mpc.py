@@ -106,6 +106,10 @@ class MPC:
         self.reconnect()
 
     def reconnect(self):
+        """Try to reconnect to mpd if connection was lost.
+
+        Try 5 times, raise error if no success.
+        """
         connected = False
 
         try:
@@ -164,6 +168,29 @@ class MPC:
         time.sleep(0.5)
 
     def get_status(self):
+        """Get status dict from mpd.
+        If connection error occurred, try to reconnect max 5 times.
+
+        :return: {'audio': '44100:24:2',
+                 'bitrate': '320',
+                 'consume': '0',
+                 'elapsed': '10.203',
+                 'mixrampdb': '0.000000',
+                 'mixrampdelay': 'nan',
+                 'nextsong': '55',
+                 'nextsongid': '55',
+                 'playlist': '2',
+                 'playlistlength': '123',
+                 'random': '1',
+                 'repeat': '1',
+                 'single': '0',
+                 'song': '58',
+                 'songid': '58',
+                 'state': 'pause',
+                 'time': '10:191',
+                 'volume': '40',
+                 'xfade': '0'}
+        """
         for i in range(5):
             try:
                 return self.client.status()
@@ -174,18 +201,42 @@ class MPC:
         raise Exception("Failed to get status from MPD!")
 
     def get_status_int(self, key, dflt=0):
+        """Fetch value from mpd status dict as int,
+        fallback to dflt if no such key.
+
+        Won't catch failed conversions.
+        """
         stat = self.get_status()
         if key in stat:
             return int(stat[key])
         return dflt
 
     def get_status_string(self, key, dflt=''):
+        """Fetch value from mpd status dict as string,
+        fallback to dflt if no such key.
+        """
         stat = self.get_status()
         if key in stat:
             return stat[key]
         return dflt
 
     def get_currentsong(self):
+        """Fetch current song dict from mpd.
+        Force reconnect if failed.
+
+        :return: {'album': 'Litany',
+                 'albumartist': 'Vader',
+                 'artist': 'Vader',
+                 'date': '2000',
+                 'file': 'local/Extreme_Metal/Vader - Litany - 01 - Wings.mp3',
+                 'genre': 'Death Metal',
+                 'id': '58',
+                 'last-modified': '2014-12-10T20:00:58Z',
+                 'pos': '58',
+                 'time': '191',
+                 'title': 'Wings',
+                 'track': '1'}
+        """
         for i in range(5):
             try:
                 return self.client.currentsong()
@@ -202,12 +253,15 @@ class MPC:
         self.client.update()
 
     def volume(self):
+        """Current volume as int in [0,100]"""
         return self.get_status_int('volume')
 
     def change_volume(self, amount):
+        """Add amount to current volume int [-100, +100]"""
         self.set_volume(self.volume() + amount)
 
     def set_volume(self, setvol):
+        """Set current volume as int in [0,100]"""
         vol = setvol
         if vol < 0:
             vol = 0
@@ -217,9 +271,11 @@ class MPC:
         return self.volume()
 
     def get_play_status(self):
-        """
+        """Get status of current song.
+        Invoked by "playstatus" command via Cmd.eval()
 
-        :return:
+        :return: [rand_stat, repeat_stat, state, volume, time, length, album,
+                  artist, title, file, year, genre, track-no]
         """
 
         result = []
@@ -306,6 +362,36 @@ class MPC:
     def toggle_repeat(self):
         rep = self.get_status_int('repeat')
         self.client.repeat(1 if rep == 0 else 0)
+
+    def playlistinfo_current(self, amount):
+        """Get list of playlist items around current song
+        :param amount: number of items to fetch from playlist
+        :return: amount items from playlistinfo()
+        """
+        song_pos = self.get_status_int('song')
+        start = max(0, song_pos - int(amount/2))
+        end = start + amount
+
+        return self.playlistinfo(start, end)
+
+    def playlistinfo(self, start, end):
+        """
+
+        :return: [[pos, title, artist, album, length]]
+        """
+
+        if end < start:
+            return []
+
+        if start >= self.get_status_int('playlistlength', start):
+            return []
+
+        result = []
+        items = self.client.playlistinfo("%d:%d" % (start, end))
+        for item in items:
+            result.append([])
+
+        return result
 
     def exit_client(self):
         """Disconnect from mpc
