@@ -248,6 +248,7 @@ Rectangle {
         }
     }
 
+    // try refetch of status every 250 ms until received
     Timer {
         id: fetchStatusTimer
         interval: 250

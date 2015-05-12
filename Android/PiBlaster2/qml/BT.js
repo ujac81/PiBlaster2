@@ -38,4 +38,10 @@ function processMessage(msg) {
         // answer on equalstatus
         stackView.update_status(msg)
     }
+
+    if (msg.code() === 601) {
+        // answer on playlistinfo
+        stackView.update_list_status(msg)
+    }
+
 }

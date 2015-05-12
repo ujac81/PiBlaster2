@@ -18,6 +18,9 @@ OTHER_FILES += \
     qml/play/PlayTab.qml \
     qml/play/VolumeTab.qml \
     qml/play/EqualizerTab.qml \
+    qml/playlist/PlayListDelegate.qml \
+    qml/playlist/PlayListModel.qml \
+    qml/playlist/PlayListPage.qml \
     qml/dialogs/NoBluetoothDialog.qml \
     qml/items/FlickText.qml \
     qml/items/ScrollBar.qml
@@ -31,4 +34,9 @@ RESOURCES += \
     resources.qrc
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+DISTFILES += \
+    qml/playlist/PlayListPage.qml \
+    qml/playlist/PlayListModel.qml \
+    qml/playlist/PlayListDelegate.qml
 

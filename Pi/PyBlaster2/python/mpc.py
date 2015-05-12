@@ -375,8 +375,10 @@ class MPC:
         return self.playlistinfo(start, end)
 
     def playlistinfo(self, start, end):
-        """
+        """Get playlist items in interval [start, end)
 
+        :param start: start index in playlist (start = 0)
+        :param end: end index in playlist (excluded)
         :return: [[pos, title, artist, album, length]]
         """
 
@@ -389,7 +391,18 @@ class MPC:
         result = []
         items = self.client.playlistinfo("%d:%d" % (start, end))
         for item in items:
-            result.append([])
+            res = [item['pos'], '', '', '', item['time']]
+            if 'title' in item:
+                res[1] = item['title']
+            else:
+                no_ext = os.path.splitext(item['file'])[0]
+                res[1] = os.path.basename(no_ext)
+            if 'artist' in item:
+                res[2] = item['artist']
+            if 'album' in 'item':
+                res[3] = item['album']
+
+            result.append(res)
 
         return result
 

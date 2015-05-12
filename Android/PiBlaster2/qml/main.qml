@@ -144,6 +144,10 @@ ApplicationWindow {
             page: "play/PlayPage.qml"
         }
         ListElement {
+            title: "Playlist"
+            page: "playlist/PlayListPage.qml"
+        }
+        ListElement {
             title: "Sliders"
             page: "content/SliderPage.qml"
         }
@@ -206,6 +210,12 @@ ApplicationWindow {
         function update_status(msg) {
             if (currentItem.objectName === "PlayPage" ) {
                 currentItem.update_status(msg);
+            }
+        }
+
+        function update_list_status(msg) {
+            if (currentItem.objectName === "PlayListPage" ) {
+                currentItem.update_playlist(msg);
             }
         }
     }

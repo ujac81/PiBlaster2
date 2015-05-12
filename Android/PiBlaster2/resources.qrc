@@ -36,5 +36,8 @@
         <file>qml/UI.js</file>
         <file>qml/BT.js</file>
         <file>qml/MainMenuBar.qml</file>
+        <file>qml/playlist/PlayListPage.qml</file>
+        <file>qml/playlist/PlayListDelegate.qml</file>
+        <file>qml/playlist/PlayListModel.qml</file>
     </qresource>
 </RCC>

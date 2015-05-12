@@ -32,4 +32,10 @@ VOL_STATUS = 404    # answer on volstatus
 EQUAL_CHANNEL_CHANGED = 501
 EQUAL_STATUS = 504  # answer on equalstatus
 
+PLAYLIST_INFO = 601
+
+
+
+
+
 KEEP_ALIVE = 1000   # answer on keepalive

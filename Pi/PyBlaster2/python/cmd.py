@@ -83,6 +83,24 @@ class Cmd:
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
+        if cmd == "playlistinfocurrent":
+            ret_code = PLAYLIST_INFO
+            if len(line) != 2 or int_args[1] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "playlistinfocurrent requires 1 int arg"
+            else:
+                ret_list = self.main.mpc.playlistinfo_current(int_args[1])
+                ret_msg = self.main.mpc.get_status_string('song')
+
+        if cmd == "playlistinfo":
+            ret_code = PLAYLIST_INFO
+            if len(line) != 3 or int_args[1] is None or int_args[2] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "playlistinfo requires 2 int args"
+            else:
+                ret_list = self.main.mpc.playlistinfo(int_args[1], int_args[2])
+                ret_msg = self.main.mpc.get_status_string('song')
+
         if cmd == "playnext":
             ret_code = PLAY_NEXT
             self.main.mpc.next()
