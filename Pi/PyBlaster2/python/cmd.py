@@ -108,6 +108,14 @@ class Cmd:
         if cmd == "playplay":
             ret_code = self.main.mpc.play()
 
+        if cmd == "playpos":
+            ret_code = PLAY_JUMP
+            if len(line) != 2 or int_args[1] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "playpos requires 1 int arg"
+            else:
+                self.main.mpc.playpos(int_args[1])
+
         if cmd == "playprev":
             ret_code = PLAY_PREV
             self.main.mpc.previous()

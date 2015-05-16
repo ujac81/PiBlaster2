@@ -22,7 +22,9 @@ ListModel {
             nowIndex = parseInt(msg.message());
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
-                var app = {"position": arr[0],
+                var app = {
+                        "id": i,
+                        "position": arr[0],
                         "title": arr[1],
                         "artist": arr[2],
                         "album": arr[3],
@@ -30,9 +32,6 @@ ListModel {
                         "selected": false,
                         "active": ( parseInt(arr[0]) === nowIndex )
                        };
-//                console.log(msg.payloadElements(i));
-//                console.log(arr[1]);
-//                console.log(app.title);
                 append(app);
             }
         } else {
@@ -45,7 +44,14 @@ ListModel {
     }
 
 
-
+    function update_playlistposition(msg) {
+        var arr = msg.payloadElements(0);
+        var pos = arr[13];
+        console.log("Activate elem #"+pos);
+        for ( var i = 0; i < count; i++ ) {
+            get(i).active = get(i).position === pos;
+        }
+    }
 
 
 }

@@ -44,12 +44,17 @@ ScrollView {
 
     function activated() {
         console.log("PLAYLIST ACTIVATED");
-        UI.btSendSingle("playlistinfocurrent 100");
+        UI.btSendSingle("playlistinfocurrent 0");
     }
 
 
     function update_playlist(msg) {
         console.log("update_playlist");
         playlistview.model.received_playlist(msg);
+    }
+
+    function update_playlistposition(msg) {
+        console.log("update_playlistposition");
+        playlistview.model.update_playlistposition(msg);
     }
 }

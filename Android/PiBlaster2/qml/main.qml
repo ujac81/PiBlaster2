@@ -211,6 +211,9 @@ ApplicationWindow {
             if (currentItem.objectName === "PlayPage" ) {
                 currentItem.update_status(msg);
             }
+            if (currentItem.objectName === "PlayListPage" ) {
+                currentItem.update_playlistposition(msg);
+            }
         }
 
         function update_list_status(msg) {

@@ -275,7 +275,7 @@ class MPC:
         Invoked by "playstatus" command via Cmd.eval()
 
         :return: [rand_stat, repeat_stat, state, volume, time, length, album,
-                  artist, title, file, year, genre, track-no]
+                  artist, title, file, year, genre, track-no, position]
         """
 
         result = []
@@ -291,7 +291,8 @@ class MPC:
                     'file',
                     'date',
                     'genre',
-                    'track']
+                    'track',
+                    'pos']
 
         status = self.get_status()
         cur = self.get_currentsong()
@@ -341,6 +342,11 @@ class MPC:
         self.client.play()
         return self.play_status()
 
+    def playpos(self, pos):
+        pl_len = self.get_status_int('playlistlength')
+        if pos < pl_len:
+            self.client.play(pos)
+
     def stop(self):
         self.client.stop()
         return self.play_status()
@@ -368,6 +374,9 @@ class MPC:
         :param amount: number of items to fetch from playlist
         :return: amount items from playlistinfo()
         """
+        if amount == 0:
+            return self.playlistinfo(0, -1)
+
         song_pos = self.get_status_int('song')
         start = max(0, song_pos - int(amount/2))
         end = start + amount
@@ -382,16 +391,22 @@ class MPC:
         :return: [[pos, title, artist, album, length]]
         """
 
+        pl_len = self.get_status_int('playlistlength')
+
+        if end == -1:
+            end = pl_len
+
         if end < start:
             return []
 
-        if start >= self.get_status_int('playlistlength', start):
+        if start >= pl_len:
             return []
 
         result = []
         items = self.client.playlistinfo("%d:%d" % (start, end))
         for item in items:
-            res = [item['pos'], '', '', '', item['time']]
+            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+            res = [item['pos'], '', '', '', length]
             if 'title' in item:
                 res[1] = item['title']
             else:
