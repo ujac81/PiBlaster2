@@ -49,6 +49,7 @@ class ServerThread(threading.Thread):
         self.port = 0
         self.uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
         self.next_buffer_size = -1  # set in read_socket to receive lines
+        self.last_data = ''  # keep receive data buffered
         self.msgid = -1  # id counter for messages sent by server (negative)
 
     def run(self):
@@ -369,8 +370,14 @@ class ServerThread(threading.Thread):
                 self.client_sock.settimeout(self.comm_timeout)
             if recv_size > 0:
                 try:
-                    data = self.client_sock.recv(recv_size).decode(
-                        'utf-8').strip()
+                    recv_data = self.last_data + \
+                                self.client_sock.recv(recv_size).\
+                                    decode('utf-8').strip()
+                    if len(recv_data) >= recv_size:
+                        data = recv_data[:recv_size]
+                        self.last_data = recv_data[recv_size:]
+                    else:
+                        self.last_data = recv_data
                 except bluetooth.btcommon.BluetoothError:
                     receiving = False
                     pass
@@ -400,13 +407,18 @@ class ServerThread(threading.Thread):
         """
 
         """
-        self.client_sock.settimeout(self.comm_timeout)
-        try:
-            self.client_sock.recv(1)
-        except bluetooth.btcommon.BluetoothError:
-            return False
-            pass
+
+        # disabled atm
+        # TODO: check if required
         return True
+
+        # self.client_sock.settimeout(self.comm_timeout)
+        # try:
+        #     self.client_sock.recv(1)
+        # except bluetooth.btcommon.BluetoothError:
+        #     return False
+        #     pass
+        # return True
 
 
 class RFCommServer:

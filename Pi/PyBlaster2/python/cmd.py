@@ -83,6 +83,10 @@ class Cmd:
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
+        if cmd == "pldelete":
+            ret_code = PLAYLIST_DELETE
+            print('---- PAYLOAD: %s' % ' '.join(payload))
+
         if cmd == "playlistinfocurrent":
             ret_code = PLAYLIST_INFO
             if len(line) != 2 or int_args[1] is None:

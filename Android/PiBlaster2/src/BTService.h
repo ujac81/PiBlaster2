@@ -44,6 +44,28 @@ public slots:
 
     void writeSocket(const QString& msg);
 
+
+    /**
+     * @brief Clear send payload buffer.
+     * To be used before writeSocketWithPayload() and addToSendPayload().
+     * Send payload is used for commands with multiple lines
+     * like playlist add commands.
+     */
+    void clearSendPayload() { _sendPayload.clear(); }
+
+    /**
+     * @brief Add a line to send payload.
+     * To be used before execCommandWithPayload().
+     */
+    void addToSendPayload( const QString& add ) { _sendPayload.append( add ); }
+
+    /**
+     * @brief Send command with prepared payload to PyBlaster via bluetooth.
+     * Fire up new RFCommSendThread to send message.
+     * Message will be received by RFCommRecvThread which will emit signal.
+     */
+    void writeSocketWithPayload( const QString& command );
+
 private slots:
 
     void serviceDiscovered(const QBluetoothServiceInfo& info);
@@ -87,6 +109,9 @@ private:
     int _msgId;
 
     QBluetoothLocalDevice::HostMode _hostMode;
+
+    QList<QString> _sendPayload;
+
 };
 
 #endif // BTService_H

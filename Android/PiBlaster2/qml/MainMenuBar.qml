@@ -110,16 +110,36 @@ MenuBar {
         enabled: false
 
         MenuItem {
-            text: "Connect"
-            onTriggered: UI.bt_reconnect()
+            text: "Select all"
+            onTriggered: stackView.playlist_action("select_all")
         }
         MenuItem {
-            text: "Disconnect"
-            onTriggered: UI.bt_disconnect()
+            text: "Deselect all"
+            onTriggered: stackView.playlist_action("deselect_all")
         }
         MenuItem {
-            text: "Exit"
-            onTriggered: Qt.quit()
+            text: "Invert selection"
+            onTriggered: stackView.playlist_action("invert_selection")
+        }
+        MenuItem {
+            text: "Delete selection"
+            onTriggered: stackView.playlist_action("delete_selection")
+        }
+        MenuItem {
+            text: "Selection after current"
+            onTriggered: stackView.playlist_action("selection_after_current")
+        }
+        MenuItem {
+            text: "Selection to end"
+            onTriggered: stackView.playlist_action("selection_to_end")
+        }
+        MenuItem {
+            text: "Randomize playlist"
+            onTriggered: stackView.playlist_action("randomize_playlist")
+        }
+        MenuItem {
+            text: "Clear Playlist"
+            onTriggered: stackView.playlist_action("clear")
         }
     }
 
@@ -131,6 +151,8 @@ MenuBar {
 
     function set_menu(tabname) {
         set_default();
+
+        playlistMenu.enabled = tabname === "PlayListPage";
     }
 
 

@@ -406,7 +406,7 @@ class MPC:
         items = self.client.playlistinfo("%d:%d" % (start, end))
         for item in items:
             length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
-            res = [item['pos'], '', '', '', length]
+            res = [item['pos'], '', '', '', length, item['id']]
             if 'title' in item:
                 res[1] = item['title']
             else:

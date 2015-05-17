@@ -23,12 +23,13 @@ ListModel {
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
                 var app = {
-                        "id": i,
+                        "index": i,
                         "position": arr[0],
                         "title": arr[1],
                         "artist": arr[2],
                         "album": arr[3],
                         "length": arr[4],
+                        "id": arr[5],
                         "selected": false,
                         "active": ( parseInt(arr[0]) === nowIndex )
                        };
@@ -51,6 +52,35 @@ ListModel {
         for ( var i = 0; i < count; i++ ) {
             get(i).active = get(i).position === pos;
         }
+    }
+
+
+    function deselect_all() {
+        for ( var i = 0; i < count; i++ ) {
+            get(i).selected = false;
+        }
+    }
+
+    function select_all() {
+        for ( var i = 0; i < count; i++ ) {
+            get(i).selected = true;
+        }
+    }
+
+    function invert_selection() {
+        for ( var i = 0; i < count; i++ ) {
+            get(i).selected = ! get(i).selected;
+        }
+    }
+
+    function delete_selection() {
+        btService.clearSendPayload();
+        for ( var i = 0; i < count; i++ ) {
+            if (get(i).selected) {
+                btService.addToSendPayload(get(i).id);
+            }
+        }
+        btService.writeSocketWithPayload('pldelete');
     }
 
 

@@ -100,13 +100,13 @@ Item {
         id: mouse
         anchors.fill: parent
         onClicked: {
-            var elem = playlistview.model.get(id);
+            var elem = playlistview.model.get(index);
             elem.selected = ! selected;
         }
 
-        onDoubleClicked: {
+        onPressAndHold: {
             UI.btSendSingle("playpos "+position);
-            var elem = playlistview.model.get(id);
+            var elem = playlistview.model.get(index);
             elem.selected = false;
         }
     }

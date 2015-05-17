@@ -57,4 +57,36 @@ ScrollView {
         console.log("update_playlistposition");
         playlistview.model.update_playlistposition(msg);
     }
+
+
+    function playlist_action(action_name) {
+        if (action_name === "select_all") {
+            playlistview.model.select_all();
+        }
+        else if (action_name === "deselect_all") {
+            playlistview.model.deselect_all();
+        }
+        else if (action_name === "invert_selection") {
+            playlistview.model.invert_selection();
+        }
+        else if (action_name === "delete_selection") {
+            playlistview.model.delete_selection();
+        }
+        else if (action_name === "selection_after_current") {
+            playlistview.model.selection_after_current();
+        }
+        else if (action_name === "selection_to_end") {
+            playlistview.model.selection_to_end();
+        }
+        else if (action_name === "randomize_playlist") {
+            playlistview.model.randomize_playlist();
+        }
+        else if (action_name === "clear") {
+            playlistview.model.clear_playlist();
+        }
+        else {
+            console.log("ERROR: illegal action_name "+action_name);
+        }
+
+    }
 }

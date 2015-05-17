@@ -147,26 +147,6 @@ ApplicationWindow {
             title: "Playlist"
             page: "playlist/PlayListPage.qml"
         }
-        ListElement {
-            title: "Sliders"
-            page: "content/SliderPage.qml"
-        }
-        ListElement {
-            title: "ProgressBar"
-            page: "content/ProgressBarPage.qml"
-        }
-        ListElement {
-            title: "Tabs"
-            page: "content/TabBarPage.qml"
-        }
-        ListElement {
-            title: "TextInput"
-            page: "content/TextInputPage.qml"
-        }
-        ListElement {
-            title: "List"
-            page: "content/ListPage.qml"
-        }
     }
 
     ////////////////////// STACK VIEW ELEMENT //////////////////////
@@ -204,6 +184,7 @@ ApplicationWindow {
         onCurrentItemChanged: {
             if ( currentItem ) {
                 currentItem.activated();
+                mainMenuBar.set_menu(currentItem.objectName);
             }
         }
 
@@ -219,6 +200,13 @@ ApplicationWindow {
         function update_list_status(msg) {
             if (currentItem.objectName === "PlayListPage" ) {
                 currentItem.update_playlist(msg);
+            }
+        }
+
+
+        function playlist_action(action_name) {
+            if (currentItem.objectName === "PlayListPage" ) {
+                currentItem.playlist_action(action_name)
             }
         }
     }

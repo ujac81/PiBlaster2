@@ -226,15 +226,15 @@ void BTService::readSocket()
         QString sline = QString::fromUtf8( line.constData(), line.length() );
         _msgHandler->bufferLine( sline );
 
-        // write '1' to buffer to tell PiBlaster to send next line.
-        // TODO: redesign
-        QByteArray text = QString("1").toUtf8() + '\n';
-        qint64 bytes = _socket->write( text );
-        if ( bytes == -1 )
-        {
-            emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
-            disconnectService();
-        }
+//        // write '1' to buffer to tell PiBlaster to send next line.
+//        // TODO: redesign
+//        QByteArray text = QString("1").toUtf8() + '\n';
+//        qint64 bytes = _socket->write( text );
+//        if ( bytes == -1 )
+//        {
+//            emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
+//            disconnectService();
+//        }
     }
 }
 
@@ -259,3 +259,46 @@ void BTService::writeSocket( const QString &msg )
 
     _msgId++;
 }
+
+
+void BTService::writeSocketWithPayload(const QString& command)
+{
+    if ( ! _socket )
+        return;
+
+    QString line = QString::number( _msgId ) + " " +
+            QString::number( _sendPayload.size() ) + " " + command;
+    QString head = QString("%1").arg( line.length(), 4, 10, QLatin1Char('0') );
+    QString send = head + line;
+    QByteArray text = send.toUtf8() + '\n';
+    qint64 bytes = _socket->write( text );
+    if ( bytes == -1 )
+    {
+        emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
+        disconnectService();
+    }
+
+    // TODO: thread this
+
+    for ( int i = 0; i < _sendPayload.size(); ++i )
+    {
+        QString line = _sendPayload[i];
+        QString head = QString("%1").arg(
+                    QString::number( line.length()), 4, '0');
+
+        QString send = head + line;
+        QByteArray text = send.toUtf8() + '\n';
+        qint64 bytes = _socket->write( text );
+        if ( bytes == -1 )
+        {
+            emit bluetoothWarning("Write to bluetooth socket failed. Disconnecting from service!");
+            disconnectService();
+            break;
+        }
+    }
+
+    _msgId++;
+}
+
+
+

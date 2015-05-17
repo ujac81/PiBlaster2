@@ -273,7 +273,7 @@ Rectangle {
     }
 
     function update_status(msg) {
-        if (msg.payloadElementsSize(0) !== 13) {
+        if (msg.payloadElementsSize(0) !== 14) {
             UI.setStatus("Ill-formed payload received for play-status!")
         } else {
             var arr = msg.payloadElements(0);
