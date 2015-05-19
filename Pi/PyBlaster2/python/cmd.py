@@ -83,10 +83,6 @@ class Cmd:
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
-        if cmd == "pldelete":
-            ret_code = PLAYLIST_DELETE
-            print('---- PAYLOAD: %s' % ' '.join(payload))
-
         if cmd == "playlistinfocurrent":
             ret_code = PLAYLIST_INFO
             if len(line) != 2 or int_args[1] is None:
@@ -94,7 +90,7 @@ class Cmd:
                 ret_msg = "playlistinfocurrent requires 1 int arg"
             else:
                 ret_list = self.main.mpc.playlistinfo_current(int_args[1])
-                ret_msg = self.main.mpc.get_status_string('song')
+                ret_msg = self.main.mpc.get_status_string('song', '-1')
 
         if cmd == "playlistinfo":
             ret_code = PLAYLIST_INFO
@@ -103,7 +99,7 @@ class Cmd:
                 ret_msg = "playlistinfo requires 2 int args"
             else:
                 ret_list = self.main.mpc.playlistinfo(int_args[1], int_args[2])
-                ret_msg = self.main.mpc.get_status_string('song')
+                ret_msg = self.main.mpc.get_status_string('song', '-1')
 
         if cmd == "playnext":
             ret_code = PLAY_NEXT
@@ -139,6 +135,34 @@ class Cmd:
 
         if cmd == "playtoggle" or cmd == "playpause":
             ret_code = self.main.mpc.toggle()
+
+        if cmd == "plclear":
+            ret_code = PLAYLIST_CLEAR
+            self.main.mpc.playlist_clear()
+
+        if cmd == "pldelete":
+            ret_code = PLAYLIST_DELETE
+            self.main.mpc.playlist_delete(payload)
+
+        if cmd == "plmove":
+            ret_code = PLAYLIST_MOVE
+            if len(line) != 3 or int_args[1] is None or int_args[2] is None:
+                ret_stat = ERRORARGS
+                ret_msg = "plmove requires 2 int args"
+            else:
+                self.main.mpc.playlist_move(int_args[1], int_args[2])
+
+        if cmd == "plselaftercur":
+            ret_code = PLAYLIST_SELECTION_AFTER_CUR
+            self.main.mpc.playlist_move_selection(payload, mode=1)
+
+        if cmd == "plseltoend":
+            ret_code = PLAYLIST_SELECTION_TO_END
+            self.main.mpc.playlist_move_selection(payload, mode=2)
+
+        if cmd == "plshuffle":
+            ret_code = PLAYLIST_SHUFFLE
+            self.main.mpc.playlist_shuffle()
 
         if cmd == "poweroff":
             ret_code = CON_POWEROFF

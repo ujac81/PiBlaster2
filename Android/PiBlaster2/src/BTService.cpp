@@ -287,6 +287,9 @@ void BTService::writeSocketWithPayload(const QString& command)
                     QString::number( line.length()), 4, '0');
 
         QString send = head + line;
+
+        qDebug() << "PAYLOAD: #" << i << ": " << send;
+
         QByteArray text = send.toUtf8() + '\n';
         qint64 bytes = _socket->write( text );
         if ( bytes == -1 )

@@ -39,8 +39,8 @@ class ServerThread(threading.Thread):
         self.mode = NOTCONNECTED
         self.client_sock = None
         self.client_info = None
-        self.timeout = 0.1  # socket timeouts for non blocking con.
-        self.comm_timeout = 2  # increase timeout on send/recv
+        self.timeout = 0.2  # socket timeouts for non blocking con.
+        self.comm_timeout = 5  # increase timeout on send/recv
         self.timeoutpolls = 200  # disconnect after N inactivity timeouts
         self.nowpolls = 0  # reset after each receive,
         # incremented while waiting for data
@@ -286,6 +286,10 @@ class ServerThread(threading.Thread):
         cmd = cmd[len(cmd_split[0]) + len(cmd_split[1]) + 2:]
         payload = self.read_rows(payload_size)
 
+        if payload is None:
+            # some shit happened while receiving or parsing payload.
+            self.main.log.write(log.ERROR, "BT RECV PAYLOAD FAILED!")
+
         if self.mode != AUTHORIZED:
             # check if password has been sent
             if cmd == self.main.settings.pin1:
@@ -331,6 +335,9 @@ class ServerThread(threading.Thread):
 
         # TODO this may loop forever -- do some max retries or so
 
+        if count == 0:
+            return []
+
         self.main.led.set_led_yellow(1)
 
         result = []
@@ -347,9 +354,13 @@ class ServerThread(threading.Thread):
             if len(result) == count:
                 break
 
-            self.receive_into_buffer()
+            if not self.receive_into_buffer():
+                result = None
 
         self.main.led.set_led_yellow(0)
+
+        if result is not None:
+            print("DELIVER PAYLOAD %s" % result)
 
         return result
 
@@ -358,50 +369,72 @@ class ServerThread(threading.Thread):
 
         """
         receiving = True
+        recv_data = self.last_data
         while receiving:
-            data = None
-            # if last package was line head (num bytes), receive msg
-            # if head size not set, receive 4 bytes (msg head)
-            recv_size = self.next_buffer_size
-            if recv_size == -1:
-                recv_size = 4
+
+            if self.next_buffer_size == -1:
                 self.client_sock.settimeout(self.timeout)
             else:
                 self.client_sock.settimeout(self.comm_timeout)
-            if recv_size > 0:
-                try:
-                    recv_data = self.last_data + \
-                                self.client_sock.recv(recv_size).\
-                                    decode('utf-8').strip()
-                    if len(recv_data) >= recv_size:
-                        data = recv_data[:recv_size]
-                        self.last_data = recv_data[recv_size:]
-                    else:
-                        self.last_data = recv_data
-                except bluetooth.btcommon.BluetoothError:
-                    receiving = False
-                    pass
-            if data and len(data) > 0:
+
+            try:
+                recv_data += self.client_sock.recv(1024).\
+                    decode('utf-8').strip()
+
+            except bluetooth.btcommon.BluetoothError:
+                receiving = False
+                pass
+
+        if not len(recv_data):
+            # nothing found via BT, wait another loop.
+            return True
+
+        print("++++BTIN+++ --%s--" % recv_data)
+
+        recv_size = self.next_buffer_size
+        if recv_size == -1:
+            recv_size = 4
+        self.last_data = recv_data
+
+        while len(self.last_data) >= recv_size:
+            now_data = self.last_data[:recv_size].strip()
+            self.last_data = self.last_data[recv_size:].strip()
+            print("----DATA--- %s" % now_data)
+
+            if len(now_data) > 0:
                 if self.next_buffer_size == -1:
-                    # Skip if received length is != 4, we received a line feed
-                    # or some other crap.
-                    # Forget this data and keep reading 4 bytes from stream
-                    # until new message header found.
-                    if len(data) == 4:
+                    # Skip if received length is != 4,
+                    # we received a line feed or some other crap.
+                    # Forget this data and keep reading 4 bytes
+                    # from stream until new message header found.
+                    if len(now_data) == 4:
                         # we should have received buffer size now
                         try:
-                            self.next_buffer_size = int(data)
+                            self.next_buffer_size = int(now_data)
+                            recv_size = self.next_buffer_size
+                            print("----NWBS---- %d" % recv_size)
                         except ValueError:
                             self.main.log.write(log.EMERGENCY,
-                                                "[RECV]: Value error in int "
-                                                "conversion! Protocol broken?")
+                                "[RECV]: Value error in int "
+                                "conversion! Protocol broken?")
+                            # Assume crappy buffer -- clean it
+                            self.last_data = ''
+                            self.next_buffer_size = -1
+                            return False
                 else:
                     # we received data
-                    self.cmdbuffer.append(data)
-                    self.main.log.write(log.DEBUG3, "---<<< RECV: "+data)
+                    self.cmdbuffer.append(now_data)
+                    self.main.log.write(log.DEBUG3,
+                                        "----RECV---- %s" % now_data)
                     self.next_buffer_size = -1
+                    recv_size = 4
+            else:
+                self.last_data = ''
+                self.next_buffer_size = -1
+                recv_size = 4
 
         self.client_sock.settimeout(self.timeout)
+        return True
 
     def recv_ok_byte(self):
         """

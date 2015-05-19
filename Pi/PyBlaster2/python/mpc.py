@@ -3,7 +3,7 @@
 @Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
-from mpd import MPDClient, ConnectionError
+from mpd import MPDClient, ConnectionError, CommandError
 import os
 import queue
 import sys
@@ -200,6 +200,11 @@ class MPC:
 
         raise Exception("Failed to get status from MPD!")
 
+    def ensure_connected(self):
+        """Fetch status which retries 5 times to reconnect if not connected.
+        """
+        self.get_status()
+
     def get_status_int(self, key, dflt=0):
         """Fetch value from mpd status dict as int,
         fallback to dflt if no such key.
@@ -237,19 +242,14 @@ class MPC:
                  'title': 'Wings',
                  'track': '1'}
         """
-        for i in range(5):
-            try:
-                return self.client.currentsong()
-            except ConnectionError:
-                self.reconnect()
-                pass
-
-        raise Exception("Failed to get current song from MPD!")
+        self.ensure_connected()
+        return self.client.currentsong()
 
     def update_database(self):
         """Trigger mpd update command (!= rescan).
         Idler will get notified when scan is done.
         """
+        self.ensure_connected()
         self.client.update()
 
     def volume(self):
@@ -262,6 +262,7 @@ class MPC:
 
     def set_volume(self, setvol):
         """Set current volume as int in [0,100]"""
+        self.ensure_connected()
         vol = setvol
         if vol < 0:
             vol = 0
@@ -308,7 +309,7 @@ class MPC:
         for key in cur_keys:
             res = cur[key] if key in cur else ''
             if key == 'title' and res == '':
-                filename = cur['file']
+                filename = cur['file'] if key in cur else 'NOT PLAYING'
                 ext = os.path.splitext(filename)[1]
                 res = os.path.split(filename)[1].replace(ext, '').\
                     replace('_', ' ')
@@ -335,10 +336,12 @@ class MPC:
         return self.play_status()
 
     def pause(self):
+        self.ensure_connected()
         self.client.pause()
         return self.play_status()
 
     def play(self):
+        self.ensure_connected()
         self.client.play()
         return self.play_status()
 
@@ -348,13 +351,16 @@ class MPC:
             self.client.play(pos)
 
     def stop(self):
+        self.ensure_connected()
         self.client.stop()
         return self.play_status()
 
     def next(self):
+        self.ensure_connected()
         self.client.next()
 
     def previous(self):
+        self.ensure_connected()
         self.client.previous()
 
     def seek_current(self, time):
@@ -420,6 +426,73 @@ class MPC:
             result.append(res)
 
         return result
+
+    def playlist_clear(self):
+        """Clear out whole playlist
+        """
+        self.ensure_connected()
+        self.client.clear()
+        self.resend_playlist()
+
+    def playlist_shuffle(self):
+        """shuffle playlist
+        """
+        # TODO 'from:to'
+        self.ensure_connected()
+        self.client.shuffle()
+        self.resend_playlist()
+
+    def playlist_delete(self, payload):
+        """Delete items from playlist
+
+        :param payload: unsorted list of string ids
+        """
+        self.ensure_connected()
+        if not len(payload):
+            return
+
+        for i in sorted([int(x) for x in payload], reverse=True):
+            try:
+                self.client.deleteid(i)
+            except CommandError:
+                pass
+
+        self.resend_playlist()
+
+    def playlist_move_selection(self, payload, mode=1):
+        """
+
+        :param payload:
+        :return:
+        """
+        self.ensure_connected()
+        if not len(payload):
+            return
+
+        move_to = -1  # == after current
+        if mode == 2:
+            move_to = self.get_status_int('playlistlength') - 1
+
+        for i in [int(x) for x in payload][::-1]:
+            self.client.moveid(i, move_to)
+
+        self.resend_playlist()
+
+    def playlist_move(self, songid, toposition):
+        """
+        """
+        self.ensure_connected()
+        # TODO exceptions
+        self.client.moveid(songid, toposition)
+        self.resend_playlist()
+
+    def resend_playlist(self):
+        """Let application send updated playlist data to client.
+
+        Invokes bluetooth send.
+        """
+        res = self.main.cmd.eval('playlistinfocurrent 0', 'idler')
+        self.main.bt.send_client([-1] + res)
 
     def exit_client(self):
         """Disconnect from mpc

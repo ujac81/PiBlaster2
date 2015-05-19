@@ -67,8 +67,8 @@ function btSendSingle(cmd) {
     if (main.btconnected) {
         // reset keep alive to prevent interference with command sending.
         keepalive.running = false;
-        keepalive.running = true;
         btService.writeSocket(cmd);
+        keepalive.running = true;
     } else {
         setStatus("Not connected to PiBlaster!");
     }

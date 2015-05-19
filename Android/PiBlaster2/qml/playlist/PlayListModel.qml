@@ -1,6 +1,9 @@
 import QtQuick 2.0
 
 
+import "../UI.js" as UI
+
+
 ListModel {
     id: playlistModel
 
@@ -73,15 +76,28 @@ ListModel {
         }
     }
 
-    function delete_selection() {
+    function process_selection(cmd) {
         btService.clearSendPayload();
         for ( var i = 0; i < count; i++ ) {
             if (get(i).selected) {
                 btService.addToSendPayload(get(i).id);
             }
         }
-        btService.writeSocketWithPayload('pldelete');
+        if (main.btconnected) {
+            keepalive.running = false;
+            btService.writeSocketWithPayload(cmd);
+            keepalive.running = true;
+        } else {
+            UI.setStatus("Not connected to PiBlaster!");
+        }
+
     }
+
+    function playlist_move(index, moveTo) {
+        playlistview.model.move(index, moveTo, 1);
+        UI.btSendSingle("plmove "+index+" "+moveTo);
+    }
+
 
 
 }

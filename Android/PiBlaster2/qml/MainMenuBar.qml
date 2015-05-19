@@ -135,11 +135,11 @@ MenuBar {
         }
         MenuItem {
             text: "Randomize playlist"
-            onTriggered: stackView.playlist_action("randomize_playlist")
+            onTriggered: UI.btSendSingle("plshuffle");
         }
         MenuItem {
             text: "Clear Playlist"
-            onTriggered: stackView.playlist_action("clear")
+            onTriggered: UI.btSendSingle("plclear");
         }
     }
 

@@ -7,6 +7,8 @@ import "../UI.js" as UI
 
 ScrollView {
 
+    id: playlistscrollview
+
     objectName: "PlayListPage"
 
     width: parent.width
@@ -70,19 +72,13 @@ ScrollView {
             playlistview.model.invert_selection();
         }
         else if (action_name === "delete_selection") {
-            playlistview.model.delete_selection();
+            playlistview.model.process_selection("pldelete");
         }
         else if (action_name === "selection_after_current") {
-            playlistview.model.selection_after_current();
+            playlistview.model.process_selection("plselaftercur");
         }
         else if (action_name === "selection_to_end") {
-            playlistview.model.selection_to_end();
-        }
-        else if (action_name === "randomize_playlist") {
-            playlistview.model.randomize_playlist();
-        }
-        else if (action_name === "clear") {
-            playlistview.model.clear_playlist();
+            playlistview.model.process_selection("plseltoend");
         }
         else {
             console.log("ERROR: illegal action_name "+action_name);
