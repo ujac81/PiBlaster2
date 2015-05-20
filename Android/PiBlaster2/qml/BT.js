@@ -49,4 +49,14 @@ function processMessage(msg) {
         stackView.update_browse(msg)
     }
 
+    if (msg.code() === 701) {
+        // answer on browse usb
+        stackView.update_upload(msg)
+    }
+
+    if (msg.code() === 900) {
+        // answer on search
+        stackView.update_search(msg)
+    }
+
 }

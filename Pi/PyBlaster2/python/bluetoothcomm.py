@@ -359,8 +359,8 @@ class ServerThread(threading.Thread):
 
         self.main.led.set_led_yellow(0)
 
-        if result is not None:
-            print("DELIVER PAYLOAD %s" % result)
+        #if result is not None:
+        #    print("DELIVER PAYLOAD %s" % result)
 
         return result
 
@@ -389,7 +389,7 @@ class ServerThread(threading.Thread):
             # nothing found via BT, wait another loop.
             return True
 
-        print("++++BTIN+++ --%s--" % recv_data)
+        # print("++++BTIN+++ --%s--" % recv_data)
 
         recv_size = self.next_buffer_size
         if recv_size == -1:
@@ -399,7 +399,7 @@ class ServerThread(threading.Thread):
         while len(self.last_data) >= recv_size:
             now_data = self.last_data[:recv_size].strip()
             self.last_data = self.last_data[recv_size:].strip()
-            print("----DATA--- %s" % now_data)
+            # print("----DATA--- %s" % now_data)
 
             if len(now_data) > 0:
                 if self.next_buffer_size == -1:
@@ -412,7 +412,7 @@ class ServerThread(threading.Thread):
                         try:
                             self.next_buffer_size = int(now_data)
                             recv_size = self.next_buffer_size
-                            print("----NWBS---- %d" % recv_size)
+                            # print("----NWBS---- %d" % recv_size)
                         except ValueError:
                             self.main.log.write(log.EMERGENCY,
                                 "[RECV]: Value error in int "
@@ -424,8 +424,8 @@ class ServerThread(threading.Thread):
                 else:
                     # we received data
                     self.cmdbuffer.append(now_data)
-                    self.main.log.write(log.DEBUG3,
-                                        "----RECV---- %s" % now_data)
+                    # self.main.log.write(log.DEBUG3,
+                    #                     "----RECV---- %s" % now_data)
                     self.next_buffer_size = -1
                     recv_size = 4
             else:

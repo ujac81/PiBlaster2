@@ -151,6 +151,14 @@ ApplicationWindow {
             title: "Browse"
             page: "browse/BrowsePage.qml"
         }
+        ListElement {
+            title: "Search"
+            page: "search/SearchPage.qml"
+        }
+        ListElement {
+            title: "Upload"
+            page: "upload/UploadPage.qml"
+        }
     }
 
     ////////////////////// STACK VIEW ELEMENT //////////////////////
@@ -213,6 +221,18 @@ ApplicationWindow {
             }
         }
 
+        function update_search(msg) {
+            if (currentItem.objectName === "SearchPage") {
+                currentItem.update_search(msg);
+            }
+        }
+
+        function update_upload(msg) {
+            if (currentItem.objectName === "UploadPage") {
+                currentItem.update_upload(msg);
+            }
+        }
+
         function playlist_action(action_name) {
             if (currentItem.objectName === "PlayListPage" ) {
                 currentItem.playlist_action(action_name)
@@ -222,6 +242,17 @@ ApplicationWindow {
         function browse_action(action_name) {
             if (currentItem.objectName === "BrowsePage" ) {
                 currentItem.browse_action(action_name)
+            }
+        }
+
+        function search_action(action_name) {
+            if (currentItem.objectName === "SearchPage" ) {
+                currentItem.search_action(action_name)
+            }
+        }
+        function upload_action(action_name) {
+            if (currentItem.objectName === "UploadPage" ) {
+                currentItem.upload_action(action_name)
             }
         }
     }

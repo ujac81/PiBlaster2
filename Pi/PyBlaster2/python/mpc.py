@@ -573,6 +573,48 @@ class MPC:
 
         self.main.led.set_led_yellow(0)
 
+    def search_file(self, arg):
+        """
+
+        :param arg:
+        :return:
+        """
+        if arg is None or len(arg) < 3:
+            return []
+
+        self.ensure_connected()
+
+        result = []
+
+        self.main.log.write(log.DEBUG1, "[MPD] Search: %s" % arg)
+
+        try:
+            search = self.client.search('file', arg)
+        except CommandError as e:
+            self.main.log.write(log.DEBUG1, "[MPD] ERROR SEARCH: %s" % e)
+            return None
+
+        self.main.log.write(log.DEBUG1, "[MPD] Search done - %d results" %
+                            len(search))
+
+        for item in search:
+
+            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+            res = ['', '', '', length, item['file']]
+            if 'title' in item:
+                res[0] = item['title']
+            else:
+                no_ext = os.path.splitext(item['file'])[0]
+                res[0] = os.path.basename(no_ext).replace('_', ' ')
+            if 'artist' in item:
+                res[1] = item['artist']
+            # TODO: album seems to be missing
+            if 'album' in 'item':
+                res[2] = item['album']
+            result.append(res)
+
+        return result
+
     def exit_client(self):
         """Disconnect from mpc
 

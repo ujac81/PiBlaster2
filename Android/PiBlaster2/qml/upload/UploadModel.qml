@@ -5,13 +5,13 @@ import "../UI.js" as UI
 
 
 ListModel {
-    id: browseModel
+    id: uploadModel
 
 
     /**
      * Called by main if dirlisting message received from PI
      */
-    function received_browse(msg) {
+    function received_upload(msg) {
 
         if ( msg.status() === 0 ) {
             clear();
@@ -26,8 +26,6 @@ ListModel {
                     "ftype": 0,
                     "title": "..",
                     "artist": parentdir,
-                    "album": "",
-                    "length": "",
                     "selected": false,
                     "file": parentdir
                 }
@@ -41,10 +39,8 @@ ListModel {
                 app = {
                         "ftype": parseInt(arr[0]),
                         "title": arr[1],
-                        "artist": arr[2],
-                        "album": arr[3],
-                        "length": arr[4],
-                        "file": arr[5],
+                        "artist": "",
+                        "file": arr[2],
                         "selected": false
                        };
                 append(app);

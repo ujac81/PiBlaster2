@@ -5,46 +5,28 @@ import "../UI.js" as UI
 
 
 ListModel {
-    id: browseModel
+    id: searchModel
 
 
     /**
      * Called by main if dirlisting message received from PI
      */
-    function received_browse(msg) {
+    function received_search(msg) {
 
         if ( msg.status() === 0 ) {
             clear();
 
             var app = {}
-            var parentdir = msg.message();
-
-            console.log("New Listing -- Parent Dir = --"+parentdir+"--");
-
-            if (parentdir !== "") {
-                app = {
-                    "ftype": 0,
-                    "title": "..",
-                    "artist": parentdir,
-                    "album": "",
-                    "length": "",
-                    "selected": false,
-                    "file": parentdir
-                }
-                append(app);
-            }
-
 
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
                 console.log(arr)
                 app = {
-                        "ftype": parseInt(arr[0]),
-                        "title": arr[1],
-                        "artist": arr[2],
-                        "album": arr[3],
-                        "length": arr[4],
-                        "file": arr[5],
+                        "title": arr[0],
+                        "artist": arr[1],
+                        "album": arr[2],
+                        "length": arr[3],
+                        "file": arr[4],
                         "selected": false
                        };
                 append(app);
@@ -52,7 +34,6 @@ ListModel {
         } else {
             UI.setStatus("Bad return status for 'dirlisting'");
         }
-
     }
 
 

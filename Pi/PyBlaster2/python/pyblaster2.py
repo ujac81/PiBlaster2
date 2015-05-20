@@ -22,6 +22,7 @@ from log import Log
 from mpc import MPC
 from settings import Settings
 from sql import DBHandle
+from usbdrive import UsbDrive
 
 
 class PyBlaster:
@@ -57,6 +58,7 @@ class PyBlaster:
         self.bt = RFCommServer(self)
         self.alsa = AlsaMixer(self)
         self.i2c = I2C(self)
+        self.usb = UsbDrive(self)
 
         # +++++++++++++++ Init Objects +++++++++++++++ #
 
@@ -69,6 +71,7 @@ class PyBlaster:
         self.bt.start_server_thread()
         self.alsa.init_alsa()
         self.i2c.open_bus()
+        self.usb.start_uploader_thread()
 
         # +++++++++++++++ Daemoninze +++++++++++++++ #
 
@@ -88,6 +91,7 @@ class PyBlaster:
         self.log.write(log.MESSAGE, "Joining threads...")
 
         # join remaining threads
+        self.usb.join()
         self.bt.join()
         self.buttons.join()
         self.lirc.join()

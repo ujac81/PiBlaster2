@@ -10,9 +10,9 @@ OTHER_FILES += \
     qml/MainMenuBar.qml \
     qml/BT.js \
     qml/UI.js \
-    qml/BrowseDelegate.qml \
-    qml/BrowseModel.qml \
-    qml/BrowsePage.qml \
+    qml/browse/BrowseDelegate.qml \
+    qml/browse/BrowseModel.qml \
+    qml/browse/BrowsePage.qml \
     qml/connect/ConnectPage.qml \
     qml/connect/ConnectTab.qml \
     qml/connect/SettingsTab.qml \
@@ -26,12 +26,14 @@ OTHER_FILES += \
     qml/playlist/PlayListPage.qml \
     qml/dialogs/NoBluetoothDialog.qml \
     qml/items/FlickText.qml \
-    qml/items/ScrollBar.qml
-#    qml/content/ListPage.qml \
-#    qml/content/ProgressBarPage.qml \
-#    qml/content/SliderPage.qml \
-#    qml/content/TabBarPage.qml \
-#    qml/content/TextInputPage.qml
+    qml/items/ScrollBar.qml \
+    qml/search/SearchPage.qml \
+    qml/search/SearchModel.qml \
+    qml/search/SearchDelegate.qml \
+    qml/search/SearchView.qml \
+    qml/upload/UploadPage.qml \
+    qml/upload/UploadModel.qml \
+    qml/upload/UploadDelegate.qml
 
 RESOURCES += \
     resources.qrc

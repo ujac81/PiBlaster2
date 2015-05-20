@@ -86,21 +86,11 @@ Item {
 
 
         onClicked: {
-            if (ftype !== 0) {
-                var elem = browseview.model.get(index);
-                elem.selected = ! selected;
-            }
+            var elem = searchview.model.get(index);
+            elem.selected = ! selected;
         }
 
-        onDoubleClicked: {
-            if (ftype === 0 || ftype === 1) {
-                browsescrollview.send_browse(file);
-            }
-        }
 
-        onPressAndHold: {
-
-        }
 
     }
 }

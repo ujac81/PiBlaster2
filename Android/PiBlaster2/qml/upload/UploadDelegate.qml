@@ -34,40 +34,7 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         text: title
-        width: parent.width - 120
-        elide: Text.ElideRight
-    }
-
-    Text {
-        color: "white"
-        font.pixelSize: 24
-        anchors.margins: 10
-        anchors.right: parent.right
-        anchors.top: parent.top
-        text: length
-        width: 80
-        elide: Text.ElideRight
-    }
-
-    Text {
-        color: "white"
-        font.pixelSize: 16
-        anchors.margins: 10
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        text: artist
-        width: parent.width / 2 - 20
-        elide: Text.ElideRight
-    }
-
-    Text {
-        color: "white"
-        font.pixelSize: 16
-        anchors.margins: 10
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        text: album
-        width: parent.width / 2 - 20
+        width: parent.width - 10
         elide: Text.ElideRight
     }
 
@@ -87,20 +54,19 @@ Item {
 
         onClicked: {
             if (ftype !== 0) {
-                var elem = browseview.model.get(index);
+                var elem = uploadview.model.get(index);
                 elem.selected = ! selected;
             }
         }
 
         onDoubleClicked: {
             if (ftype === 0 || ftype === 1) {
-                browsescrollview.send_browse(file);
+                uploadscrollview.send_browse(file);
             }
         }
 
         onPressAndHold: {
 
         }
-
     }
 }

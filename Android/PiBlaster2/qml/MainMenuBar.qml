@@ -143,7 +143,7 @@ MenuBar {
         }
     }
 
-    ////////////////////// PLAYLIST //////////////////////
+    ////////////////////// BROWSE //////////////////////
     Menu {
         id: browseMenu
         title: "Browse"
@@ -175,6 +175,58 @@ MenuBar {
         }
     }
 
+    ////////////////////// SEARCH //////////////////////
+    Menu {
+        id: searchMenu
+        title: "Search"
+        enabled: false
+
+        MenuItem {
+            text: "Select all"
+            onTriggered: stackView.search_action("select_all")
+        }
+        MenuItem {
+            text: "Deselect all"
+            onTriggered: stackView.search_action("deselect_all")
+        }
+        MenuItem {
+            text: "Invert selection"
+            onTriggered: stackView.search_action("invert_selection")
+        }
+        MenuItem {
+            text: "Selection after current"
+            onTriggered: stackView.search_action("selection_after_current")
+        }
+        MenuItem {
+            text: "Selection to end"
+            onTriggered: stackView.search_action("selection_to_end")
+        }
+    }
+
+    ////////////////////// UPLOAD //////////////////////
+    Menu {
+        id: uploadMenu
+        title: "Upload"
+        enabled: false
+
+        MenuItem {
+            text: "Select all"
+            onTriggered: stackView.search_action("select_all")
+        }
+        MenuItem {
+            text: "Deselect all"
+            onTriggered: stackView.search_action("deselect_all")
+        }
+        MenuItem {
+            text: "Invert selection"
+            onTriggered: stackView.search_action("invert_selection")
+        }
+        MenuItem {
+            text: "Upload selection"
+            onTriggered: stackView.upload_action("upload")
+        }
+    }
+
 
 
 
@@ -186,6 +238,8 @@ MenuBar {
 
         playlistMenu.enabled = tabname === "PlayListPage";
         browseMenu.enabled = tabname === "BrowsePage";
+        searchMenu.enabled = tabname === "SearchPage";
+        uploadMenu.enabled = tabname === "UploadPage";
     }
 
 
@@ -195,5 +249,7 @@ MenuBar {
         playMenu.enabled = true;
         playlistMenu.enabled = false;
         browseMenu.enabled = false;
+        searchMenu.enabled = false;
+        uploadMenu.enabled = false;
     }
 }

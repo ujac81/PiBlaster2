@@ -42,5 +42,12 @@
         <file>qml/browse/BrowsePage.qml</file>
         <file>qml/browse/BrowseModel.qml</file>
         <file>qml/browse/BrowseDelegate.qml</file>
+        <file>qml/search/SearchPage.qml</file>
+        <file>qml/search/SearchModel.qml</file>
+        <file>qml/search/SearchDelegate.qml</file>
+        <file>qml/search/SearchView.qml</file>
+        <file>qml/upload/UploadPage.qml</file>
+        <file>qml/upload/UploadModel.qml</file>
+        <file>qml/upload/UploadDelegate.qml</file>
     </qresource>
 </RCC>

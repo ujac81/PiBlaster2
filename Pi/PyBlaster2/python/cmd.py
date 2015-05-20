@@ -83,6 +83,20 @@ class Cmd:
                     ret_list = []
                     ret_stat = ERROREVAL
 
+        if cmd == "browseusb":
+            ret_code = USB_BROWSE_LIST
+            if len(payload) != 1:
+                ret_stat = ERRORARGS
+                ret_msg = "browse requires dir payload"
+            else:
+                path = payload[0][1:-1]  # extract '-' markers
+                ret_list = self.main.usb.browse_path(path)
+                # parent dir -- empty if root
+                ret_msg = os.path.dirname(path)
+                if ret_list is None:
+                    ret_list = []
+                    ret_stat = ERROREVAL
+
         if cmd == "disconnect":
             ret_stat = STATUSDISCONNECT
             ret_code = CON_DISCONNECT
@@ -97,7 +111,7 @@ class Cmd:
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
-        if cmd == "pladdselaftercurrent":
+        if cmd == "pladdselaftercur":
             ret_code = PLAYLIST_ADD
             self.main.mpc.playlist_add(payload, mode=2)
 
@@ -197,6 +211,15 @@ class Cmd:
             ret_stat = STATUSEXIT
             self.main.keep_run = 0
 
+        if cmd == "searchfile":
+            ret_code = SEARCH_RESULTS
+            if len(line) < 2:
+                ret_stat = ERRORARGS
+                ret_msg = "searchfile requires 1 arg"
+            else:
+                search_arg = ' '.join(line[1:])[1:-1].strip()
+                ret_list = self.main.mpc.search_file(search_arg)
+
         if cmd == "setequal":
             ret_code = EQUAL_CHANNEL_CHANGED
             if len(line) != 3 or int_args[1] is None or int_args[2] is None:
@@ -260,6 +283,10 @@ class Cmd:
         if cmd == "update":
             ret_code = UPDATE_DB
             self.main.mpc.update_database()
+
+        if cmd == "upload":
+            ret_code = UPLOAD
+            self.main.usb.queue_upload(payload)
 
         if cmd == "voldec":
             ret_code = VOL_MIXER_CHANGED
