@@ -143,6 +143,38 @@ MenuBar {
         }
     }
 
+    ////////////////////// PLAYLIST //////////////////////
+    Menu {
+        id: browseMenu
+        title: "Browse"
+        enabled: false
+
+        MenuItem {
+            text: "Select all"
+            onTriggered: stackView.browse_action("select_all")
+        }
+        MenuItem {
+            text: "Deselect all"
+            onTriggered: stackView.browse_action("deselect_all")
+        }
+        MenuItem {
+            text: "Invert selection"
+            onTriggered: stackView.browse_action("invert_selection")
+        }
+        MenuItem {
+            text: "Selection after current"
+            onTriggered: stackView.browse_action("selection_after_current")
+        }
+        MenuItem {
+            text: "Selection to end"
+            onTriggered: stackView.browse_action("selection_to_end")
+        }
+        MenuItem {
+            text: "Update Database"
+            onTriggered: UI.btSendSingle("update");
+        }
+    }
+
 
 
 
@@ -153,6 +185,7 @@ MenuBar {
         set_default();
 
         playlistMenu.enabled = tabname === "PlayListPage";
+        browseMenu.enabled = tabname === "BrowsePage";
     }
 
 
@@ -161,5 +194,6 @@ MenuBar {
         equalstatusMenu.enabled = true;
         playMenu.enabled = true;
         playlistMenu.enabled = false;
+        browseMenu.enabled = false;
     }
 }

@@ -97,6 +97,14 @@ class Cmd:
         if cmd == "keepalive":
             ret_code = KEEP_ALIVE
 
+        if cmd == "pladdselaftercurrent":
+            ret_code = PLAYLIST_ADD
+            self.main.mpc.playlist_add(payload, mode=2)
+
+        if cmd == "pladdseltoend":
+            ret_code = PLAYLIST_ADD
+            self.main.mpc.playlist_add(payload, mode=1)
+
         if cmd == "playlistinfocurrent":
             ret_code = PLAYLIST_INFO
             if len(line) != 2 or int_args[1] is None:
@@ -248,6 +256,10 @@ class Cmd:
         if cmd == "togglerepeat":
             ret_code = TOGGLE_REPEAT
             self.main.mpc.toggle_repeat()
+
+        if cmd == "update":
+            ret_code = UPDATE_DB
+            self.main.mpc.update_database()
 
         if cmd == "voldec":
             ret_code = VOL_MIXER_CHANGED

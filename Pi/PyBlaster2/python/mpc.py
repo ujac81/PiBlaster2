@@ -474,7 +474,11 @@ class MPC:
             move_to = self.get_status_int('playlistlength') - 1
 
         for i in [int(x) for x in payload][::-1]:
-            self.client.moveid(i, move_to)
+            try:
+                self.client.moveid(i, move_to)
+            except CommandError as e:
+                print("MOVE ERROR %d -> %d: %s" % (i, move_to, e))
+                pass
 
         self.resend_playlist()
 
@@ -482,8 +486,11 @@ class MPC:
         """
         """
         self.ensure_connected()
-        # TODO exceptions
-        self.client.moveid(songid, toposition)
+        try:
+            self.client.moveid(songid, toposition)
+        except CommandError as e:
+            print("MOVE ERROR %d -> %d: %s" % (songid, toposition, e))
+            pass
         self.resend_playlist()
 
     def resend_playlist(self):
@@ -532,6 +539,39 @@ class MPC:
                 result.append(res)
 
         return result
+
+    def playlist_add(self, payload, mode=1):
+        """
+
+        :param payload:
+        :param mode:
+        :return:
+        """
+        if not len(payload):
+            return
+
+        self.ensure_connected()
+
+        self.main.led.set_led_yellow(1)
+
+        if mode == 1 or 'position' not in self.get_currentsong():
+            # Insert at end
+            for item in payload:
+                try:
+                    self.client.add(item)
+                except CommandError:
+                    print("ADD URI ERROR: "+item)
+                    pass
+        else:
+            # Insert after current -- reversed order
+            for item in reversed(payload):
+                try:
+                    self.client.addid(item, -1)
+                except CommandError:
+                    print("ADD URI ERROR: "+item)
+                    pass
+
+        self.main.led.set_led_yellow(0)
 
     def exit_client(self):
         """Disconnect from mpc

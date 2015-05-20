@@ -93,9 +93,9 @@ ListModel {
 
     }
 
-    function playlist_move(index, moveTo) {
-        playlistview.model.move(index, moveTo, 1);
-        UI.btSendSingle("plmove "+index+" "+moveTo);
+    function playlist_move(id, moveTo) {
+        playlistview.model.move(id, moveTo, 1);
+        UI.btSendSingle("plmove "+id+" "+moveTo);
     }
 
 

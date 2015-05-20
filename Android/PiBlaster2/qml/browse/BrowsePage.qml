@@ -69,39 +69,25 @@ ScrollView {
     }
 
 
-//    function update_playlist(msg) {
-//        console.log("update_playlist");
-//        playlistview.model.received_playlist(msg);
-//    }
+    function browse_action(action_name) {
+        if (action_name === "select_all") {
+            browseview.model.select_all();
+        }
+        else if (action_name === "deselect_all") {
+            browseview.model.deselect_all();
+        }
+        else if (action_name === "invert_selection") {
+            browseview.model.invert_selection();
+        }
+        else if (action_name === "selection_after_current") {
+            browseview.model.process_selection("pladdselaftercur");
+        }
+        else if (action_name === "selection_to_end") {
+            browseview.model.process_selection("pladdseltoend");
+        }
+        else {
+            console.log("ERROR: illegal action_name "+action_name);
+        }
 
-//    function update_playlistposition(msg) {
-//        console.log("update_playlistposition");
-//        playlistview.model.update_playlistposition(msg);
-//    }
-
-
-//    function playlist_action(action_name) {
-//        if (action_name === "select_all") {
-//            playlistview.model.select_all();
-//        }
-//        else if (action_name === "deselect_all") {
-//            playlistview.model.deselect_all();
-//        }
-//        else if (action_name === "invert_selection") {
-//            playlistview.model.invert_selection();
-//        }
-//        else if (action_name === "delete_selection") {
-//            playlistview.model.process_selection("pldelete");
-//        }
-//        else if (action_name === "selection_after_current") {
-//            playlistview.model.process_selection("plselaftercur");
-//        }
-//        else if (action_name === "selection_to_end") {
-//            playlistview.model.process_selection("plseltoend");
-//        }
-//        else {
-//            console.log("ERROR: illegal action_name "+action_name);
-//        }
-
-//    }
+    }
 }

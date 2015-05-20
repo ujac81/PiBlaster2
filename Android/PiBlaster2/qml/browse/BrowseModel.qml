@@ -78,7 +78,7 @@ ListModel {
         btService.clearSendPayload();
         for ( var i = 0; i < count; i++ ) {
             if (get(i).selected) {
-                btService.addToSendPayload(get(i).id);
+                btService.addToSendPayload(get(i).file);
             }
         }
         if (main.btconnected) {

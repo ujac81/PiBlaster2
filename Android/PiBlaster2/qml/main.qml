@@ -218,6 +218,12 @@ ApplicationWindow {
                 currentItem.playlist_action(action_name)
             }
         }
+
+        function browse_action(action_name) {
+            if (currentItem.objectName === "BrowsePage" ) {
+                currentItem.browse_action(action_name)
+            }
+        }
     }
 
     ////////////////////// ONLOAD //////////////////////
