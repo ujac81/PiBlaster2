@@ -149,7 +149,7 @@ Item {
                     }
                     console.log("Move id "+id+" to index "+newPosition)
                     root.z = 1;
-                    playlistview.model.playlist_move(id, moveTo);
+                    playlistview.model.playlist_move(index, moveTo);
                     root.opacity = 1;
                     playlistview.interactive = true;
                     dragArea.drag.target = null;

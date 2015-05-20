@@ -147,6 +147,10 @@ ApplicationWindow {
             title: "Playlist"
             page: "playlist/PlayListPage.qml"
         }
+        ListElement {
+            title: "Browse"
+            page: "browse/BrowsePage.qml"
+        }
     }
 
     ////////////////////// STACK VIEW ELEMENT //////////////////////
@@ -203,6 +207,11 @@ ApplicationWindow {
             }
         }
 
+        function update_browse(msg) {
+            if (currentItem.objectName === "BrowsePage") {
+                currentItem.update_browse(msg);
+            }
+        }
 
         function playlist_action(action_name) {
             if (currentItem.objectName === "PlayListPage" ) {

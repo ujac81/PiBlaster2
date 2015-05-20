@@ -10,6 +10,9 @@ OTHER_FILES += \
     qml/MainMenuBar.qml \
     qml/BT.js \
     qml/UI.js \
+    qml/BrowseDelegate.qml \
+    qml/BrowseModel.qml \
+    qml/BrowsePage.qml \
     qml/connect/ConnectPage.qml \
     qml/connect/ConnectTab.qml \
     qml/connect/SettingsTab.qml \
@@ -35,8 +38,8 @@ RESOURCES += \
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
-DISTFILES += \
-    qml/playlist/PlayListPage.qml \
-    qml/playlist/PlayListModel.qml \
-    qml/playlist/PlayListDelegate.qml
+#DISTFILES += \
+#    qml/playlist/PlayListPage.qml \
+#    qml/playlist/PlayListModel.qml \
+#    qml/playlist/PlayListDelegate.qml
 

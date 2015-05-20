@@ -83,7 +83,7 @@ void BTCommMessageHandler::bufferLine( const QString& lineIn )
             std::map<int, BTMessage*>::iterator iter = _recvBuffer.find( id );
             if ( iter != _recvBuffer.end() )
             {
-                iter->second->addPayload( subLine );
+                iter->second->addPayload( subLine.trimmed() );
                 if ( iter->second->payloadComplete() )
                     messageDone( id, iter->second );
             }
@@ -101,7 +101,7 @@ void BTCommMessageHandler::bufferLine( const QString& lineIn )
         int status  = line.mid(4, 4).toInt();
         int code    = line.mid(8, 4).toInt();
         int plSize  = line.mid(12, 6).toInt();
-        QString msg = line.right(line.length()-18);
+        QString msg = line.right(line.length()-18).trimmed();
         BTMessage* msgObj = newMessageObject( id, status, code, plSize, msg );
         if ( msgObj->payloadComplete() )
             messageDone( id, msgObj );

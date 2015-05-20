@@ -194,7 +194,7 @@ class MPC:
         for i in range(5):
             try:
                 return self.client.status()
-            except ConnectionError:
+            except (ConnectionError, CommandError):
                 self.reconnect()
                 pass
 
@@ -417,7 +417,7 @@ class MPC:
                 res[1] = item['title']
             else:
                 no_ext = os.path.splitext(item['file'])[0]
-                res[1] = os.path.basename(no_ext)
+                res[1] = os.path.basename(no_ext).replace('_', ' ')
             if 'artist' in item:
                 res[2] = item['artist']
             if 'album' in 'item':
@@ -493,6 +493,45 @@ class MPC:
         """
         res = self.main.cmd.eval('playlistinfocurrent 0', 'idler')
         self.main.bt.send_client([-1] + res)
+
+    def browse(self, folder):
+        """
+
+        :param folder:
+        :return:
+        """
+        if folder is None:
+            return None
+
+        self.ensure_connected()
+
+        result = []
+
+        try:
+            lsdir = self.client.lsinfo(folder)
+        except CommandError:
+            return None
+
+        for item in lsdir:
+            if 'directory' in item:
+                title = os.path.basename(item['directory'])
+                result.append(['1', title, '', '', '', item['directory']])
+            else:
+                length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+                res = ['2', '', '', '', length, item['file']]
+                if 'title' in item:
+                    res[1] = item['title']
+                else:
+                    no_ext = os.path.splitext(item['file'])[0]
+                    res[1] = os.path.basename(no_ext).replace('_', ' ')
+                if 'artist' in item:
+                    res[2] = item['artist']
+                # TODO: album seems to be missing
+                if 'album' in 'item':
+                    res[3] = item['album']
+                result.append(res)
+
+        return result
 
     def exit_client(self):
         """Disconnect from mpc

@@ -7,7 +7,7 @@ from codes import *
 
 import gpio
 import log
-
+import os
 
 STATUSOK = 0            # evaluation successful
 ERRORPARSE = 1          # failed to read command
@@ -68,6 +68,20 @@ class Cmd:
 
         # Command evaluation, in alphabetical order.
         # If ret_code is unchanged, unknown command is assumed.
+
+        if cmd == "browse":
+            ret_code = BROWSE_LIST
+            if len(payload) != 1:
+                ret_stat = ERRORARGS
+                ret_msg = "browse requires dir payload"
+            else:
+                path = payload[0][1:-1]  # extract '-' markers
+                ret_list = self.main.mpc.browse(path)
+                # parent dir -- empty if root
+                ret_msg = os.path.dirname(path)
+                if ret_list is None:
+                    ret_list = []
+                    ret_stat = ERROREVAL
 
         if cmd == "disconnect":
             ret_stat = STATUSDISCONNECT

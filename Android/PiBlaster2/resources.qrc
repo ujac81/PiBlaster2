@@ -39,5 +39,8 @@
         <file>qml/playlist/PlayListPage.qml</file>
         <file>qml/playlist/PlayListDelegate.qml</file>
         <file>qml/playlist/PlayListModel.qml</file>
+        <file>qml/browse/BrowsePage.qml</file>
+        <file>qml/browse/BrowseModel.qml</file>
+        <file>qml/browse/BrowseDelegate.qml</file>
     </qresource>
 </RCC>

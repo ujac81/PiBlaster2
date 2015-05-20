@@ -44,4 +44,9 @@ function processMessage(msg) {
         stackView.update_list_status(msg)
     }
 
+    if (msg.code() === 700) {
+        // answer on browse
+        stackView.update_browse(msg)
+    }
+
 }
