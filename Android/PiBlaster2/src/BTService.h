@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QVector>
 #include <QTimer>
+#include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
 #include <QBluetoothLocalDevice>
 #include <QBluetoothServiceDiscoveryAgent>
@@ -36,6 +37,15 @@ public slots:
      * TODO: emits bluetoothOff() if bluetooth is not on
      */
     void checkBluetoothOn();
+
+    bool checkPairing(const QString& address);
+
+    /**
+     * @brief Check if devices are paired, requests pairing if not.
+     * Will emit bluetoothPaired after pairing
+     * @param address
+     */
+    void requestPairing(const QString& address);
 
     void serviceSearch(const QString& address);
     void stopServiceSearch();
@@ -80,9 +90,12 @@ private slots:
     void socketError(QBluetoothSocket::SocketError error);
     void socketStateChanged(QBluetoothSocket::SocketState state);
 
-
     /// @brief Triggered if state of local bluetooth device changed.
     void localDeviceChanged(QBluetoothLocalDevice::HostMode state);
+
+    /// @brief Triggered after local device is paired
+    void localDevicePaired(const QBluetoothAddress& address,
+                           QBluetoothLocalDevice::Pairing pairing);
 
 Q_SIGNALS:
 
@@ -90,6 +103,8 @@ Q_SIGNALS:
     void bluetoothWarning(const QString&);
     void bluetoothMessage(const QString&);
     void bluetoothModeChanged(QBluetoothLocalDevice::HostMode state);
+    void bluetoothPaired(const QBluetoothAddress& address,
+                         QBluetoothLocalDevice::Pairing pairing);
 
     void bluetoothConnected();
     void bluetoothDisconnected();
@@ -103,6 +118,9 @@ private:
     bool _foundPiBlasterService;
     QBluetoothServiceDiscoveryAgent* _discovery;
     QBluetoothServiceInfo _serviceInfo;
+
+    QBluetoothDeviceDiscoveryAgent* _agent;
+    bool _deviceFound;
 
     QBluetoothSocket* _socket;
 

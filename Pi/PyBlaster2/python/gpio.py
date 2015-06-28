@@ -254,7 +254,7 @@ class ButtonThread(threading.Thread):
                 if self.prev_in[i] != inpt:
                     # Note: depending on your wiring, the 'not' must be
                     # removed!
-                    if not inpt:
+                    if inpt:
                         self.queue_lock.acquire()
                         self.queue.put([self.pins[i], self.names[i]])
                         self.queue_lock.release()

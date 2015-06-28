@@ -3,10 +3,15 @@
 
 
 function bt_reconnect() {
-    console.log("SCANNING...");
-    btService.serviceSearch(main.btmac);
-    main.btconnecting = true;
-    main.btconnected = false;
+    if ( ! btService.checkPairing(main.btmac) ) {
+        console.log("PAIRING...");
+        bt_request_pairing()
+    } else {
+        console.log("SCANNING...");
+        btService.serviceSearch(main.btmac);
+        main.btconnecting = true;
+        main.btconnected = false;
+    }
 }
 function bt_disconnect() {
     console.log("DISCONNECTING...");
@@ -15,10 +20,23 @@ function bt_disconnect() {
     main.btconnected = false;
 }
 
-
 function bt_message(msg) {
     console.log("BT SERVICE MESSAGE: "+msg);
     setStatus("Bluetooth: "+msg);
+}
+
+function bt_request_pairing() {
+    console.log("REQUESTING...");
+    btService.requestPairing(main.btmac);
+}
+
+function bt_paired(addr, state) {
+    console.log("BT PAIRED TO "+addr.toString()+", state: "+state)
+    // try to connect if paired to device\
+    // TODO check that addr is main.btmac  (need to cast QVariant or whatever to string)
+    if (state !== 0) {
+        bt_reconnect();
+    }
 }
 
 // Raise no bluetooth dialog if bluetooth adapter lost.
@@ -31,7 +49,7 @@ function bt_devstate(state) {
     }
     if (lastBTDeviceState === 0 && state === 1 && main.btautoconnect) {
         console.log("Bluetooth activated -- autoconnecting...");
-        bt_reconnect();
+        bt_request_pairing();
     }
     main.lastBTDeviceState = state;
 }

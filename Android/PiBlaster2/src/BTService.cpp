@@ -2,12 +2,16 @@
 #include "BTService.h"
 
 #include <QBluetoothAddress>
+#include <QBluetoothLocalDevice>
+#include <QBluetoothDeviceDiscoveryAgent>
 
 BTService::BTService(BTCommMessageHandler* msgHandler):
     QObject(),
     _msgHandler(msgHandler),
     _foundPiBlasterService(false),
     _discovery(0),
+    _agent(0),
+    _deviceFound(false),
     _socket(0),
     _msgId(0)
 {
@@ -18,12 +22,22 @@ BTService::BTService(BTCommMessageHandler* msgHandler):
             SIGNAL(hostModeStateChanged(QBluetoothLocalDevice::HostMode)),
             this, SLOT(localDeviceChanged(QBluetoothLocalDevice::HostMode)));
 
+    connect(_localDevice,
+            SIGNAL(pairingFinished(const QBluetoothAddress&, QBluetoothLocalDevice::Pairing)),
+            this, SLOT(localDevicePaired(const QBluetoothAddress&,
+                                         QBluetoothLocalDevice::Pairing))
+            );
+
     _uuid = QBluetoothUuid(QString("94f39d29-7d6d-437d-973b-fba39e49d4ee"));
 }
 
 
 BTService::~BTService()
-{}
+{
+    delete _discovery;
+    delete _agent;
+    delete _socket;
+}
 
 
 void BTService::checkBluetoothOn()
@@ -46,21 +60,65 @@ void BTService::checkBluetoothOn()
     }
 }
 
+bool BTService::checkPairing(const QString& address)
+{
+    QBluetoothAddress addr(address);
+    QBluetoothLocalDevice::Pairing pairing = _localDevice->pairingStatus(addr);
+    qDebug() << "Check pairing for " << address << " = " << pairing;
+    return pairing != QBluetoothLocalDevice::Unpaired;
+}
 
-void BTService::localDeviceChanged( QBluetoothLocalDevice::HostMode state )
+void BTService::requestPairing(const QString& address)
+{
+    if ( _localDevice->isValid() )
+    {
+        QBluetoothAddress addr(address);
+        QBluetoothLocalDevice::Pairing pairing = _localDevice->pairingStatus(addr);
+
+        if (pairing == QBluetoothLocalDevice::Paired)
+        {
+            emit bluetoothPaired(addr, pairing);
+        }
+        else
+        {
+            qDebug() << "Request pairing for " << address << " = " << pairing;
+            _localDevice->
+                    requestPairing(addr, QBluetoothLocalDevice::Paired);
+        }
+
+    }
+    else
+    {
+        // TODO: some error
+    }
+}
+
+
+void BTService::localDeviceChanged(QBluetoothLocalDevice::HostMode state)
 {
     _hostMode = state;
     emit bluetoothModeChanged(state);
 }
 
 
+void BTService::localDevicePaired(const QBluetoothAddress& address,
+                                  QBluetoothLocalDevice::Pairing pairing)
+{
+    qDebug() << "Paired: " << address << " = " << pairing;
+    if (pairing == QBluetoothLocalDevice::Paired)
+    {
+        emit bluetoothPaired(address, pairing);
+    }
+}
+
 void BTService::serviceSearch(const QString& address)
 {
     disconnectService();
 
-    emit bluetoothMessage( "Scanning for PiBlaster service..." );
+    emit bluetoothMessage("Scanning for PiBlaster service... ");
 
-    _discovery = new QBluetoothServiceDiscoveryAgent(this );
+    delete _discovery;
+    _discovery = new QBluetoothServiceDiscoveryAgent(this);
     _discovery->setRemoteAddress( QBluetoothAddress(address) );
     _discovery->setUuidFilter( _uuid );
 
@@ -71,7 +129,7 @@ void BTService::serviceSearch(const QString& address)
     connect(_discovery, SIGNAL(serviceDiscovered(QBluetoothServiceInfo)),
             this, SLOT(serviceDiscovered(QBluetoothServiceInfo)));
 
-    _discovery->start();
+    _discovery->start(QBluetoothServiceDiscoveryAgent::FullDiscovery);
 }
 
 
@@ -129,7 +187,7 @@ void BTService::serviceError(QBluetoothServiceDiscoveryAgent::Error error)
         emit bluetoothError("Discovery error: adapter has been powered off while scanning!");
         break;
     case QBluetoothServiceDiscoveryAgent::InputOutputError:
-        emit bluetoothError("Discovery error: I/O error!");
+//        emit bluetoothError("Discovery error: I/O error!");
         break;
     case QBluetoothServiceDiscoveryAgent::InvalidBluetoothAdapterError:
         emit bluetoothError("Discovery error: Invalid adapter!");
@@ -142,11 +200,19 @@ void BTService::serviceError(QBluetoothServiceDiscoveryAgent::Error error)
 
 void BTService::serviceDiscovered( const QBluetoothServiceInfo& info )
 {
-    //if ( info.serviceUuid() == _uuid )
+    qDebug() << "Got Service " << info.serviceUuid().toString();
+
+    QList<QBluetoothUuid> services = info.serviceClassUuids();
+    for (int i = 0; i < services.size(); ++i)
     {
-        emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
-        _foundPiBlasterService = true;
-        _serviceInfo = info;
+        qDebug() << "services: " << services[i].toString();
+        if ( services[i] == _uuid )
+        {
+            qDebug() << "Got service with given uuid!";
+            emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
+            _foundPiBlasterService = true;
+            _serviceInfo = info;
+        }
     }
 }
 
@@ -155,8 +221,13 @@ void BTService::serviceScanFinished()
 {
     if ( _foundPiBlasterService )
     {
+        qDebug() << "Got service...";
+
         emit bluetoothMessage("Connecting to service...");
 
+        // todo: pair here?
+
+        delete _socket;
         _socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
 
         // TODO: catch I/O errors on socket
@@ -169,7 +240,7 @@ void BTService::serviceScanFinished()
         connect(_socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)),
                 this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)));
 
-        _socket->connectToService( _serviceInfo );
+        _socket->connectToService( _serviceInfo.device().address(), _uuid );
     } else {
         emit bluetoothError("PiBlaster Service not found.");
         return;

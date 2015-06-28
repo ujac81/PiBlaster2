@@ -43,9 +43,14 @@ class AlsaMixer:
 
         :return:
         """
+        if not self.mixers:
+            raise Exception("AlsaMixer: No mixers found!")
+
         if self.mixer not in self.mixers:
-            raise Exception("AlsaMixer: no such mixer channel: %s" %
-                            self.mixer)
+            self.main.log.write(log.MESSAGE,
+                                "[ALSA] desired mixer channel not found! "
+                                "Falling back to %s." % self.mixers[0])
+            self.mixer = self.mixers[0]
         self.init_equal_channels()
 
     def get_master_volume(self):

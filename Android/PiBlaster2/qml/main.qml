@@ -270,6 +270,7 @@ ApplicationWindow {
         btService.bluetoothError.connect(UI.bt_error);
         btService.bluetoothWarning.connect(UI.bt_warning);
         btService.bluetoothModeChanged.connect(UI.bt_devstate);
+        btService.bluetoothPaired.connect(UI.bt_paired);
         btService.bluetoothConnected.connect(UI.bt_connected);
         btService.bluetoothDisconnected.connect(UI.bt_disconnected);
         UI.setStatus("PiBlaster 2 remote loaded.");

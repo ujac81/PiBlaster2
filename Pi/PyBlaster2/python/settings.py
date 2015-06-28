@@ -72,6 +72,9 @@ class Settings:
         parser.add_argument("-c", "--config", type=str,
                             help="use this pyblaster.conf",
                             default=self.configfile)
+        parser.add_argument("-g", "--gpiotest", type=str,
+                            help="run gpio test",
+                            default=self.configfile)
 
         args = parser.parse_args()
 

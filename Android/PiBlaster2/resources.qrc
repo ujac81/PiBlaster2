@@ -9,11 +9,6 @@
         <file>images/tabs_standard.png</file>
         <file>images/textinput.png</file>
         <file>images/toolbar.png</file>
-        <file>qml/content/TextInputPage.qml</file>
-        <file>qml/content/TabBarPage.qml</file>
-        <file>qml/content/SliderPage.qml</file>
-        <file>qml/content/ProgressBarPage.qml</file>
-        <file>qml/content/ListPage.qml</file>
         <file>qml/content/AndroidDelegate.qml</file>
         <file>qml/connect/ConnectPage.qml</file>
         <file>qml/connect/SettingsTab.qml</file>

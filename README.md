@@ -18,6 +18,8 @@ Untar it and put it to a desired location. Run the update manager
 and install the updates. Make sure to select all required platforms e.g.
 Android 4.4.2 if required.
 
+**Be warned:** the full android sdk + stuff will require >10gigs of disk space!
+
 ### Android NDK
 Download latest native development kit from [android NDK download site](http://developer.android.com/tools/sdk/ndk).
 As of 2015/02/07 there is a bin which is a self extracting archive. Make it
@@ -40,7 +42,7 @@ selected for Qt and QtCreator is selected for tools.
 
 To configure android kit successfully, install a java sdk and the ant tool.
 
-    $ sudo aptitude install openjdk-7-jdk ant
+    $ sudo aptitude install openjdk-7-jdk ant lib32stdc++6 lib32z1
 
 ## Compile Application
 See [qt docs](http://doc.qt.io/qtcreator/creator-developing-android.html)

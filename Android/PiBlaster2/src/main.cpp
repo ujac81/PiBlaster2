@@ -2,6 +2,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QLoggingCategory>
 
 #include "BTCommMessageHandler.h"
 #include "BTMessage.h"
@@ -10,6 +11,9 @@
 
 int main(int argc, char *argv[])
 {
+    QLoggingCategory::setFilterRules(QStringLiteral("qt.bluetooth* = true"));
+
+
     BTCommMessageHandler* btMessages = new BTCommMessageHandler();
     BTService* btService = new BTService(btMessages);
     btService->checkBluetoothOn();

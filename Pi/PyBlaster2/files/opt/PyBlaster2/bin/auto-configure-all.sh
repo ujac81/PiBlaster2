@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 
 
@@ -24,7 +25,7 @@ sudo aptitude install vim usbmount  python3-pip libbluetooth-dev cmake gdebi-cor
 i2c-dev
 i2c-bcm2708
 lirc_dev
-lirc_rpi gpio_in_pin=26
+lirc_rpi gpio_in_pin=25
 snd_soc_bcm2708
 bcm2708_dmaengine
 snd_soc_pcm512x
