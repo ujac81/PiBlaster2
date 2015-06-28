@@ -183,6 +183,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 delegate: AndroidDelegate {
                     text: title
+                    requireconnect: title != "Connect"
                     onClicked: stackView.push(Qt.resolvedUrl(page))
                 }
             }

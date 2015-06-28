@@ -49,6 +49,7 @@ Item {
     width: parent.width
     height: 88
 
+    property bool requireconnect
     property alias text: textitem.text
     signal clicked
 
@@ -60,7 +61,7 @@ Item {
 
     Text {
         id: textitem
-        color: "white"
+        color: (root.requireconnect && ! main.btconnected) ? "grey" : "white"
         font.pixelSize: 32
         text: modelData
         anchors.verticalCenter: parent.verticalCenter
@@ -86,7 +87,13 @@ Item {
     MouseArea {
         id: mouse
         anchors.fill: parent
-        onClicked: root.clicked()
+        onClicked: {
+            if (root.requireconnect && ! main.btconnected) {
+                // do nothing
+            } else {
+                root.clicked()
+            }
+        }
 
     }
 }

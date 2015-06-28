@@ -16,6 +16,7 @@
 #include <QBluetoothServiceDiscoveryAgent>
 #include <QBluetoothServiceInfo>
 #include <QBluetoothSocket>
+#include <QLowEnergyController>
 
 
 QT_USE_NAMESPACE
@@ -83,6 +84,12 @@ private slots:
     void serviceError(QBluetoothServiceDiscoveryAgent::Error error);
     void serviceScanStopped();
 
+    void lowEnergyServiceDiscovered(QBluetoothUuid);
+    void lowEnergyServiceScanFinished();
+    void lowEnergyServiceError(QLowEnergyController::Error error);
+    void lowEnergyDeviceConnected();
+    void lowEnergyDeviceDisconnected();
+
 
     void readSocket();
     void socketConnected();
@@ -118,6 +125,8 @@ private:
     bool _foundPiBlasterService;
     QBluetoothServiceDiscoveryAgent* _discovery;
     QBluetoothServiceInfo _serviceInfo;
+
+    QLowEnergyController* _control;
 
     QBluetoothDeviceDiscoveryAgent* _agent;
     bool _deviceFound;

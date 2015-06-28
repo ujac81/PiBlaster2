@@ -10,6 +10,7 @@ BTService::BTService(BTCommMessageHandler* msgHandler):
     _msgHandler(msgHandler),
     _foundPiBlasterService(false),
     _discovery(0),
+    _control(0),
     _agent(0),
     _deviceFound(false),
     _socket(0),
@@ -37,6 +38,7 @@ BTService::~BTService()
     delete _discovery;
     delete _agent;
     delete _socket;
+    delete _control;
 }
 
 
@@ -130,8 +132,39 @@ void BTService::serviceSearch(const QString& address)
             this, SLOT(serviceDiscovered(QBluetoothServiceInfo)));
 
     _discovery->start(QBluetoothServiceDiscoveryAgent::FullDiscovery);
+
+//    delete _control;
+
+//    _control = new QLowEnergyController(QBluetoothAddress(address), this);
+
+//    connect(_control, SIGNAL(serviceDiscovered(QBluetoothUuid)),
+//            this, SLOT(lowEnergyServiceDiscovered(QBluetoothUuid)));
+
+//    connect(_control, SIGNAL(serviceDiscovered(QBluetoothUuid)),
+//            this, SLOT(lowEnergyServiceDiscovered(QBluetoothUuid)));
+//    connect(_control, SIGNAL(discoveryFinished()),
+//            this, SLOT(lowEnergyServiceScanFinished()));
+//    connect(_control, SIGNAL(error(QLowEnergyController::Error)),
+//            this, SLOT(lowEnergyServiceError(QLowEnergyController::Error)));
+//    connect(_control, SIGNAL(connected()),
+//            this, SLOT(lowEnergyDeviceConnected()));
+//    connect(_control, SIGNAL(disconnected()),
+//            this, SLOT(lowEnergyDeviceDisconnected()));
+
+//    _control->connectToDevice();
+
 }
 
+void BTService::lowEnergyDeviceConnected()
+{
+    qDebug() << "LE Device connected -- starting scan...";
+    _control->discoverServices();
+}
+
+void BTService::lowEnergyDeviceDisconnected()
+{
+    qDebug() << "WARNING LE Device disconnected";
+}
 
 void BTService::disconnectService()
 {
@@ -187,7 +220,7 @@ void BTService::serviceError(QBluetoothServiceDiscoveryAgent::Error error)
         emit bluetoothError("Discovery error: adapter has been powered off while scanning!");
         break;
     case QBluetoothServiceDiscoveryAgent::InputOutputError:
-//        emit bluetoothError("Discovery error: I/O error!");
+        emit bluetoothError("Discovery error: I/O error!");
         break;
     case QBluetoothServiceDiscoveryAgent::InvalidBluetoothAdapterError:
         emit bluetoothError("Discovery error: Invalid adapter!");
@@ -214,6 +247,26 @@ void BTService::serviceDiscovered( const QBluetoothServiceInfo& info )
             _serviceInfo = info;
         }
     }
+}
+
+
+void BTService::lowEnergyServiceDiscovered(QBluetoothUuid uuid)
+{
+    qDebug() << "Got LE Service " << uuid.toString();
+    if (uuid == _uuid)
+    {
+        _foundPiBlasterService = true;
+    }
+}
+
+void BTService::lowEnergyServiceError(QLowEnergyController::Error error)
+{
+    qDebug() << "LE ERROR: " << error;
+}
+
+void BTService::lowEnergyServiceScanFinished()
+{
+    qDebug() << "LE SERVICE SCAN DONE.";
 }
 
 
