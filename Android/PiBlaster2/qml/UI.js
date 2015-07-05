@@ -1,4 +1,13 @@
 
+
+////////////////////// PIXEL SIZE //////////////////////
+
+function dp(size_mm) {
+    var dpi = Screen.pixelDensity
+    return size_mm * dpi
+}
+
+
 ////////////////////// BLUETOOTH ACTIONS //////////////////////
 
 
@@ -72,6 +81,7 @@ function bt_connected() {
     main.btconnecting = false;
     keepalive.running = true;
     main.btautoconnect = true;
+    stackView.show_main();
 }
 
 function bt_disconnected() {
@@ -79,6 +89,7 @@ function bt_disconnected() {
     main.btconnected = false;
     main.btconnecting = false;
     keepalive.running = false;
+    stackView.show_main();
 }
 
 function btSendSingle(cmd) {

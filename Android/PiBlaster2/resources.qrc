@@ -9,7 +9,6 @@
         <file>images/tabs_standard.png</file>
         <file>images/textinput.png</file>
         <file>images/toolbar.png</file>
-        <file>qml/content/AndroidDelegate.qml</file>
         <file>qml/connect/ConnectPage.qml</file>
         <file>qml/connect/SettingsTab.qml</file>
         <file>qml/connect/ConnectTab.qml</file>
@@ -44,5 +43,6 @@
         <file>qml/upload/UploadPage.qml</file>
         <file>qml/upload/UploadModel.qml</file>
         <file>qml/upload/UploadDelegate.qml</file>
+        <file>qml/content/MainDelegate.qml</file>
     </qresource>
 </RCC>

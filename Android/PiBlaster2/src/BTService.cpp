@@ -119,6 +119,8 @@ void BTService::serviceSearch(const QString& address)
 
     emit bluetoothMessage("Scanning for PiBlaster service... ");
 
+    qDebug() << "Searching for " << _uuid.toString();
+
     delete _discovery;
     _discovery = new QBluetoothServiceDiscoveryAgent(this);
     _discovery->setRemoteAddress( QBluetoothAddress(address) );
@@ -234,18 +236,22 @@ void BTService::serviceError(QBluetoothServiceDiscoveryAgent::Error error)
 void BTService::serviceDiscovered( const QBluetoothServiceInfo& info )
 {
     qDebug() << "Got Service " << info.serviceUuid().toString();
+    bool found = info.serviceUuid().toString().contains(_uuid.toString());
 
     QList<QBluetoothUuid> services = info.serviceClassUuids();
     for (int i = 0; i < services.size(); ++i)
     {
         qDebug() << "services: " << services[i].toString();
-        if ( services[i] == _uuid )
-        {
-            qDebug() << "Got service with given uuid!";
-            emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
-            _foundPiBlasterService = true;
-            _serviceInfo = info;
-        }
+        found |= services[i] == _uuid;
+    }
+
+    if ( found )
+    {
+        qDebug() << "Got service with given uuid!";
+        emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
+        _foundPiBlasterService = true;
+        _serviceInfo = info;
+        // TODO stop scan here
     }
 }
 

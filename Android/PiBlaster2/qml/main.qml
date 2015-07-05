@@ -5,6 +5,7 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Controls 1.3
+import QtQuick.Window 2.2
 import Qt.labs.settings 1.0
 
 import "content"
@@ -16,6 +17,8 @@ import "BT.js" as BT
 
 
 ApplicationWindow {
+
+    property int dp: Screen.pixelDensity
 
     id: main
     visible: true
@@ -181,7 +184,7 @@ ApplicationWindow {
                 id: mainListView
                 model: pageModel
                 anchors.fill: parent
-                delegate: AndroidDelegate {
+                delegate: MainDelegate {
                     text: title
                     requireconnect: title != "Connect"
                     onClicked: stackView.push(Qt.resolvedUrl(page))
@@ -256,6 +259,12 @@ ApplicationWindow {
                 currentItem.upload_action(action_name)
             }
         }
+
+        function show_main() {
+            if (stackView.depth > 1) {
+                stackView.pop();
+            }
+        }
     }
 
     ////////////////////// ONLOAD //////////////////////
@@ -280,6 +289,13 @@ ApplicationWindow {
             console.log("Found active bluetooth on startup -- autoconnecting...");
             UI.bt_reconnect();
         }
+
+
+
+        console.log(UI.dp(1));
+        console.log(UI.dp(10));
+        console.log(1*dp);
+        console.log(10*dp);
     }
 
 

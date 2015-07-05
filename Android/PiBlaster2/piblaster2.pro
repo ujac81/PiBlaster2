@@ -4,6 +4,11 @@ TARGET = PiBlaster2
 
 include(src/src.pri)
 
+# bug somewhere -- as of 2015/07/04
+# https://forum.qt.io/topic/39578/bits-c-config-h-missing/7
+INCLUDEPATH += $(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_NDK_TOOLCHAIN_VERSION)/libs/armeabi-v7a/include
+
+
 OTHER_FILES += \
     android/AndroidManifest.xml \
     qml/main.qml \
@@ -16,7 +21,6 @@ OTHER_FILES += \
     qml/connect/ConnectPage.qml \
     qml/connect/ConnectTab.qml \
     qml/connect/SettingsTab.qml \
-    qml/content/AndroidDelegate.qml \
     qml/play/PlayPage.qml \
     qml/play/PlayTab.qml \
     qml/play/VolumeTab.qml \
@@ -44,4 +48,7 @@ ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 #    qml/playlist/PlayListPage.qml \
 #    qml/playlist/PlayListModel.qml \
 #    qml/playlist/PlayListDelegate.qml
+
+DISTFILES += \
+    qml/content/MainDelegate.qml
 
