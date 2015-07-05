@@ -27,7 +27,7 @@ Item {
     }
 
     Column {
-        spacing: 40
+        spacing: main.sizeVerticalSpacing
         anchors.centerIn: parent
 
         Button {
@@ -57,22 +57,22 @@ Item {
         id: touchStyle
         ButtonStyle {
             panel: Item {
-                implicitHeight: 50
-                implicitWidth: 320
+                implicitHeight: main.sizeButton
+                implicitWidth: main.sizeButtonWidth
                 BorderImage {
                     anchors.fill: parent
                     antialiasing: true
-                    border.bottom: 8
-                    border.top: 8
-                    border.left: 8
-                    border.right: 8
-                    anchors.margins: control.pressed ? -4 : 0
+                    border.bottom: main.sizeLine
+                    border.top: main.sizeLine
+                    border.left: main.sizeLine
+                    border.right: main.sizeLine
+                    anchors.margins: control.pressed ? -main.sizeLine/2 : 0
                     source: control.pressed ? "/images/button_pressed.png" : "/images/button_default.png"
                     Text {
                         text: control.text
                         anchors.centerIn: parent
                         color: "white"
-                        font.pixelSize: 23
+                        font.pixelSize: main.sizeFontButton
                         renderType: Text.NativeRendering
                     }
                 }

@@ -6,6 +6,7 @@ import QtQuick.Controls.Styles 1.1
 
 import "../items"
 import "../UI.js" as UI
+import "../component"
 
 Rectangle {
     id: volTab
@@ -18,6 +19,7 @@ Rectangle {
     property int playMixerVolume: 50
     property int playAmpVolume: 50
 
+    // whole page is flickable
     Flickable {
         id: volFlick
         anchors.fill: parent
@@ -29,27 +31,28 @@ Rectangle {
         leftMargin: 0.1 * volTab.width
         topMargin: 0.3 * volTab.width
 
+        // main column layout for text+slider items
         Column {
             id: volCol
-            spacing: 40
+            spacing: main.sizeVerticalSpacing
             width: 0.8 * volTab.width
 
             //// master slider ////
 
             Column {
-                spacing: 10
+                spacing: main.sizeMargins
                 width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
-                    font.pixelSize: 20
+                    font.pixelSize: main.sizeFontItem
                     text: "Master Volume " + volTab.playVolume
                     color: "white"
                 }
                 Slider {
                     id: volPlayVolumeSider
                     width: parent.width
-                    anchors.margins: 20
+                    anchors.margins: 2*main.sizeMargins
                     style: touchStyle
                     value: volTab.playVolume
                     updateValueWhileDragging: false
@@ -68,19 +71,19 @@ Rectangle {
             //// mixer slider ////
 
             Column {
-                spacing: 10
+                spacing: main.sizeMargins
                 width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
-                    font.pixelSize: 20
+                    font.pixelSize: main.sizeFontItem
                     text: "Mixer Volume " + volTab.playMixerVolume
                     color: "white"
                 }
                 Slider {
                     id: volMixerVolumeSider
                     width: parent.width
-                    anchors.margins: 20
+                    anchors.margins: 2*main.sizeMargins
                     style: touchStyle
                     value: volTab.playMixerVolume
                     updateValueWhileDragging: false
@@ -99,19 +102,19 @@ Rectangle {
             //// amp slider ////
 
             Column {
-                spacing: 10
+                spacing: main.sizeMargins
                 width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
-                    font.pixelSize: 20
+                    font.pixelSize: main.sizeFontItem
                     text: "Amp Volume " + volTab.playAmpVolume
                     color: "white"
                 }
                 Slider {
                     id: volAmpVolumeSider
                     width: parent.width
-                    anchors.margins: 20
+                    anchors.margins: 2*main.sizeMargins
                     style: touchStyle
                     value: volTab.playAmpVolume
                     updateValueWhileDragging: false
@@ -143,40 +146,14 @@ Rectangle {
 
     Component {
         id: touchStyle
-        SliderStyle {
-            handle: Rectangle {
-                width: 30
-                height: 30
-                radius: height
-                antialiasing: true
-                color: Qt.lighter("#468bb7", 1.2)
-            }
-
-            groove: Item {
-                implicitHeight: 50
-                implicitWidth: 400
-                Rectangle {
-                    height: 8
-                    width: parent.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: "#444"
-                    opacity: 0.8
-                    Rectangle {
-                        antialiasing: true
-                        radius: 1
-                        color: "#468bb7"
-                        height: parent.height
-                        width: parent.width * control.value / control.maximumValue
-                    }
-                }
-            }
-        }
+        SlideStyle {}
     }
 
     // Attach scrollbars to the right and bottom edges of the view.
     ScrollBar {
         id: volScrollBar
-        width: 12; height: volFlick.height-12
+        width: main.sizeScrollBar
+        height: volFlick.height-main.sizeScrollBar
         anchors.right: volFlick.right
         opacity: 0
         orientation: Qt.Vertical

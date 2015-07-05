@@ -7,6 +7,8 @@ import QtQuick.Controls.Styles 1.1
 import "../items"
 import "../UI.js" as UI
 
+import "../component"
+
 Rectangle {
     id: playTab
 
@@ -26,7 +28,7 @@ Rectangle {
     property int playMixerVolume: 50
     property int playAmpVolume: 50
 
-
+    // whole page might be flicked if not fits on screen
     Flickable {
         id: playFlick
         anchors.fill: parent
@@ -38,30 +40,36 @@ Rectangle {
         leftMargin: 0.1 * playTab.width
         topMargin: 0.1 * playTab.width
 
+        // main page layout -- one column
         Column {
             id: playGrid
-            spacing: 40
+            spacing: main.sizeVerticalSpacing
             width: 0.8 * playTab.width
 
+            // song name
             FlickText {
-                textheight: 28
+                textheight: main.sizeFontHead
                 flicktext: playTab.playSong
                 textweight: Font.DemiBold
             }
+            // artist
             FlickText {
-                textheight: 24
+                textheight: main.sizeFontSubHead
                 flicktext: playTab.playArtist
             }
+            // album
             FlickText {
-                textheight: 20
+                textheight:main.sizeFontItem
                 flicktext: playTab.playAlbum
             }
 
+            // play controls button row
             Row {
-                spacing: 20
-                height: 48
+                spacing: main.sizeVerticalSubSpacing
+                height: main.sizeButton
                 anchors.horizontalCenter: parent.horizontalCenter
 
+                // prev button
                 Image {
                     source: "qrc:///images/play/backward.png"
                     width: parent.height
@@ -71,6 +79,7 @@ Rectangle {
                         onClicked: UI.btSendSingle("playprev");
                     }
                 }
+                // stop button
                 Image {
                     source: "qrc:///images/play/stop.png"
                     width: parent.height
@@ -80,6 +89,7 @@ Rectangle {
                         onClicked: UI.btSendSingle("playstop");
                     }
                 }
+                // toggle button
                 Image {
                     source: main.playPlaying ? "qrc:///images/play/pause.png" : "qrc:///images/play/play.png"
                     width: parent.height
@@ -89,6 +99,7 @@ Rectangle {
                         onClicked: UI.btSendSingle("playtoggle");
                     }
                 }
+                // next button
                 Image {
                     source: "qrc:///images/play/forward.png"
                     width: parent.height
@@ -100,11 +111,14 @@ Rectangle {
                 }
             }
 
+            // shuffle/repeat button row
             Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 60
-                height: 48
 
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 1.5 * main.sizeVerticalSpacing
+                height: main.sizeButton
+
+                // shuffle button
                 Image {
                     source: "qrc:///images/play/shuffle.png"
                     width: parent.height
@@ -115,6 +129,7 @@ Rectangle {
                         onClicked: UI.btSendSingle("togglerandom");
                     }
                 }
+                // repeat button
                 Image {
                     source: "qrc:///images/play/repeat.png"
                     width: parent.height
@@ -127,13 +142,14 @@ Rectangle {
                 }
             }
 
+            // play position text + slider
             Column {
-                spacing: 10
+                spacing: main.sizeMargins
                 width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
-                    font.pixelSize: 20
+                    font.pixelSize: main.sizeFontItem
                     text: "Position " + playTab.playPositionText + " / " + playTab.playLengthText
                     color: "white"
                 }
@@ -141,7 +157,7 @@ Rectangle {
                     id: playPlayPosSider
                     property int preventSend: 1
                     width: parent.width
-                    anchors.margins: 20
+                    anchors.margins: 2*main.sizeMargins
                     style: touchStyle
                     value: 0
                     updateValueWhileDragging: false
@@ -157,19 +173,19 @@ Rectangle {
                 }
             }
             Column {
-                spacing: 10
+                spacing: main.sizeMargins
                 width: parent.width
                 Text {
                     horizontalAlignment: Text.AlignLeft
                     verticalAlignment: Text.AlignBottom
-                    font.pixelSize: 20
+                    font.pixelSize: main.sizeFontItem
                     text: "Volume " + playTab.playVolume
                     color: "white"
                 }
                 Slider {
                     id: playPlayVolumeSider
                     width: parent.width
-                    anchors.margins: 20
+                    anchors.margins: 2*main.sizeMargins
                     style: touchStyle
                     value: playTab.playVolume
                     updateValueWhileDragging: false
@@ -201,34 +217,7 @@ Rectangle {
 
     Component {
         id: touchStyle
-        SliderStyle {
-            handle: Rectangle {
-                width: 30
-                height: 30
-                radius: height
-                antialiasing: true
-                color: Qt.lighter("#468bb7", 1.2)
-            }
-
-            groove: Item {
-                implicitHeight: 50
-                implicitWidth: 400
-                Rectangle {
-                    height: 8
-                    width: parent.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: "#444"
-                    opacity: 0.8
-                    Rectangle {
-                        antialiasing: true
-                        radius: 1
-                        color: "#468bb7"
-                        height: parent.height
-                        width: parent.width * control.value / control.maximumValue
-                    }
-                }
-            }
-        }
+        SlideStyle {}
     }
 
     Timer {
@@ -264,7 +253,8 @@ Rectangle {
     // Attach scrollbars to the right and bottom edges of the view.
     ScrollBar {
         id: playScrollBar
-        width: 12; height: playFlick.height-12
+        width: main.sizeScrollBar
+        height: playFlick.height-main.sizeScrollBar
         anchors.right: playFlick.right
         opacity: 0
         orientation: Qt.Vertical

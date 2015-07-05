@@ -24,22 +24,22 @@ Item {
     }
 
     Column {
-        spacing: 60
+        spacing: main.sizeVerticalSpacing
         anchors.centerIn: parent
 
         Column {
-            spacing: 20
+            spacing: main.sizeVerticalSubSpacing
             Text {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
-                font.pixelSize: 28
+                font.pixelSize: main.sizeFontButton
                 text: "PiBlaster MAC"
                 color: "white"
             }
             TextField {
                 focus: false
                 id: macTextField
-                anchors.margins: 20
+                anchors.margins: main.sizeMargins
                 text: main.btmac
                 style: touchStyle
                 onAccepted: main.btmac = macTextField.text
@@ -47,18 +47,18 @@ Item {
         }
 
         Column {
-            spacing: 20
+            spacing: main.sizeVerticalSubSpacing
             Text {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignBottom
-                font.pixelSize: 28
+                font.pixelSize: main.sizeFontButton
                 text: "Connect Password"
                 color: "white"
             }
             TextField {
                 focus: false
                 id: pwTextField
-                anchors.margins: 20
+                anchors.margins: main.sizeMargins
                 text: main.btpin
                 style: touchStyle
                 onAccepted: main.btpin = pwTextField.text
@@ -66,12 +66,12 @@ Item {
         }
 
         Row {
-            spacing: 20
+            spacing: main.sizeVerticalSubSpacing
 
             Text {
                 horizontalAlignment: Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 28
+                font.pixelSize: main.sizeFontButton
                 text: "Autoconnect"
                 color: "white"
             }
@@ -89,14 +89,14 @@ Item {
 
         TextFieldStyle {
             textColor: "white"
-            font.pixelSize: 28
+            font.pixelSize: main.sizeFontButton
             background: Item {
-                implicitHeight: 50
-                implicitWidth: 320
+                implicitHeight: main.sizeButton
+                implicitWidth: main.sizeButtonWidth
                 BorderImage {
                     source: "/images/textinput.png"
-                    border.left: 8
-                    border.right: 8
+                    border.left: main.sizeLine
+                    border.right: main.sizeLine
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -110,19 +110,19 @@ Item {
         SwitchStyle {
 
             groove: Rectangle {
-                implicitHeight: 50
-                implicitWidth: 152
+                implicitHeight: main.sizeButton
+                implicitWidth: main.sizeButtonWidth / 2
                 Rectangle {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
                     width: parent.width/2 - 2
-                    height: 20
+                    height: main.sizeVerticalSubSpacing
                     anchors.margins: 2
                     color: control.checked ? "#468bb7" : "#222"
                     Behavior on color {ColorAnimation {}}
                     Text {
-                        font.pixelSize: 23
+                        font.pixelSize: main.sizeFontButton
                         color: "white"
                         anchors.centerIn: parent
                         text: "ON"
@@ -133,7 +133,7 @@ Item {
                     height: parent.height
                     anchors.right: parent.right
                     Text {
-                        font.pixelSize: 23
+                        font.pixelSize: main.sizeFontButton
                         color: "white"
                         anchors.centerIn: parent
                         text: "OFF"

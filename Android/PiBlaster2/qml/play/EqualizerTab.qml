@@ -7,6 +7,7 @@ import QtQuick.Controls.Styles 1.1
 import "../items"
 import "../UI.js" as UI
 
+import "../component"
 
 Rectangle {
     id: equalTab
@@ -33,7 +34,7 @@ Rectangle {
 
         Row {
             id: equalRow
-            spacing: 20
+            spacing: 2*main.sizeMargins
             height: 0.8 * equalTab.width
 
 
@@ -43,13 +44,13 @@ Rectangle {
                 model: equalTab.equalText.length
 
                 Column {
-                    spacing: 20
-                    width: 50
+                    spacing: 2*main.sizeMargins
+                    width: main.sizeSlideButton+2*main.sizeMargins
 
                     Slider {
                         id: equalSlide
-                        height: 0.8 * equalTab.height - 20 - 20 - 10
-                        width: 50
+                        height: 0.8 * equalTab.height - 5*main.sizeMargins
+                        width: main.sizeSlideButton+2*main.sizeMargins
                         style: touchStyle
                         value: equalTab.equalVal[index]
                         updateValueWhileDragging: false
@@ -68,10 +69,10 @@ Rectangle {
 
                     Text {
                         id: equalText
-                        width: 50
+                        width: main.sizeSlideButton+2*main.sizeMargins
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
-                        font.pixelSize: 20
+                        font.pixelSize: main.sizeFontItem
                         text: equalTab.equalText[index]
                         color: "white"
                     }
@@ -106,40 +107,14 @@ Rectangle {
 
     Component {
         id: touchStyle
-        SliderStyle {
-            handle: Rectangle {
-                width: 30
-                height: 30
-                radius: height
-                antialiasing: true
-                color: Qt.lighter("#468bb7", 1.2)
-            }
-
-            groove: Item {
-                implicitHeight: 50
-                implicitWidth: 400
-                Rectangle {
-                    height: 8
-                    width: parent.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: "#444"
-                    opacity: 0.8
-                    Rectangle {
-                        antialiasing: true
-                        radius: 1
-                        color: "#468bb7"
-                        height: parent.height
-                        width: parent.width * control.value / control.maximumValue
-                    }
-                }
-            }
-        }
+        SlideStyle {}
     }
 
     // Attach scrollbars to the right and bottom edges of the view.
     ScrollBar {
         id: equalVertScrollBar
-        width: 12; height: equalFlick.height-12
+        width: main.sizeScrollBar
+        height: equalFlick.height-main.sizeScrollBar
         anchors.right: equalFlick.right
         opacity: 0
         orientation: Qt.Vertical
@@ -148,7 +123,8 @@ Rectangle {
     }
     ScrollBar {
         id: equalHorizScrollBar
-        width: equalFlick.width-12; height: 12
+        width: equalFlick.width-main.sizeScrollBar
+        height: main.sizeScrollBar
         anchors.bottom: equalFlick.bottom
         opacity: 0
         orientation: Qt.Horizontal

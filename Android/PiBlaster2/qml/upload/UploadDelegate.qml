@@ -7,7 +7,7 @@ import "../UI.js" as UI
 Item {
     id: root
     width: parent.width
-    height: 88
+    height: main.sizeListItem
 
     Rectangle {
         anchors.fill: parent
@@ -29,19 +29,19 @@ Item {
 
     Text {
         color: "white"
-        font.pixelSize: 24
-        anchors.margins: 10
+        font.pixelSize: main.sizeFontListItem
+        anchors.margins: main.sizeMargins
         anchors.left: parent.left
         anchors.top: parent.top
         text: title
-        width: parent.width - 10
+        width: parent.width - main.sizeMargins
         elide: Text.ElideRight
     }
 
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 10
+        anchors.margins: main.sizeMargins
         height: 1
         color: "#424246"
     }

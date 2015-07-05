@@ -1,3 +1,4 @@
+
 QT += qml quick bluetooth
 TARGET = PiBlaster2
 !no_desktop: QT += widgets
@@ -6,18 +7,21 @@ include(src/src.pri)
 
 # bug somewhere -- as of 2015/07/04
 # https://forum.qt.io/topic/39578/bits-c-config-h-missing/7
-INCLUDEPATH += $(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_NDK_TOOLCHAIN_VERSION)/libs/armeabi-v7a/include
+# INCLUDEPATH += $(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/$(ANDROID_NDK_TOOLCHAIN_VERSION)/libs/armeabi-v7a/include
 
 
 OTHER_FILES += \
     android/AndroidManifest.xml \
     qml/main.qml \
+    qml/Global.qml \
     qml/MainMenuBar.qml \
     qml/BT.js \
     qml/UI.js \
     qml/browse/BrowseDelegate.qml \
     qml/browse/BrowseModel.qml \
     qml/browse/BrowsePage.qml \
+    qml/component/SlideStyle.qml \
+    qml/component/TabStyle.qml \
     qml/connect/ConnectPage.qml \
     qml/connect/ConnectTab.qml \
     qml/connect/SettingsTab.qml \
@@ -31,6 +35,7 @@ OTHER_FILES += \
     qml/dialogs/NoBluetoothDialog.qml \
     qml/items/FlickText.qml \
     qml/items/ScrollBar.qml \
+    qml/items/VolumeSlider.qml \
     qml/search/SearchPage.qml \
     qml/search/SearchModel.qml \
     qml/search/SearchDelegate.qml \
@@ -50,5 +55,9 @@ ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 #    qml/playlist/PlayListDelegate.qml
 
 DISTFILES += \
-    qml/content/MainDelegate.qml
+    qml/content/MainDelegate.qml \
+    qml/Global.qml \
+    qml/component/TabStyle.qml \
+    qml/component/SlideStyle.qml \
+    qml/items/VolumeSlider.qml
 

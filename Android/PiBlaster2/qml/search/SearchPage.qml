@@ -12,17 +12,17 @@ Item {
 
     Row {
 
-        spacing: 40
+        spacing: main.sizeVerticalSpacing
         id: searchBox
         width: parent.width
-        height: 100
+        height: main.sizeFontHead + 5 * main.sizeMargin
 
         Text {
             id: searchtext
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignBottom
-            anchors.margins: 20
-            font.pixelSize: 28
+            anchors.margins: 2*main.sizeMargin
+            font.pixelSize: main.sizeFontHead
             text: "Search: "
             color: "white"
         }
@@ -30,10 +30,10 @@ Item {
         TextField {
             focus: false
             id: macTextField
-            anchors.margins: 20
+            anchors.margins: 2*main.sizeMargin
             text: ''
             style: touchStyle
-            width: parent.width - searchtext.width - 80
+            width: parent.width - searchtext.width - 2*2*2*main.sizeMargin
             onAccepted: {
                 if (text.length < 4 ) {
                     UI.setStatus("Search string requires at least 3 charackters!");
@@ -50,9 +50,8 @@ Item {
         id: searchscrollview
 
         width: parent.width
-        height: parent.height - 100
+        height: parent.height - main.sizeFontHead + 5 * main.sizeMargin
         anchors.top: searchBox.bottom
-
     }
 
 
@@ -61,14 +60,14 @@ Item {
 
         TextFieldStyle {
             textColor: "white"
-            font.pixelSize: 28
+            font.pixelSize: main.sizeFontHead
             background: Item {
-                implicitHeight: 50
-                implicitWidth: 320
+                implicitHeight: main.sizeButton
+                implicitWidth: main.sizeButtonWidth
                 BorderImage {
                     source: "/images/textinput.png"
-                    border.left: 8
-                    border.right: 8
+                    border.left: main.sizeMargins
+                    border.right: main.sizeMargins
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right

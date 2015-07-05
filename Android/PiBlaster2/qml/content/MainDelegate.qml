@@ -5,7 +5,7 @@ import QtQuick 2.2
 Item {
     id: root
     width: parent.width
-    height: 88
+    height: main.sizeMainItem
 
     property bool requireconnect
     property alias text: textitem.text
@@ -20,24 +20,25 @@ Item {
     Text {
         id: textitem
         color: (root.requireconnect && ! main.btconnected) ? "grey" : "white"
-        font.pixelSize: 32
+        font.pixelSize: main.sizeFontHead
         text: modelData
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: 30
+        anchors.leftMargin: main.sizeFontHead
     }
 
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 15
+        anchors.margins: main.sizeFontHead / 2
         height: 1
         color: "#424246"
     }
 
     Image {
         anchors.right: parent.right
-        anchors.rightMargin: 20
+        anchors.margins: main.sizeMargins
+        anchors.rightMargin: 2 * main.sizeMargins
         anchors.verticalCenter: parent.verticalCenter
         source: "/images/navigation_next_item.png"
     }

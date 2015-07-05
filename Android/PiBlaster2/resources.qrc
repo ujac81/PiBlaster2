@@ -44,5 +44,8 @@
         <file>qml/upload/UploadModel.qml</file>
         <file>qml/upload/UploadDelegate.qml</file>
         <file>qml/content/MainDelegate.qml</file>
+        <file>qml/Global.qml</file>
+        <file>qml/component/TabStyle.qml</file>
+        <file>qml/component/SlideStyle.qml</file>
     </qresource>
 </RCC>

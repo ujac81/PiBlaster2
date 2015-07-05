@@ -5,12 +5,14 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Controls 1.3
-import QtQuick.Window 2.2
 import Qt.labs.settings 1.0
+import QtQuick.Window 2.2
+
 
 import "content"
 import "dialogs"
 import "play"
+import "."
 
 import "UI.js" as UI
 import "BT.js" as BT
@@ -18,12 +20,39 @@ import "BT.js" as BT
 
 ApplicationWindow {
 
-    property int dp: Screen.pixelDensity
-
     id: main
     visible: true
     width: 800
     height: 1280
+
+    property real dp: Screen.pixelDensity
+    property int sizeToolbar: Math.floor(dp * 8)
+    property int sizeFooter: Math.floor(dp * 5)
+    property int sizeTabBar: Math.floor(dp * 5)
+    property int sizeButton: sizeTabBar
+    property int sizeButtonWidth: Math.floor(dp * 40)
+    property int sizeMainItem: Math.floor(dp * 9)
+    property int sizeMargins: Math.floor(dp)
+    property int sizeButtons: Math.floor(dp * 6)
+    property int sizeLine: Math.floor(dp)
+    property int sizeVerticalSpacing: Math.floor(dp * 4)
+    property int sizeVerticalSubSpacing: Math.floor(dp * 2)
+    property int sizeListItem: Math.floor(dp * 9)
+
+    property int sizeFontHead: Math.floor(dp * 3)
+    property int sizeFontSubHead: Math.floor(dp * 2.5)
+    property int sizeFontStatus: Math.floor(dp * 2)
+    property int sizeFontButton: sizeFontStatus
+    property int sizeFontTabHead: sizeFontStatus
+    property int sizeFontItem: sizeFontStatus
+    property int sizeFontListItem: Math.floor(dp * 2.4)
+    property int sizeFontSubItem: Math.floor(dp * 1.8)
+
+    property int sizeSlideButton: Math.floor(dp * 3)
+    property int sizeSlider: sizeButtonWidth
+
+    property int sizeScrollBar: Math.floor(dp * 1.2)
+
 
     property string color1: "#94d9ff"
     property int lastBTDeviceState: 0
@@ -68,20 +97,21 @@ ApplicationWindow {
     ////////////////////// TOP TOOL BAR //////////////////////
 
     toolBar: ToolBar {
-        height: 80
+        height: main.sizeToolbar
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 10
+            anchors.margins: sizeMargins
             Rectangle {
                 id: backButton
-                width: opacity ? 60 : 0
+                width: opacity ? main.sizeButtons : 0
                 anchors.left: parent.left
-                anchors.leftMargin: 20
+                anchors.margins: main.sizeMargins
+                anchors.leftMargin: 2 * main.sizeMargins
                 opacity: stackView.depth > 1 ? 1 : 0
                 anchors.verticalCenter: parent.verticalCenter
                 antialiasing: true
-                height: 60
+                height: main.sizeButtons
                 radius: 4
                 color: backmouse.pressed ? "#222" : "transparent"
                 Behavior on opacity { NumberAnimation{} }
@@ -92,14 +122,14 @@ ApplicationWindow {
                 MouseArea {
                     id: backmouse
                     anchors.fill: parent
-                    anchors.margins: -10
+                    anchors.margins: -main.sizeMargins
                     onClicked: stackView.pop()
                 }
             }
             Text {
-                font.pixelSize: 30
+                font.pixelSize: main.sizeFontHead
                 Behavior on x { NumberAnimation{ easing.type: Easing.OutCubic} }
-                x: backButton.x + backButton.width + 20
+                x: backButton.x + backButton.width + 2 * main.sizeMargins
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
                 text: "PiBlaster Remote 2.0"
@@ -115,10 +145,10 @@ ApplicationWindow {
     ////////////////////// BOTTOM STATUS BAR //////////////////////
 
     statusBar: BorderImage {
-        border.top: 8
+        border.top: main.sizeLine
         source: "/images/statusbar.png"
         width: parent.width
-        height: main.statustext != "" ? 50 : 0
+        height: main.statustext != "" ? main.sizeFooter : 0
         Behavior on height {
             NumberAnimation {
                 easing.type: Easing.OutCubic;
@@ -126,7 +156,7 @@ ApplicationWindow {
             }
         }
         Text {
-            font.pixelSize: 20
+            font.pixelSize: main.sizeFontStatus
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
             text: main.statustext
@@ -289,13 +319,6 @@ ApplicationWindow {
             console.log("Found active bluetooth on startup -- autoconnecting...");
             UI.bt_reconnect();
         }
-
-
-
-        console.log(UI.dp(1));
-        console.log(UI.dp(10));
-        console.log(1*dp);
-        console.log(10*dp);
     }
 
 

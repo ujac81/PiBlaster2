@@ -3,7 +3,7 @@ import QtQuick 2.2
 
 Rectangle {
 
-    property int textheight: 28
+    property int textheight: main.sizeFontHead
     property string flicktext: "some text"
     property int textweight: Font.Normal
 
