@@ -15,7 +15,7 @@ mkdir -pv /var/lib/pyblaster2
     service bluetooth restart
 }
 
-chmod 755 /opt/PyBlaster2/python/pyblaster2.py
+chmod 755 /opt/PyBlaster2/python/pyblaster2.py /opt/PyBlaster2/python/pyblaster2-util.py
 ln -sf /opt/PyBlaster2/python/pyblaster2.py /usr/bin/pyblaster2
 
 chown -R pi:pi /opt/PyBlaster2

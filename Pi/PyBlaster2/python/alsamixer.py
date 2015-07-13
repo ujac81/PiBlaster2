@@ -118,7 +118,7 @@ class AlsaMixer:
         Will only work if alsa plugin equal loaded as 'equal'.
         """
 
-        channels = Popen(["amixer", "-D", "equal", "scontrols"],
+        channels = Popen(["sudo", "amixer", "-D", "equal", "scontrols"],
                          stdout=PIPE, stderr=PIPE).\
             communicate()[0].decode('utf-8').split('\n')
 
@@ -138,7 +138,7 @@ class AlsaMixer:
         if not len(self.equal_channels):
             return []
 
-        channels = Popen(["amixer", "-D", "equal", "contents"],
+        channels = Popen(["sudo", "amixer", "-D", "equal", "contents"],
                          stdout=PIPE, stderr=PIPE).\
             communicate()[0].decode('utf-8').split('\n')
 
@@ -147,6 +147,7 @@ class AlsaMixer:
             m = re.search('values=(\d+),(\d+)', chan)
             if m is not None:
                 res.append((int(m.group(1)) + int(m.group(2))) / 2)
+
         return res
 
     def set_equal_channel(self, chan, val):
@@ -165,7 +166,7 @@ class AlsaMixer:
         if val > 100:
             val = 100
 
-        Popen(["amixer", "-D", "equal", "cset", "numid=%d" % (chan+1),
+        Popen(["sudo", "amixer", "-D", "equal", "cset", "numid=%d" % (chan+1),
                "%s" % val], stdout=PIPE, stderr=PIPE).communicate()
 
         self.main.log.write(log.MESSAGE,
@@ -196,7 +197,8 @@ class AlsaMixer:
 
         cmd = ""
         for i in range(len(int_vals)):
-            cmd += "amixer -D equal cset numid=%d %s;" % (i+1, int_vals[i])
+            cmd += "sudo amixer -D equal cset numid=%d %s;" % \
+                   (i+1, int_vals[i])
 
         if not len(cmd):
             return
