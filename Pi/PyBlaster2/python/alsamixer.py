@@ -23,6 +23,7 @@ class AlsaMixer:
         self.mixers = alsaaudio.mixers()
         self.equal_channels = []  # names of equalizer channels if found
         self.mixer = self.main.settings.mixer_channel
+        self.amp = 'Channels'  # TODO: to config
 
         # alsaaudio.Mixer().setvolume() is somehow strange.
         # At least for my device.
@@ -53,16 +54,11 @@ class AlsaMixer:
             self.mixer = self.mixers[0]
         self.init_equal_channels()
 
-    def get_master_volume(self):
-        """Get volume of alsa master channel for sound card #0
-        :return: value between 0 and 100
-        """
+    def calc_vol_from_mixer(self, vol):
 
         # getvolume / setvolume is totally strange for alsaaudio.Mixer().
         # (at least for my device)
         # This is the best fit for a*e^(bx) behaviour.
-
-        vol = alsaaudio.Mixer(self.mixer).getvolume()[0]
         if vol == 100:
             return 100
         if vol == 0:
@@ -76,16 +72,13 @@ class AlsaMixer:
 
         return vol2
 
-    def set_master_volume(self, val):
-        """Set volume of alsa master channel for sound card #0
-        :param val: volume value in [0,100]
-        """
-
+    def calc_vol_for_mixer(self, val):
         # getvolume / setvolume is totally strange for alsaaudio.Mixer().
         # (at least for my device)
         # This is the best fit for a*e^(bx) behaviour.
         # For set volume inverse function 1/b*log(x/a) is used.
 
+        vol = 0
         if val == 0:
             vol = 0
         elif val == 100:
@@ -98,10 +91,41 @@ class AlsaMixer:
                 vol = 100
             else:
                 vol = vol2
+        return vol
+
+    def get_master_volume(self):
+        """Get volume of alsa master channel for sound card #0
+        :return: value between 0 and 100
+        """
+        vol = alsaaudio.Mixer(self.mixer).getvolume()[0]
+        return self.calc_vol_from_mixer(vol)
+
+    def set_master_volume(self, val):
+        """Set volume of alsa master channel for sound card #0
+        :param val: volume value in [0,100]
+        """
+        vol = self.calc_vol_for_mixer(val)
 
         self.main.log.write(log.MESSAGE, "[ALSA] setting mixer volume to "
                                          "%d (=%d)..." % (val, vol))
         alsaaudio.Mixer(self.mixer).setvolume(vol)
+
+    def get_amp_volume(self):
+        """Get volume of alsa amp channel for sound card #0
+        :return: value between 0 and 100
+        """
+        vol = alsaaudio.Mixer(self.amp).getvolume()[0]
+        return self.calc_vol_from_mixer(vol)
+
+    def set_amp_volume(self, val):
+        """Set volume of alsa master channel for sound card #0
+        :param val: volume value in [0,100]
+        """
+        vol = self.calc_vol_for_mixer(val)
+
+        self.main.log.write(log.MESSAGE, "[ALSA] setting amp volume to "
+                                         "%d (=%d)..." % (val, vol))
+        alsaaudio.Mixer(self.amp).setvolume(vol)
 
     def has_equalizer(self):
         """True if alsa device named 'equal' found.

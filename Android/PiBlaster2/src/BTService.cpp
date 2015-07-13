@@ -251,7 +251,23 @@ void BTService::serviceDiscovered( const QBluetoothServiceInfo& info )
         emit bluetoothMessage("Found PiBlaster service... Waiting for scan to finish.");
         _foundPiBlasterService = true;
         _serviceInfo = info;
-        // TODO stop scan here
+
+        emit bluetoothMessage("Connecting to service...");
+
+        delete _socket;
+        _socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
+
+        // TODO: catch I/O errors on socket
+
+        connect(_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
+        connect(_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
+        connect(_socket, SIGNAL(error(QBluetoothSocket::SocketError)),
+                this, SLOT(socketError(QBluetoothSocket::SocketError)));
+        connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+        connect(_socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)),
+                this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)));
+
+        _socket->connectToService( _serviceInfo.device().address(), _uuid );
     }
 }
 
@@ -278,29 +294,8 @@ void BTService::lowEnergyServiceScanFinished()
 
 void BTService::serviceScanFinished()
 {
-    if ( _foundPiBlasterService )
+    if ( ! _foundPiBlasterService )
     {
-        qDebug() << "Got service...";
-
-        emit bluetoothMessage("Connecting to service...");
-
-        // todo: pair here?
-
-        delete _socket;
-        _socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-
-        // TODO: catch I/O errors on socket
-
-        connect(_socket, SIGNAL(connected()), this, SLOT(socketConnected()));
-        connect(_socket, SIGNAL(disconnected()), this, SLOT(socketDisconnected()));
-        connect(_socket, SIGNAL(error(QBluetoothSocket::SocketError)),
-                this, SLOT(socketError(QBluetoothSocket::SocketError)));
-        connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
-        connect(_socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)),
-                this, SLOT(socketStateChanged(QBluetoothSocket::SocketState)));
-
-        _socket->connectToService( _serviceInfo.device().address(), _uuid );
-    } else {
         emit bluetoothError("PiBlaster Service not found.");
         return;
     }
