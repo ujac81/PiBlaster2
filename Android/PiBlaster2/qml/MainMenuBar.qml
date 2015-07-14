@@ -9,6 +9,8 @@ import "UI.js" as UI
 
 MenuBar {
 
+    id: mainMenuBar
+
 
     ////////////////////// MAIN //////////////////////
     Menu {
@@ -149,6 +151,19 @@ MenuBar {
         title: "Browse"
         enabled: false
 
+         MenuItem {
+            text: "Scroll to start"
+            onTriggered: stackView.browse_action("scroll_start")
+        }
+        MenuItem {
+             text: "Scroll to end"
+             onTriggered: stackView.browse_action("scroll_end")
+         }
+        MenuItem {
+            text: "Select all"
+            onTriggered: stackView.browse_action("select_all")
+        }
+
         MenuItem {
             text: "Select all"
             onTriggered: stackView.browse_action("select_all")
@@ -251,5 +266,12 @@ MenuBar {
         browseMenu.enabled = false;
         searchMenu.enabled = false;
         uploadMenu.enabled = false;
+    }
+
+    function popupMenu(menuname) {
+        if (menuname === "browse") {
+            browseMenu.popup();
+        }
+
     }
 }

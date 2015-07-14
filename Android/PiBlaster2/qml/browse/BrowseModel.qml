@@ -37,7 +37,6 @@ ListModel {
 
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
-                console.log(arr)
                 app = {
                         "ftype": parseInt(arr[0]),
                         "title": arr[1],
@@ -90,5 +89,19 @@ ListModel {
         }
         deselect_all();
     }
+
+    function append_item(file, title) {
+        btService.clearSendPayload();
+        btService.addToSendPayload(file);
+        if (main.btconnected) {
+            keepalive.running = false;
+            btService.writeSocketWithPayload('pladdseltoend');
+            keepalive.running = true;
+            UI.setStatus(title + " appended to playlist");
+        } else {
+            UI.setStatus("Not connected to PiBlaster!");
+        }
+    }
+
 }
 

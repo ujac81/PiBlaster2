@@ -92,7 +92,11 @@ ApplicationWindow {
 
     ////////////////////// MENU //////////////////////
 
-    menuBar: MainMenuBar { id: mainMenuBar }
+    menuBar: MainMenuBar {}
+
+    function popupMenu(menuname) {
+        menuBar.popupMenu(menuname);
+    }
 
     ////////////////////// TOP TOOL BAR //////////////////////
 
@@ -222,7 +226,7 @@ ApplicationWindow {
             }
 
             function activated() {
-                mainMenuBar.set_menu("main");
+                menuBar.set_menu("main");
             }
         }
 
@@ -230,7 +234,7 @@ ApplicationWindow {
         onCurrentItemChanged: {
             if ( currentItem ) {
                 currentItem.activated();
-                mainMenuBar.set_menu(currentItem.objectName);
+                menuBar.set_menu(currentItem.objectName);
             }
         }
 

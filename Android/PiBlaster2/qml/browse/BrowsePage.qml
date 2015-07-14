@@ -70,7 +70,13 @@ ScrollView {
 
 
     function browse_action(action_name) {
-        if (action_name === "select_all") {
+        if (action_name === "scroll_start") {
+            browseview.positionViewAtBeginning()
+        }
+        else if (action_name === "scroll_end") {
+            browseview.positionViewAtEnd()
+        }
+        else if (action_name === "select_all") {
             browseview.model.select_all();
         }
         else if (action_name === "deselect_all") {

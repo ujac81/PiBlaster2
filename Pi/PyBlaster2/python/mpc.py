@@ -524,18 +524,18 @@ class MPC:
                 title = os.path.basename(item['directory'])
                 result.append(['1', title, '', '', '', item['directory']])
             else:
-                length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
-                res = ['2', '', '', '', length, item['file']]
+                res = ['2']
                 if 'title' in item:
-                    res[1] = item['title']
+                    res.append(item['title'])
                 else:
                     no_ext = os.path.splitext(item['file'])[0]
-                    res[1] = os.path.basename(no_ext).replace('_', ' ')
-                if 'artist' in item:
-                    res[2] = item['artist']
-                # TODO: album seems to be missing
-                if 'album' in 'item':
-                    res[3] = item['album']
+                    res.append(os.path.basename(no_ext).replace('_', ' '))
+
+                res.append(item['artist'] if 'artist' in item else '')
+                res.append(item['album'] if 'album' in item else '')
+                length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+                res.append(length)
+                res.append(item['file'])
                 result.append(res)
 
         return result
@@ -554,7 +554,7 @@ class MPC:
 
         self.main.led.set_led_yellow(1)
 
-        if mode == 1 or 'position' not in self.get_currentsong():
+        if mode == 1 or 'pos' not in self.get_currentsong():
             # Insert at end
             for item in payload:
                 try:
