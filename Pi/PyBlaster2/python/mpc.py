@@ -411,18 +411,18 @@ class MPC:
         result = []
         items = self.client.playlistinfo("%d:%d" % (start, end))
         for item in items:
-            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
-            res = [item['pos'], '', '', '', length, item['id']]
+            res = [item['pos']]
             if 'title' in item:
-                res[1] = item['title']
+                res.append(item['title'])
             else:
                 no_ext = os.path.splitext(item['file'])[0]
-                res[1] = os.path.basename(no_ext).replace('_', ' ')
-            if 'artist' in item:
-                res[2] = item['artist']
-            if 'album' in 'item':
-                res[3] = item['album']
-
+                res.append(os.path.basename(no_ext).replace('_', ' '))
+            res.append(item['artist'] if 'artist' in item else '')
+            res.append(item['album'] if 'album' in item else '')
+            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+            res.append(length)
+            res.append(item['file'])
+            result.append(res)
             result.append(res)
 
         return result
@@ -598,19 +598,17 @@ class MPC:
                             len(search))
 
         for item in search:
-
-            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
-            res = ['', '', '', length, item['file']]
+            res = []
             if 'title' in item:
-                res[0] = item['title']
+                res.append(item['title'])
             else:
                 no_ext = os.path.splitext(item['file'])[0]
-                res[0] = os.path.basename(no_ext).replace('_', ' ')
-            if 'artist' in item:
-                res[1] = item['artist']
-            # TODO: album seems to be missing
-            if 'album' in 'item':
-                res[2] = item['album']
+                res.append(os.path.basename(no_ext).replace('_', ' '))
+            res.append(item['artist'] if 'artist' in item else '')
+            res.append(item['album'] if 'album' in item else '')
+            length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
+            res.append(length)
+            res.append(item['file'])
             result.append(res)
 
         return result

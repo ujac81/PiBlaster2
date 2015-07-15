@@ -35,15 +35,15 @@ Item {
         function tabChanged(index) {
             if ( index ===  0 ) {
                 UI.btSendSingle("playstatus");
-                mainMenuBar.set_menu("playstatusMenu")
+                main.menuBar.set_menu("playstatusMenu")
             }
             if ( index ===  1 ) {
                 UI.btSendSingle("volstatus");
-                mainMenuBar.set_menu("volstatusMenu")
+                main.menuBar.set_menu("volstatusMenu")
             }
             if ( index ===  2 ) {
                 UI.btSendSingle("equalstatus");
-                mainMenuBar.set_menu("equalstatusMenu")
+                main.menuBar.set_menu("equalstatusMenu")
             }
         }
     }

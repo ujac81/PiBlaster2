@@ -126,11 +126,7 @@ Item {
                         var elem = browseview.model.get(index);
                         elem.selected = ! selected;
                     }
-                    onDoubleClicked: {
-                        var elem = browseview.model.get(index);
-                        elem.selected = true;
-                        main.popupMenu("browse");
-                    }
+                    onDoubleClicked: browsescrollview.send_browse(file)
                 } // mouse area
             }
 
@@ -220,11 +216,6 @@ Item {
                         var elem = browseview.model.get(index);
                         elem.selected = ! selected;
                     }
-                }
-                onDoubleClicked: {
-                    var elem = browseview.model.get(index);
-                    elem.selected = true;
-                    main.popupMenu("browse");
                 }
                 onPressAndHold: {
                     var elem = browseview.model.get(index);

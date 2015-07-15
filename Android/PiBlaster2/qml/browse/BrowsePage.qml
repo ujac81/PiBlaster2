@@ -18,14 +18,13 @@ ScrollView {
     focus: true
 
     Keys.onReleased: {
-        console.log(event.key)
-        console.log(browseview.model.cur_parent)
         if (event.key === Qt.Key_Back && browseview.model.cur_parent !== "") {
             browsescrollview.send_browse(browseview.model.cur_parent);
             event.accepted = true;
         }
         if (event.key === Qt.Key_Menu) {
             main.popupMenu("browse");
+            event.accepted = true;
         }
     }
 
@@ -81,7 +80,6 @@ ScrollView {
         console.log("update_browse");
         browseview.model.received_browse(msg);
     }
-
 
     function browse_action(action_name) {
         if (action_name === "scroll_start") {

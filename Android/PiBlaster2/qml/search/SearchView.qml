@@ -9,8 +9,8 @@ import "../UI.js" as UI
 ScrollView {
 
 
-    width: parent.width
-    height: parent.height
+//    width: parent.width
+//    height: parent.height
 
     flickableItem.interactive: true
 
@@ -67,7 +67,13 @@ ScrollView {
 
 
     function search_action(action_name) {
-        if (action_name === "select_all") {
+        if (action_name === "scroll_start") {
+            searchview.positionViewAtBeginning();
+        }
+        else if (action_name === "scroll_end") {
+            searchview.positionViewAtEnd();
+        }
+        else if (action_name === "select_all") {
             searchview.model.select_all();
         }
         else if (action_name === "deselect_all") {

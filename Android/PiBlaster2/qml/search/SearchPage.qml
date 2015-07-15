@@ -10,6 +10,18 @@ Item {
 
     objectName: "SearchPage"
 
+//    height: parent.height
+//    width: parent.width
+
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Menu) {
+            main.popupMenu("search");
+            event.accepted = true;
+        }
+    }
+
     Row {
 
         spacing: main.sizeVerticalSpacing
@@ -23,6 +35,7 @@ Item {
             verticalAlignment: Text.AlignBottom
             anchors.margins: 2*main.sizeMargin
             font.pixelSize: main.sizeFontHead
+            height: parent.height
             text: "Search: "
             color: "white"
         }
@@ -50,8 +63,9 @@ Item {
         id: searchscrollview
 
         width: parent.width
-        height: parent.height - main.sizeFontHead + 5 * main.sizeMargin
+//        height: parent.height - main.sizeFontHead + 5 * main.sizeMargin
         anchors.top: searchBox.bottom
+        anchors.bottom: parent.bottom
     }
 
 

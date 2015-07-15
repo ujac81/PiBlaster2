@@ -71,5 +71,18 @@ ListModel {
         }
         deselect_all();
     }
+
+    function append_item(file, title) {
+        btService.clearSendPayload();
+        btService.addToSendPayload(file);
+        if (main.btconnected) {
+            keepalive.running = false;
+            btService.writeSocketWithPayload('pladdseltoend');
+            keepalive.running = true;
+            UI.setStatus(title + " appended to playlist");
+        } else {
+            UI.setStatus("Not connected to PiBlaster!");
+        }
+    }
 }
 

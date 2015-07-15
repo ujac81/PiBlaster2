@@ -197,6 +197,14 @@ MenuBar {
         enabled: false
 
         MenuItem {
+           text: "Scroll to start"
+           onTriggered: stackView.search_action("scroll_start")
+       }
+       MenuItem {
+            text: "Scroll to end"
+            onTriggered: stackView.search_action("scroll_end")
+        }
+        MenuItem {
             text: "Select all"
             onTriggered: stackView.search_action("select_all")
         }
@@ -271,6 +279,12 @@ MenuBar {
     function popupMenu(menuname) {
         if (menuname === "browse") {
             browseMenu.popup();
+        }
+        else if (menuname === "search") {
+            searchMenu.popup();
+        }
+        else {
+            console.log("Illegal menuname "+menuname);
         }
 
     }

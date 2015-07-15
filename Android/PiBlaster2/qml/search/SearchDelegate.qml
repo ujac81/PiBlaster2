@@ -97,6 +97,11 @@ Item {
             var elem = searchview.model.get(index);
             elem.selected = ! selected;
         }
+        onPressAndHold: {
+            var elem = searchview.model.get(index);
+            elem.selected = false;
+            searchview.model.append_item(file, title);
+        }
 
         // TODO: double click = open menu or so
         // TODO: hold click = append or so
