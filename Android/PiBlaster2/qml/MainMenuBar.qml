@@ -196,7 +196,7 @@ MenuBar {
         title: "Search"
         enabled: false
 
-        MenuItem {
+       MenuItem {
            text: "Scroll to start"
            onTriggered: stackView.search_action("scroll_start")
        }
@@ -233,16 +233,24 @@ MenuBar {
         enabled: false
 
         MenuItem {
+            text: "Scroll to start"
+            onTriggered: stackView.upload_action("scroll_start")
+        }
+        MenuItem {
+             text: "Scroll to end"
+             onTriggered: stackView.upload_action("scroll_end")
+         }
+        MenuItem {
             text: "Select all"
-            onTriggered: stackView.search_action("select_all")
+            onTriggered: stackView.upload_action("select_all")
         }
         MenuItem {
             text: "Deselect all"
-            onTriggered: stackView.search_action("deselect_all")
+            onTriggered: stackView.upload_action("deselect_all")
         }
         MenuItem {
             text: "Invert selection"
-            onTriggered: stackView.search_action("invert_selection")
+            onTriggered: stackView.upload_action("invert_selection")
         }
         MenuItem {
             text: "Upload selection"
@@ -283,9 +291,11 @@ MenuBar {
         else if (menuname === "search") {
             searchMenu.popup();
         }
+        else if (menuname === "upload") {
+            uploadMenu.popup();
+        }
         else {
             console.log("Illegal menuname "+menuname);
         }
-
     }
 }

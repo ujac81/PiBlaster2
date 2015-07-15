@@ -20,7 +20,6 @@ ListModel {
 
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
-                console.log(arr)
                 app = {
                         "title": arr[0],
                         "artist": arr[1],
@@ -85,4 +84,3 @@ ListModel {
         }
     }
 }
-

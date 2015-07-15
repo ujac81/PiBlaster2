@@ -15,6 +15,20 @@ ScrollView {
     height: parent.height
 
     flickableItem.interactive: true
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Back && uploadview.model.cur_parent !== "/") {
+            uploadscrollview.send_browse(uploadview.model.cur_parent);
+            event.accepted = true;
+        }
+        if (event.key === Qt.Key_Menu) {
+            main.popupMenu("upload");
+            event.accepted = true;
+        }
+    }
+
+
 
     ListView {
         id: uploadview
@@ -70,7 +84,13 @@ ScrollView {
 
 
     function upload_action(action_name) {
-        if (action_name === "select_all") {
+        if (action_name === "scroll_start") {
+            uploadview.positionViewAtBeginning()
+        }
+        else if (action_name === "scroll_end") {
+            uploadview.positionViewAtEnd()
+        }
+        else if (action_name === "select_all") {
             uploadview.model.select_all();
         }
         else if (action_name === "deselect_all") {

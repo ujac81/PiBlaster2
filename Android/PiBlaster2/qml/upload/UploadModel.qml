@@ -7,6 +7,8 @@ import "../UI.js" as UI
 ListModel {
     id: uploadModel
 
+    property string cur_parent: "/"
+
 
     /**
      * Called by main if dirlisting message received from PI
@@ -18,6 +20,7 @@ ListModel {
 
             var app = {}
             var parentdir = msg.message();
+            uploadModel.cur_parent = parentdir;
 
             console.log("New Listing -- Parent Dir = --"+parentdir+"--");
 
@@ -35,11 +38,10 @@ ListModel {
 
             for ( var i = 0; i < msg.payloadSize(); i++ ) {
                 var arr = msg.payloadElements(i);
-                console.log(arr)
                 app = {
                         "ftype": parseInt(arr[0]),
                         "title": arr[1],
-                        "artist": "",
+                        "artist": "", // parentdir for '..'
                         "file": arr[2],
                         "selected": false
                        };
@@ -48,9 +50,7 @@ ListModel {
         } else {
             UI.setStatus("Bad return status for 'dirlisting'");
         }
-
     }
-
 
     function deselect_all() {
         for ( var i = 0; i < count; i++ ) {
