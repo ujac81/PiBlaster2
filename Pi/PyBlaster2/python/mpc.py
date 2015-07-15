@@ -309,7 +309,7 @@ class MPC:
         for key in cur_keys:
             res = cur[key] if key in cur else ''
             if key == 'title' and res == '':
-                filename = cur['file'] if key in cur else 'NOT PLAYING'
+                filename = cur['file'] if 'file' in cur else 'NOT PLAYING'
                 ext = os.path.splitext(filename)[1]
                 res = os.path.split(filename)[1].replace(ext, '').\
                     replace('_', ' ')
