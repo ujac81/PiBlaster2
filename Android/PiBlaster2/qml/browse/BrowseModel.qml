@@ -7,6 +7,8 @@ import "../UI.js" as UI
 ListModel {
     id: browseModel
 
+    property string cur_parent: ""
+
 
     /**
      * Called by main if dirlisting message received from PI
@@ -18,6 +20,7 @@ ListModel {
 
             var app = {}
             var parentdir = msg.message();
+            browseModel.cur_parent = parentdir;
 
             console.log("New Listing -- Parent Dir = --"+parentdir+"--");
 

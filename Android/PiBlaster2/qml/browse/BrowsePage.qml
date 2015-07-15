@@ -15,6 +15,20 @@ ScrollView {
     height: parent.height
 
     flickableItem.interactive: true
+    focus: true
+
+    Keys.onReleased: {
+        console.log(event.key)
+        console.log(browseview.model.cur_parent)
+        if (event.key === Qt.Key_Back && browseview.model.cur_parent !== "") {
+            browsescrollview.send_browse(browseview.model.cur_parent);
+            event.accepted = true;
+        }
+        if (event.key === Qt.Key_Menu) {
+            main.popupMenu("browse");
+        }
+    }
+
 
     ListView {
         id: browseview
