@@ -421,8 +421,7 @@ class MPC:
             res.append(item['album'] if 'album' in item else '')
             length = time.strftime("%M:%S", time.gmtime(int(item['time'])))
             res.append(length)
-            res.append(item['file'])
-            result.append(res)
+            res.append(item['id'])
             result.append(res)
 
         return result
@@ -434,13 +433,19 @@ class MPC:
         self.client.clear()
         self.resend_playlist()
 
-    def playlist_shuffle(self):
+    def playlist_shuffle(self, mode=1):
         """shuffle playlist
         """
-        # TODO 'from:to'
-        self.ensure_connected()
-        self.client.shuffle()
-        self.resend_playlist()
+        if mode == 1:
+            self.ensure_connected()
+            self.client.shuffle()
+            self.resend_playlist()
+        elif mode == 2:
+            self.ensure_connected()
+            song_pos = self.get_status_int('song') + 1
+            pl_len = self.get_status_int('playlistlength') - 1
+            self.client.shuffle("%d:%d" % (song_pos, pl_len))
+            self.resend_playlist()
 
     def playlist_delete(self, payload):
         """Delete items from playlist

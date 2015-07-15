@@ -188,6 +188,10 @@ class Cmd:
             else:
                 self.main.mpc.playlist_move(int_args[1], int_args[2])
 
+        if cmd == "plrandomizeremain":
+            ret_code = PLAYLIST_SHUFFLE
+            self.main.mpc.playlist_shuffle(mode=2)
+
         if cmd == "plselaftercur":
             ret_code = PLAYLIST_SELECTION_AFTER_CUR
             self.main.mpc.playlist_move_selection(payload, mode=1)

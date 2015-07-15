@@ -15,6 +15,14 @@ ScrollView {
     height: parent.height
 
     flickableItem.interactive: true
+    focus: true
+
+    Keys.onReleased: {
+        if (event.key === Qt.Key_Menu) {
+            main.popupMenu("playlist");
+            event.accepted = true;
+        }
+    }
 
     ListView {
         id: playlistview
@@ -62,7 +70,19 @@ ScrollView {
 
 
     function playlist_action(action_name) {
-        if (action_name === "select_all") {
+        if (action_name === "play_now") {
+            playlistview.model.play_now()
+        }
+        else if (action_name === "scroll_start") {
+            playlistview.positionViewAtBeginning()
+        }
+        else if (action_name === "scroll_now") {
+            playlistview.model.scroll_now()
+        }
+        else if (action_name === "scroll_end") {
+            playlistview.positionViewAtEnd()
+        }
+        else if (action_name === "select_all") {
             playlistview.model.select_all();
         }
         else if (action_name === "deselect_all") {

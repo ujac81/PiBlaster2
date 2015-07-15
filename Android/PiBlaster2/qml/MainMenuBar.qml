@@ -112,6 +112,22 @@ MenuBar {
         enabled: false
 
         MenuItem {
+            text: "Play now"
+            onTriggered: stackView.playlist_action("play_now")
+        }
+        MenuItem {
+            text: "Scroll to start"
+            onTriggered: stackView.playlist_action("scroll_start")
+        }
+        MenuItem {
+            text: "Scroll to current"
+            onTriggered: stackView.playlist_action("scroll_now")
+        }
+        MenuItem {
+            text: "Scroll to end"
+            onTriggered: stackView.playlist_action("scroll_end")
+        }
+        MenuItem {
             text: "Select all"
             onTriggered: stackView.playlist_action("select_all")
         }
@@ -128,16 +144,20 @@ MenuBar {
             onTriggered: stackView.playlist_action("delete_selection")
         }
         MenuItem {
-            text: "Selection after current"
+            text: "Move selection after current"
             onTriggered: stackView.playlist_action("selection_after_current")
         }
         MenuItem {
-            text: "Selection to end"
+            text: "Move selection to end"
             onTriggered: stackView.playlist_action("selection_to_end")
         }
         MenuItem {
-            text: "Randomize playlist"
+            text: "Randomize whole playlist"
             onTriggered: UI.btSendSingle("plshuffle");
+        }
+        MenuItem {
+            text: "Randomize playlist after current"
+            onTriggered: UI.btSendSingle("plrandomizeremain");
         }
         MenuItem {
             text: "Clear Playlist"
@@ -177,11 +197,11 @@ MenuBar {
             onTriggered: stackView.browse_action("invert_selection")
         }
         MenuItem {
-            text: "Selection after current"
+            text: "Add selection after current"
             onTriggered: stackView.browse_action("selection_after_current")
         }
         MenuItem {
-            text: "Selection to end"
+            text: "Add selection at end"
             onTriggered: stackView.browse_action("selection_to_end")
         }
         MenuItem {
@@ -287,6 +307,9 @@ MenuBar {
     function popupMenu(menuname) {
         if (menuname === "browse") {
             browseMenu.popup();
+        }
+        else if (menuname === "playlist") {
+            playlistMenu.popup();
         }
         else if (menuname === "search") {
             searchMenu.popup();

@@ -13,7 +13,6 @@ ListModel {
     }
 
 
-
     /**
      * Called by main if shwowdevices message received from PI
      */
@@ -75,6 +74,29 @@ ListModel {
             get(i).selected = ! get(i).selected;
         }
     }
+
+    // play 1st selected item now.
+    function play_now() {
+        for ( var i = 0; i < count; i++ ) {
+            if (get(i).selected) {
+                UI.btSendSingle("playpos "+get(i).position);
+                deselect_all();
+                return;
+            }
+        }
+    }
+
+
+    // scroll to currently active tune.
+    function scroll_now() {
+        for ( var i = 0; i < count; i++ ) {
+            if (get(i).active) {
+                playlistview.positionViewAtIndex(i, ListView.Center)
+                return;
+            }
+        }
+    }
+
 
     function process_selection(cmd) {
         btService.clearSendPayload();

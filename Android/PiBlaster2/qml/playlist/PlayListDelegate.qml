@@ -16,7 +16,6 @@ Item {
         visible: active && ! selected
     }
 
-
     Rectangle {
         anchors.fill: parent
         color: "blue"
@@ -113,13 +112,6 @@ Item {
         onClicked: {
             var elem = playlistview.model.get(index);
             elem.selected = ! selected;
-        }
-
-        onDoubleClicked: {
-            // TODO: open menu here
-            UI.btSendSingle("playpos "+position);
-            var elem = playlistview.model.get(index);
-            elem.selected = false;
         }
 
         onPressAndHold: {
