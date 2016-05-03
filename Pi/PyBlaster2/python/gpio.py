@@ -21,13 +21,15 @@ class PB_GPIO:
     """Prepare GPIOs for PyBlaster"""
 
     @staticmethod
-    def init_gpio():
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
+    def init_gpio(main):
+        if main.settings.use_gpio:
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setwarnings(False)
 
     @staticmethod
-    def cleanup():
-        GPIO.cleanup()
+    def cleanup(main):
+        if main.settings.use_gpio:
+            GPIO.cleanup()
 
 
 class LEDThread(threading.Thread):
@@ -123,14 +125,17 @@ class LED:
         self.main = main
         self.queue = queue.Queue()  # use one queue for all LEDS
         self.queue_lock = threading.Lock()
-        self.led_thread = LEDThread(self.main, self.queue, self.queue_lock)
+        self.led_thread = None
+        if main.settings.use_gpio:
+            self.led_thread = LEDThread(self.main, self.queue, self.queue_lock)
 
     def init_leds(self):
         """Start LEDThread event loop.
         Do not call before LED ids are known via settings.
         """
-        self.led_thread.start()
-        self.reset_leds()
+        if self.led_thread is not None:
+            self.led_thread.start()
+            self.reset_leds()
 
     def show_init_done(self):
         """Let LEDs flash to indicate that PyBlaster initialization is done"""
@@ -147,7 +152,8 @@ class LED:
 
     def set_led(self, num, state):
         """Set specific LED to state"""
-        self.queue.put([num, state])
+        if self.led_thread is not None:
+            self.queue.put([num, state])
 
     def set_leds(self, state=1):
         """Set all LEDs to state"""
@@ -201,7 +207,8 @@ class LED:
 
     def join(self):
         """Join LEDThread before exit."""
-        self.led_thread.join()
+        if self.led_thread is not None:
+            self.led_thread.join()
 
 
 class ButtonThread(threading.Thread):
@@ -290,6 +297,9 @@ class Buttons:
         Not called in __init__() because of later GPIO init in LED class.
         """
 
+        if self.main.settings.use_gpio is False:
+            return
+
         btns = [int(self.main.settings.defvars['PYBLASTER_BUTTON_'+x])
                 for x in ['GREEN', 'YELLOW', 'RED', 'BLUE', 'WHITE']]
 
@@ -303,7 +313,8 @@ class Buttons:
     def join(self):
         """Join all button threads after keep_run in root is False.
         """
-        self.btn_thread.join()
+        if self.btn_thread is not None:
+            self.btn_thread.join()
 
     def has_button_events(self):
         """True if button events in queue

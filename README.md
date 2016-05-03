@@ -101,7 +101,9 @@ To upgrade run
 
 TODO.
 
-## Configure Raspberry Pi
+## Configure Raspberry Pi (using raspbian wheezy)
+
+How to configure using ubuntu mate see below.
 
 ### Disable display manager in jessie
 Comment out the default display manager in */etc/X11/default-display-manager*
@@ -504,4 +506,41 @@ a tmux window if a screen is connected and *PYBLASTER_RUN_TMUX=1* is set in
 */etc/default/pyblaster2*. Note: this setup will prevent the normal daemon
 from starting at boot, but this is intended. You don't need 2 pyblaster2
 instances at a time ;)
+
+# Install on ubuntu mate 15.04
+Install [ubuntu mate](https://ubuntu-mate.org/raspberry-pi/) on a raspberry pi 2 and configure it with the wizzard at 1st boot (keyboard and video required).
+
+## Install developer packages
+
+    sudo aptitude install python3-dev python3-pip ipython3
+
+## Configure
+ssh
+
+    sudo aptitude install ssh
+
+Extend disk
+
+    sudo fdisk /dev/mmcblk0
+    # Delete the second partition (d, 2)
+    # re-create it using defaults (n, p, 2, enter, enter)
+    # write and exit (w)
+    # reboot
+    sudo resize2fs /dev/mmcblk0p2
+
+MPD user to pulse audio group (to check pulse audio stuff, google "mpd pulseaudio")
+
+    sudo usermod -aG pulse,pulse-access mpd
+
+Enable pulse in /etc/mpd.conf
+
+### Disable display manager
+Comment out the default display manager in */etc/X11/default-display-manager*
+and add
+
+    /bin/true
+
+to that file.
+
+
 

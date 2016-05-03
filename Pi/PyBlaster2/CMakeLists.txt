@@ -31,7 +31,10 @@ set(CPACK_DEBIAN_PACKAGE_VERSION ${PYBLASTER_VERSION_FULL})
 set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmake/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/cmake/debian/prerm;" )
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "udev, usbmount, python-sqlite, python-rpi.gpio, sqlite3, bluez, python3-lirc, python-smbus, tmux, mpd")
-set(CPACK_DEBIAN_PACKAGE_CONFLICTS "pyblaster")
+#set(CPACK_DEBIAN_PACKAGE_DEPENDS "udev, usbmount, python-sqlite, python-rpi.gpio, sqlite3, bluez, python3-lirc, python-smbus, tmux, mpd")
+
+
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "usbmount, mpd, mpc")
+
 
 include(CPack)

@@ -40,6 +40,7 @@ class Settings:
         self.pin2 = None  # loaded from db
         self.dbfile = "/var/lib/pyblaster2/pyblaster.sqlite"
         self.use_lirc = False  # Listen on infrared device (requires lirc)
+        self.use_gpio = False  # Use buttons and LEDs
         self.pidfile = "/var/run/pyblaster2.pid"
         self.rebuilddb = False  # If set to true database will be rebuilt.
         self.defvars = {}  # variables from /etc/default/pyblaster2

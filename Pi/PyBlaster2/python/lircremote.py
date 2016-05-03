@@ -3,7 +3,6 @@
 @Author Ulrich Jansen <ulrich.jansen@rwth-aachen.de>
 """
 
-import lirc
 import queue
 import threading
 import sys
@@ -30,6 +29,11 @@ class LircThread(threading.Thread):
         """Loop until main wants to exit."""
 
         # try:
+
+        import lirc
+
+        self.main.log.write(log.MESSAGE,
+                            "[THREAD] Lirc socket starting...")
 
         conf = self.main.settings.defvars['PYBLASTER_LIRC_CONF']
         self.lircsock = lirc.init("pyblaster2", conf, blocking=False)
@@ -61,15 +65,19 @@ class Lirc:
         self.queue = queue.Queue()
         self.queue_lock = threading.Lock()
         self.main = main
-        self.lircthread = LircThread(self.main, self.queue, self.queue_lock)
+        self.lircthread = None
+        if self.main.settings.use_lirc:
+            self.lircthread = LircThread(self.main, self.queue, self.queue_lock)
 
     def start(self):
         """fire up IR read loop"""
-        self.lircthread.start()
+        if self.lircthread is not None:
+            self.lircthread.start()
 
     def join(self):
         """wait for IR read loop to exit"""
-        self.lircthread.join(0.1)
+        if self.lircthread is not None:
+            self.lircthread.join(0.1)
 
     def has_lirc_event(self):
         """True if IR event received"""

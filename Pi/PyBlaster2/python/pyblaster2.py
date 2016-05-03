@@ -48,7 +48,7 @@ class PyBlaster:
         self.settings = Settings(self)
         self.settings.parse()
 
-        PB_GPIO.init_gpio()
+        PB_GPIO.init_gpio(self)
         self.led = LED(self)
         self.buttons = Buttons(self)
         self.lirc = Lirc(self)
@@ -103,7 +103,7 @@ class PyBlaster:
         # cleanup
         self.mpc.exit_client()
         self.delete_pidfile()
-        PB_GPIO.cleanup()
+        PB_GPIO.cleanup(self)
 
     def run(self):
         """Daemon loop"""
