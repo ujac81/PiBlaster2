@@ -30,6 +30,10 @@ MenuBar {
             text: "Exit"
             onTriggered: Qt.quit()
         }
+        MenuItem {
+            text: "Power off"
+            onTriggered: UI.btSendSingle('poweroff')
+        }
     }
 
     ////////////////////// EQUAL //////////////////////

@@ -230,10 +230,10 @@ class UsbDrive:
                  if os.path.isfile(os.path.join(path, f))
                  and f.endswith(('.mp3', '.flac', '.ogg'))]
 
-        for d in dirs:
+        for d in sorted(dirs):
             res.append(['1', d, os.path.join(path, d)])
 
-        for f in files:
+        for f in sorted(files):
             res.append(['2', f, os.path.join(path, f)])
 
         return res

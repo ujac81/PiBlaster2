@@ -34,7 +34,7 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmake/debian
 #set(CPACK_DEBIAN_PACKAGE_DEPENDS "udev, usbmount, python-sqlite, python-rpi.gpio, sqlite3, bluez, python3-lirc, python-smbus, tmux, mpd")
 
 
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "usbmount, mpd, mpc")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "mpd, mpc, sqlite3")
 
 
 include(CPack)

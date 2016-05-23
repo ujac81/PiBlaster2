@@ -414,7 +414,7 @@ class MPC:
             res = [item['pos']]
             if 'title' in item:
                 res.append(item['title'])
-            else:
+            elif 'file' in item:
                 no_ext = os.path.splitext(item['file'])[0]
                 res.append(os.path.basename(no_ext).replace('_', ' '))
             res.append(item['artist'] if 'artist' in item else '')
@@ -528,7 +528,8 @@ class MPC:
             if 'directory' in item:
                 title = os.path.basename(item['directory'])
                 result.append(['1', title, '', '', '', item['directory']])
-            else:
+            # need to check for file item -- may not scan 'playlist' items.
+            elif 'file' in item:
                 res = ['2']
                 if 'title' in item:
                     res.append(item['title'])
@@ -606,7 +607,7 @@ class MPC:
             res = []
             if 'title' in item:
                 res.append(item['title'])
-            else:
+            elif 'file' in item:
                 no_ext = os.path.splitext(item['file'])[0]
                 res.append(os.path.basename(no_ext).replace('_', ' '))
             res.append(item['artist'] if 'artist' in item else '')
