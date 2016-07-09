@@ -6,6 +6,7 @@
 from mpd import MPDClient, ConnectionError, CommandError
 import os
 import queue
+import random
 import sys
 import time
 import threading
@@ -97,6 +98,8 @@ class MPC:
         self.idler = MPDIdler(self.main, self.queue, self.queue_lock)
         self.client = MPDClient()
         self.client.timeout = 10
+        self.on_party = False  # prevent triggering of party mode appends while appending
+        random.seed()
 
     def connect(self):
         """Connect to MPD, retry 5 times, than raise.
@@ -146,6 +149,8 @@ class MPC:
         self.main.log.write(log.MESSAGE, "[MPD event]: %s" % events)
 
         for event in events:
+            if event == 'player' or event == 'playlist':
+                self.check_party_mode()
             if event == 'player' or event == 'options' or event == 'mixer':
                 res = self.main.cmd.eval('playstatus', 'idler')
                 self.main.bt.send_client([-1] + res)
@@ -166,6 +171,30 @@ class MPC:
         time.sleep(0.5)
         self.toggle_repeat()
         time.sleep(0.5)
+        
+    def check_party_mode(self):
+        """Check if need to append items to playlist
+        
+        Triggered after each playlist or play event.
+        """
+        if self.on_party:
+            return
+        
+        self.on_party = True
+        pos = self.get_status_int('song')
+        pl_len = self.get_status_int('playlistlength')
+        pl_remain = max(pl_len - pos - 1, 0)
+        if pl_remain < self.main.settings.party_min:
+            pl_add = max(self.main.settings.party_mode - pl_remain, 0)
+            print("Adding %d songs to playlist -- random mode" % pl_add)
+            self.ensure_connected()
+            db_files = self.client.list('file')
+            add = []
+            for i in range(pl_add):
+                add.append(db_files[random.randrange(0, len(db_files))])
+            self.playlist_add(add)
+            
+        self.on_party = False
 
     def get_status(self):
         """Get status dict from mpd.
@@ -528,8 +557,9 @@ class MPC:
             if 'directory' in item:
                 title = os.path.basename(item['directory'])
                 result.append(['1', title, '', '', '', item['directory']])
-            # need to check for file item -- may not scan 'playlist' items.
-            elif 'file' in item:
+        
+        for item in lsdir:
+            if 'file' in item:
                 res = ['2']
                 if 'title' in item:
                     res.append(item['title'])

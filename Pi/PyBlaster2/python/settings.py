@@ -47,6 +47,9 @@ class Settings:
         self.mixer_channel = 'Master'  # name for alsa mixer master channel
         self.amp_i2cbus = -1  # id of i2c bus (use i2cdetect -l)
         self.amp_i2caddress = 0x0  # i2c address for amp
+        self.party_mode = 20  # append this number of songs to playlist
+        self.party_min = 10 # low water mark for party mode
+        
 
     def parse(self):
         """ Parse command line args, set defaults and invoke self.read_config()
